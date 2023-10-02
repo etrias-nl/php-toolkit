@@ -1,0 +1,67 @@
+'on':
+    workflow_call:
+
+permissions: write-all
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.head_ref || github.actor }}
+    cancel-in-progress: true
+
+jobs:
+    checks:
+        runs-on: ubuntu-latest
+        steps:
+            -
+                uses: actions/checkout@v4.1.0
+            -
+                uses: actions/cache@v3.3.2
+                with:
+                    path: var/composer
+                    key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+                    restore-keys: ${{ runner.os }}-composer-
+            -
+                uses: actions/cache@v3.3.2
+                with:
+                    path: |
+                        var
+                        !var/composer
+                    key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+                    restore-keys: |
+                        ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-
+                        ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}-${{ github.event.pull_request.base.sha || github.sha }}
+            -
+                uses: ScribeMD/docker-cache@0.3.6
+                with:
+                    key: ${{ runner.os }}-docker-${{ hashFiles('Makefile', 'okteto.yaml') }}
+            -
+                id: install
+                run: make composer-update
+            -
+                run: make lint
+                if: "!cancelled() && steps.install.outcome == 'success'"
+            -
+                run: make psalm
+                if: "!cancelled() && steps.install.outcome == 'success' && github.ref_name != 'main'"
+            -
+                run: make test
+                if: "!cancelled() && steps.install.outcome == 'success'"
+            -
+                run: make psalm-suppress cs-fix
+                continue-on-error: true
+                if: "!cancelled() && steps.install.outcome == 'success' && github.ref_name == 'main'"
+            -
+                uses: stefanzweifel/git-auto-commit-action@v4.16.0
+                with:
+                    commit_user_name: etrias
+                    commit_user_email: it@etrias.nl
+                    commit_author: etrias <it@etrias.nl>
+                if: github.ref_name == 'main'
+            -
+                if: failure() && github.event_name == 'push'
+                env:
+                    SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
+                uses: voxmedia/github-action-slack-notify-build@v1.6.0
+                with:
+                    channel_id: ${{ secrets.SLACK_NOTIFICATIONS_CHANNEL }}
+                    status: FAILED
+                    color: danger
