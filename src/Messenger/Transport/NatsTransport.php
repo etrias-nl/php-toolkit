@@ -35,7 +35,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             $this->connect();
-            // consumer would be created on first handle call
             $this->getConsumer()->handle(function (Payload $message) use (&$receivedMessages): void {
                 $receivedMessages[] = $this->serializer->decode(['body' => $message->body]);
             });

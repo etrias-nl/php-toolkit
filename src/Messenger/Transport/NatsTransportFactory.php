@@ -22,11 +22,10 @@ final class NatsTransportFactory implements TransportFactoryInterface
             throw new \RuntimeException('Missing "stream" parameter in connection string.');
         }
 
-        /** @todo figure out existing arg $options */
-        $options = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
+        $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
 
         return new NatsTransport(
-            new Client(new Configuration($options)),
+            new Client(new Configuration($config)),
             $serializer,
             $queryParts['stream'],
         );
