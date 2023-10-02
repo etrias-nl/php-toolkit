@@ -3,7 +3,7 @@
     "description": "Common PHP Tooling",
     "license": "MIT",
     "require": {
-        "php": "^8.1"
+        "php": "^8.2.10"
     },
     "require-dev": {
         "basis-company/nats": "^0.13.2",
