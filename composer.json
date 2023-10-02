@@ -3,7 +3,12 @@
     "description": "Common PHP Tooling",
     "license": "MIT",
     "require": {
-        "php": "^8"
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "basis-company/nats": "^0.13.2",
+        "symfony/messenger": "^6.3.5",
+        "symfony/uid": "^6.3"
     },
     "autoload": {
         "psr-4": {

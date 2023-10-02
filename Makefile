@@ -4,7 +4,7 @@ MAKEFLAGS += --warn-undefined-variables --always-make
 exec_docker=docker compose run --quiet-pull -e CI -e GITHUB_ACTIONS -e RUNNER_DEBUG -u "$(shell id -u):$(shell id -g)" --rm -w /app
 
 composer-update:
-	${exec_docker} php sh -c "composer validate && composer update --no-progress -n && composer bump && composer --working-dir=/usr/local/etc/tools normalize /app/composer.json"
+	${exec_docker} php sh -c "composer update --no-progress -n && composer bump && composer --working-dir=/usr/local/etc/tools normalize /app/composer.json && composer validate"
 lint:
 	${exec_docker} php sh -c "phplint --no-progress --cache=var/phplint-cache --warning bin/console src tests"
 cs-fix:

@@ -7,11 +7,15 @@ use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonyLevelSetList;
 use Rector\Symfony\Set\SymfonySetList;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
         __DIR__.'/src',
         __DIR__.'/tests',
+    ]);
+    $rectorConfig->skip([
+        FlipTypeControlToUseExclusiveTypeRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');
     $rectorConfig->importNames();
