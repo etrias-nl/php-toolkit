@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 
 final class NatsTransportFactory implements TransportFactoryInterface
 {
-    public function createTransport(string $dsn, array $options, SerializerInterface $serializer): NatsTransport
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
     {
         $urlParts = parse_url($dsn);
         $queryParts = [];
@@ -32,7 +32,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         );
     }
 
-    public function supports(string $dsn, array $options): bool
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
         return str_starts_with($dsn, 'nats://') || str_starts_with($dsn, 'natsstreaming://');
     }
