@@ -19,7 +19,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         parse_str($urlParts['query'] ?? '', $queryParts);
 
         if (!isset($queryParts['stream'])) {
-            throw new \InvalidArgumentException('Connection string must contain "stream" in querystring');
+            throw new \RuntimeException('Missing "stream" parameter in connection string.');
         }
 
         /** @todo figure out existing arg $options */
