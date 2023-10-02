@@ -1,5 +1,6 @@
 {
     "name": "etrias/php-toolkit",
+    "description": "Common PHP Tooling",
     "license": "MIT",
     "require": {
         "php": "^8"

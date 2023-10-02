@@ -1,0 +1,6 @@
+version: '3'
+services:
+    php:
+        image: etriasnl/dev-php-fpm:8.1.23-89
+        volumes:
+            - '.:/app'
