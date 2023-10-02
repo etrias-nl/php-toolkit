@@ -1,0 +1,17 @@
+{
+    "name": "etrias/php-toolkit",
+    "license": "MIT",
+    "require": {
+        "php": "^8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Etrias\\PhpToolkit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Etrias\\PhpToolkit\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -eu
+
+[[ $# -ne 0 ]] && echo "Usage: $0" && exit 1
+[[ $(git status --porcelain) ]] && echo "Commit your changes" && exit 1
+[[ $(git log --branches --not --remotes) ]] && echo "Push your commits" && exit 1
+
+repo="etrias-nl/$(basename "$(pwd)")"
+
+# sync git refs
+git fetch --all --prune --tags --prune-tags --force --quiet
+
+# save user's initial branch
+curr_branch=$(git branch --show-current)
+
+# checkout mainstream, aka current minor
+git checkout main --quiet
+git pull --ff-only --quiet
+
+# check version
+[[ $(git describe --tags --abbrev=0 --exact-match) ]] && echo "Commit already tagged" && exit 1
+
+# check runs
+gh api "/repos/${repo}/commits/$(git rev-parse HEAD)/check-runs" | jq -e '.check_runs[] | select(.conclusion != "success") | {name,status,conclusion,details_url}' && \
+    (read -p "Continue? (y/N) " -r && [[ ${REPLY:-N} =~ ^[Yy]$ ]] || exit)
+
+# set versions
+curr_version="$(git describe --abbrev=0 --tags || echo "")"
+next_version="$(docker run --rm alpine/semver semver -i patch "${curr_version}")"
+
+# confirm release
+echo "Releasing ${curr_version} -> ${next_version}"
+read -p "Continue? (y/N) " -r && [[ ${REPLY:-N} =~ ^[Yy]$ ]] || exit
+
+# tag release
+git tag "${next_version}"
+
+# push release
+git push --tags
+
+# restore user's initial branch
+git checkout "${curr_branch}" --quiet
+
+# diff
+open "https://github.com/${repo}/compare/${curr_version}...${next_version}?w=1" &>/dev/null
