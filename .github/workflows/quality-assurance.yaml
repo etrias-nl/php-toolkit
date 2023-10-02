@@ -1,5 +1,11 @@
+name: Quality Assurance
+
 'on':
-    workflow_call:
+    workflow_dispatch:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
 
 permissions: write-all
 
