@@ -5,3 +5,17 @@ exec_docker=docker compose run $(shell [ "$$CI" = true ] && echo "-t" || echo "-
 
 composer-update:
 	${exec_docker} php sh -c "composer validate && composer update --no-progress -n && composer bump && composer --working-dir=/usr/local/etc/tools normalize /app/composer.json"
+lint:
+	${exec_docker} php sh -c "phplint --no-progress --cache=var/phplint-cache --warning bin/console src tests"
+cs-fix:
+	${exec_docker} php sh -c "php-cs-fixer fix"
+psalm:
+	${exec_docker} php sh -c "psalm --no-progress"
+psalm-suppress: composer-update
+	${exec_docker} php sh -c "psalm --no-progress --set-baseline=psalm-baseline.xml"
+test:
+	${exec_docker} php sh -c "phpunit"
+rector-fix: composer-update
+	${exec_docker} php sh -c "rector process --no-progress-bar"
+tools:
+	${exec_docker} php sh -c "rm -rf /app/var/tools && cp -R /usr/local/etc/tools/vendor /app/var/tools"
