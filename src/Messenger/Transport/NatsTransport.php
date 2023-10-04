@@ -20,6 +20,8 @@ use Symfony\Component\Uid\Uuid;
 
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface
 {
+    private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
+
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
 
@@ -35,8 +37,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             $this->connect();
-            $this->getConsumer()->handle(function (Payload $message) use (&$receivedMessages): void {
-                $receivedMessages[] = $this->serializer->decode(['body' => $message->body]);
+            $this->getConsumer()->handle(function (Payload $payload) use (&$receivedMessages): void {
+                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])
+                    ->with(new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID)))
+                ;
             });
         } catch (\Throwable $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -57,10 +61,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function send(Envelope $envelope): Envelope
     {
-        $encodedMessage = $this->serializer->encode($envelope);
         $messageId = Uuid::v4()->toRfc4122();
+        $encodedMessage = $this->serializer->encode($envelope);
         $payload = new Payload($encodedMessage['body'], [
-            'Nats-Msg-Id' => $messageId,
+            self::HEADER_MESSAGE_ID => $messageId,
         ]);
 
         try {
