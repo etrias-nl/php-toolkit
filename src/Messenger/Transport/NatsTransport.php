@@ -79,15 +79,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function getMessageCount(): int
     {
-        if (null === $info = $this->getStream()->info()) {
-            return 0;
-        }
-
-        if (null === $state = $info->getValue('state')) {
-            return 0;
-        }
-
-        return $state->messages;
+        return $this->getStream()->info()?->getValue('state')?->messages ?? 0;
     }
 
     private function connect(): void
