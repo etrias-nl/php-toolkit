@@ -15,31 +15,22 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
 {
-    /**
-     * @var Envelope[]
-     */
-    private array $envelopes = [];
+    private ?Envelope $currentEnvelope = null;
     private bool $loggedPayload = false;
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        if (!$this->envelopes) {
+        if (null === $this->currentEnvelope) {
             return $record;
         }
 
-        $envelope = reset($this->envelopes);
-        $messageIds = array_map(
-            static fn (Envelope $envelope) => $envelope->last(TransportMessageIdStamp::class)?->getId(),
-            $this->envelopes
-        );
         $messengerContext = [
-            'id' => reset($messageIds),
-            'trace' => array_values(array_filter($messageIds)),
-            'origin' => $envelope->last(OriginTransportMessageIdStamp::class)?->id,
+            'id' => $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId(),
+            'origin' => $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id,
         ];
 
         if (!$this->loggedPayload) {
-            $messengerContext['payload'] = (new ObjectNormalizer())->normalize($envelope->getMessage());
+            $messengerContext['payload'] = (new ObjectNormalizer())->normalize($this->currentEnvelope->getMessage());
             $this->loggedPayload = true;
         }
 
@@ -48,22 +39,23 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $currentMessageId = $this->envelopes ? reset($this->envelopes)->last(TransportMessageIdStamp::class)?->getId() : null;
+        $prevEnvelope = $this->currentEnvelope;
+        $originMessageId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId();
 
-        if ($currentMessageId) {
+        if ($originMessageId) {
             $envelope = $envelope
                 ->withoutAll(OriginTransportMessageIdStamp::class)
-                ->with(new OriginTransportMessageIdStamp($currentMessageId))
+                ->with(new OriginTransportMessageIdStamp($originMessageId))
             ;
         }
 
-        array_unshift($this->envelopes, $envelope);
+        $this->currentEnvelope = $envelope;
         $this->loggedPayload = false;
 
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            array_shift($this->envelopes);
+            $this->currentEnvelope = $prevEnvelope;
             $this->loggedPayload = false;
         }
     }
