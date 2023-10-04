@@ -2,6 +2,5 @@ version: '3'
 services:
     php:
         image: etriasnl/dev-php-fpm:8.1.24-90
-        tty: true
         volumes:
             - '.:/app'

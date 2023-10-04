@@ -13,6 +13,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.head_ref || github.actor }}
     cancel-in-progress: true
 
+env:
+    FORCE_COLOR: '1'
+
 jobs:
     checks:
         runs-on: ubuntu-latest
