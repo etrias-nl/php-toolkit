@@ -4,6 +4,7 @@ services:
         image: etriasnl/dev-php-fpm:8.1.24-90
         volumes:
             - '.:/app'
+        working_dir: /app
         environment:
             - CI
             - GITHUB_ACTIONS

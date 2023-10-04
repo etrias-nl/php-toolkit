@@ -1,7 +1,7 @@
 MAKEFLAGS += --warn-undefined-variables --always-make
 .DEFAULT_GOAL := _
 
-exec_docker=docker compose run --quiet-pull -u "$(shell id -u):$(shell id -g)" --rm -w /app
+exec_docker=docker compose run --quiet-pull --rm -u "$(shell id -u):$(shell id -g)"
 
 composer-update:
 	${exec_docker} php sh -c "composer update --no-progress -n && composer --working-dir=/usr/local/etc/tools normalize /app/composer.json && composer validate"
