@@ -39,7 +39,7 @@ final class LogTest extends TestCase
                 $this->logger->info('handling2');
 
                 if ($bus) {
-                    $bus->dispatch((object) ['nested' => true]);
+                    $bus->dispatch(Envelope::wrap((object) ['nested' => true], [new TransportMessageIdStamp('NestedID')]));
                 }
 
                 return $stack->next()->handle($envelope, $stack);
@@ -57,12 +57,12 @@ final class LogTest extends TestCase
                 [%a] test.INFO: before [] []
                 [%a] test.INFO: handling1 {"messenger":{"id":null,"trace":[],"origin":null,"payload":{"test1":true,"bus":null}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":null,"trace":[],"origin":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"trace":[],"origin":null,"payload":{"nested":true,"bus":null}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":null,"trace":[],"origin":null}} []
+                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","trace":["NestedID"],"origin":null,"payload":{"nested":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","trace":["NestedID"],"origin":null}} []
                 [%a] test.INFO: handling1 {"messenger":{"id":"ID","trace":["ID"],"origin":"OriginID","payload":{"test2":true,"bus":null}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":"ID","trace":["ID"],"origin":"OriginID"}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"trace":["ID"],"origin":"ID","payload":{"nested":true,"bus":null}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":null,"trace":["ID"],"origin":"ID"}} []
+                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","trace":["NestedID","ID"],"origin":"ID","payload":{"nested":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","trace":["NestedID","ID"],"origin":"ID"}} []
                 [%a] test.INFO: after {"foo":"after"} []
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
