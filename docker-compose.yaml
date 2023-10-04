@@ -4,3 +4,8 @@ services:
         image: etriasnl/dev-php-fpm:8.1.24-90
         volumes:
             - '.:/app'
+        environment:
+            - CI
+            - GITHUB_ACTIONS
+            - RUNNER_DEBUG
+            - NO_COLOR=0
