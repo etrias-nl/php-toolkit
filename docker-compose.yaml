@@ -1,7 +1,14 @@
 version: '3'
 services:
+    nats:
+        image: nats:2.9.22
+        command:
+            - '--jetstream'
+            - '--debug'
     php:
         image: etriasnl/dev-php-fpm:8.1.24-90
+        depends_on:
+            - nats
         volumes:
             - '.:/app'
         working_dir: /app

@@ -40,12 +40,12 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $prevEnvelope = $this->currentEnvelope;
-        $originMessageId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId();
+        $prevMessageId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId();
 
-        if ($originMessageId) {
+        if ($prevMessageId) {
             $envelope = $envelope
                 ->withoutAll(OriginTransportMessageIdStamp::class)
-                ->with(new OriginTransportMessageIdStamp($originMessageId))
+                ->with(new OriginTransportMessageIdStamp($prevMessageId))
             ;
         }
 

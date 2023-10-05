@@ -51,18 +51,19 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function ack(Envelope $envelope): void
     {
-        // no-op
+        // no-op: acked on read
     }
 
     public function reject(Envelope $envelope): void
     {
-        // no-op
+        // no-op: acked on read
     }
 
     public function send(Envelope $envelope): Envelope
     {
-        $messageId = Uuid::v4()->toRfc4122();
+        $envelope = $envelope->withoutAll(TransportMessageIdStamp::class);
         $encodedMessage = $this->serializer->encode($envelope);
+        $messageId = Uuid::v4()->toRfc4122();
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
         ]);
