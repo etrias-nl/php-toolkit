@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
+use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -27,6 +28,7 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
         $messengerContext = [
             'id' => $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId(),
             'origin' => $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id,
+            'user' => $this->currentEnvelope->last(SecurityStamp::class)?->token->getUserIdentifier(),
         ];
 
         if (!$this->loggedPayload) {
