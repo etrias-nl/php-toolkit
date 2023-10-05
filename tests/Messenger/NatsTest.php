@@ -69,5 +69,6 @@ final class NatsTest extends TestCase
 
         self::assertSame((array) $message, (array) $ackedEnvelope->getMessage());
         self::assertSame($messageId, $ackedEnvelope->last(TransportMessageIdStamp::class)?->getId());
+        self::assertSame([], $transport->get());
     }
 }
