@@ -32,5 +32,8 @@ return (new Config())
                 __FILE__,
                 __DIR__.'/rector.php',
             ])
+            ->notPath([
+                'Fixtures/Messenger/encoded_envelope.php',
+            ])
     )
 ;
