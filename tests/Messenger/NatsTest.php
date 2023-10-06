@@ -25,7 +25,7 @@ final class NatsTest extends TestCase
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
 
-        $transport = $factory->createTransport('nats://foo?stream=bar', [], new PhpSerializer());
+        $transport = $factory->createTransport('nats://foo?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::assertInstanceOf(NatsTransport::class, $transport);
 
@@ -36,7 +36,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $transport = (new NatsTransportFactory())->createTransport('nats://foobar?stream=test'.time(), [], new PhpSerializer());
+        $transport = (new NatsTransportFactory())->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
 
@@ -45,7 +45,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $transport = (new NatsTransportFactory())->createTransport('nats://nats?stream=test'.time(), [], new PhpSerializer());
+        $transport = (new NatsTransportFactory())->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::assertSame(0, $transport->getMessageCount());
 

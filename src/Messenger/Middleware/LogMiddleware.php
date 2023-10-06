@@ -12,7 +12,6 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
 {
@@ -32,7 +31,7 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
         ];
 
         if (!$this->loggedPayload) {
-            $messengerContext['payload'] = (new ObjectNormalizer())->normalize($this->currentEnvelope->getMessage());
+            $messengerContext['payload'] = $this->currentEnvelope->getMessage();
             $this->loggedPayload = true;
         }
 
@@ -42,12 +41,11 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $prevEnvelope = $this->currentEnvelope;
-        $prevMessageId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId();
 
-        if ($prevMessageId) {
+        if (null !== $prevEnvelope) {
             $envelope = $envelope
                 ->withoutAll(OriginTransportMessageIdStamp::class)
-                ->with(new OriginTransportMessageIdStamp($prevMessageId))
+                ->with(new OriginTransportMessageIdStamp($prevEnvelope->last(TransportMessageIdStamp::class)?->getId()))
             ;
         }
 

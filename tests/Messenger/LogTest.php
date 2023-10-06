@@ -59,15 +59,15 @@ final class LogTest extends TestCase
         self::assertStringMatchesFormat(
             <<<'TXT'
                 [%a] test.INFO: before [] []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":"TestUser","payload":{"test1":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":"TestUser","payload":{"stdClass":{"test1":true,"bus":null}}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null,"user":"TestUser"}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":null,"payload":{"test2":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":null,"payload":{"stdClass":{"test2":true,"bus":null}}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null,"user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":null,"user":null,"payload":{"nested":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":null,"user":null,"payload":{"stdClass":{"nested":true,"bus":null}}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":null,"user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"ID","origin":"OriginID","user":null,"payload":{"test3":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling1 {"messenger":{"id":"ID","origin":"OriginID","user":null,"payload":{"stdClass":{"test3":true,"bus":null}}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":"ID","origin":"OriginID","user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":"ID","user":null,"payload":{"nested":true,"bus":null}},"foo":"handling"} []
+                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":"ID","user":null,"payload":{"stdClass":{"nested":true,"bus":null}}},"foo":"handling"} []
                 [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":"ID","user":null}} []
                 [%a] test.INFO: after {"foo":"after"} []
                 TXT,
