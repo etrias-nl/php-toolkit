@@ -15,6 +15,7 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__.'/tests',
     ]);
     $rectorConfig->skip([
+        'tests/Fixtures/Messenger/encoded_envelope.php',
         FlipTypeControlToUseExclusiveTypeRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');

@@ -33,12 +33,14 @@ final class SecurityMiddleware implements MiddlewareInterface
         $prevToken = $this->tokenStorage->getToken();
 
         if (null === $stamp = $envelope->last(SecurityStamp::class)) {
+            $stamped = false;
             $newToken = $prevToken;
 
             if (null !== $prevToken) {
                 $envelope = $envelope->with(new SecurityStamp($prevToken, $this->getFirewallConfig($prevToken)?->getProvider()));
             }
         } else {
+            $stamped = true;
             $newToken = $stamp->token;
 
             if (null !== $userProvider = $stamp->userProvider ?? $this->getFirewallConfig($newToken)?->getProvider()) {
@@ -57,7 +59,9 @@ final class SecurityMiddleware implements MiddlewareInterface
         $this->tokenStorage->setToken($newToken);
 
         try {
-            return $stack->next()->handle($envelope, $stack);
+            $envelope = $stack->next()->handle($envelope, $stack);
+
+            return $stamped ? $envelope : $envelope->withoutAll(SecurityStamp::class);
         } finally {
             $this->tokenStorage->setToken($prevToken);
         }
@@ -66,11 +70,7 @@ final class SecurityMiddleware implements MiddlewareInterface
     private function getFirewallConfig(TokenInterface $token): ?FirewallConfig
     {
         if (method_exists($token, 'getFirewallName')) {
-            $firewallConfig = $this->firewallMap->getFirewallConfig(new Request([], [], ['_firewall_context' => 'security.firewall.map.context.'.$token->getFirewallName()]));
-
-            if (null !== $firewallConfig) {
-                return $firewallConfig;
-            }
+            return $this->firewallMap->getFirewallConfig(new Request([], [], ['_firewall_context' => 'security.firewall.map.context.'.$token->getFirewallName()]));
         }
 
         if (null !== $request = $this->requestStack->getMainRequest()) {
