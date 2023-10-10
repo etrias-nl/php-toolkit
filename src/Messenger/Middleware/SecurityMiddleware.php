@@ -67,6 +67,9 @@ final class SecurityMiddleware implements MiddlewareInterface
         }
     }
 
+    /**
+     * @see https://github.com/symfony/symfony/pull/51909
+     */
     private function getFirewallConfig(TokenInterface $token): ?FirewallConfig
     {
         if (method_exists($token, 'getFirewallName')) {
