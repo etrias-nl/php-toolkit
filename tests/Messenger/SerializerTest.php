@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
-use Etrias\PhpToolkit\Messenger\Serializer\MarshallingSerializer;
+use Etrias\PhpToolkit\Messenger\Serializer\DeflateSerializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -14,12 +14,13 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
  */
 final class SerializerTest extends TestCase
 {
-    public function testMarshalling(): void
+    public function testDeflate(): void
     {
-        $serializer = new MarshallingSerializer();
+        $deflateSerializer = new DeflateSerializer();
         $message = (object) ['typeString' => 'string', 'typeInt' => 1, 'typeFloat' => 1.1, 'typeBool' => true, 'typeNull' => null, 'typeArray' => ['nested'], 'typeObject' => (object) ['nested' => true]];
         $messageIdStamp = new TransportMessageIdStamp('ID');
-        $encodedEnvelope = $serializer->encode(Envelope::wrap($message, [$messageIdStamp]));
+        $envelope = Envelope::wrap($message, [$messageIdStamp]);
+        $encodedEnvelope = $deflateSerializer->encode($envelope);
 
         self::assertArrayHasKey('body', $encodedEnvelope);
         self::assertIsString($encodedEnvelope['body']);
@@ -38,11 +39,15 @@ final class SerializerTest extends TestCase
             self::assertSame($message->typeObject->nested, $decodedMessage->typeObject->nested);
         };
 
-        $assertDecodedEnvelope($serializer->decode($encodedEnvelope));
+        $assertDecodedEnvelope($deflateSerializer->decode($encodedEnvelope));
 
-        $encodedFixture = \dirname(__DIR__).'/Fixtures/Messenger/encoded_envelope.php';
-        // file_put_contents($encodedFixture, '<?php return '.var_export($encodedEnvelope, true).';');
+        $compressedFixture = \dirname(__DIR__).'/Fixtures/Messenger/envelope_compressed.php';
+        $uncompressedFixture = \dirname(__DIR__).'/Fixtures/Messenger/envelope_uncompressed.php';
 
-        $assertDecodedEnvelope($serializer->decode(require $encodedFixture));
+        // file_put_contents($compressedFixture, '<?php return '.var_export($encodedEnvelope, true).';');
+        // file_put_contents($uncompressedFixture, '<?php return '.var_export((new \Symfony\Component\Messenger\Transport\Serialization\PhpSerializer())->encode($envelope), true).';');
+
+        $assertDecodedEnvelope($deflateSerializer->decode(require $compressedFixture));
+        $assertDecodedEnvelope($deflateSerializer->decode(require $uncompressedFixture));
     }
 }

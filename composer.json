@@ -8,7 +8,6 @@
     "require-dev": {
         "basis-company/nats": "^0.14",
         "monolog/monolog": "^3",
-        "symfony/cache": "^6",
         "symfony/messenger": "^6",
         "symfony/property-access": "^6",
         "symfony/security-bundle": "^6",
