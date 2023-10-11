@@ -66,7 +66,7 @@ final class SecurityTest extends TestCase
         self::assertNull($envelope->last(SecurityStamp::class));
 
         $envelopeToken = new PreAuthenticatedToken(new InMemoryUser('TestUser', null), 'main');
-        $envelope = $bus->dispatch((object) ['test2' => true], [new SecurityStamp($envelopeToken)]);
+        $envelope = $bus->dispatch((object) ['test4' => true], [new SecurityStamp($envelopeToken)]);
 
         self::assertSame($token, $tokenStorage->getToken());
         self::assertSame($envelopeToken, $tokenStorageRecord->getToken());
