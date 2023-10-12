@@ -39,15 +39,18 @@ final class SecurityMiddleware implements MiddlewareInterface
         } else {
             $stamped = true;
             $newToken = $stamp->token;
-            $userProvider = $this->getUserProvider($stamp->userProvider);
 
-            if (null === $tokenUser = $newToken->getUser()) {
-                $tokenUser = $userProvider->loadUserByIdentifier($newToken->getUserIdentifier());
-            } else {
-                $tokenUser = $userProvider->refreshUser($tokenUser);
+            if (null !== $newToken) {
+                $userProvider = $this->getUserProvider($stamp->userProvider);
+
+                if (null === $tokenUser = $newToken->getUser()) {
+                    $tokenUser = $userProvider->loadUserByIdentifier($newToken->getUserIdentifier());
+                } else {
+                    $tokenUser = $userProvider->refreshUser($tokenUser);
+                }
+
+                $newToken->setUser($tokenUser);
             }
-
-            $newToken->setUser($tokenUser);
         }
 
         $this->tokenStorage->setToken($newToken);

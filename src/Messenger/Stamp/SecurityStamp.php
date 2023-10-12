@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 final class SecurityStamp implements StampInterface
 {
     public function __construct(
-        public readonly TokenInterface $token,
+        public readonly ?TokenInterface $token,
         public readonly ?string $userProvider = null,
     ) {}
 }

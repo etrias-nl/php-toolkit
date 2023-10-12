@@ -77,11 +77,12 @@ final class SecurityTest extends TestCase
         self::assertNull($envelope->last(SecurityStamp::class));
 
         $envelopeToken = new PreAuthenticatedToken(new InMemoryUser('TestUser', null), 'main');
-        $envelope = $bus->dispatch((object) ['test2' => true], [new SecurityStamp($envelopeToken, 'user_provider')]);
+        $envelopeStamp = new SecurityStamp($envelopeToken, 'user_provider');
+        $envelope = $bus->dispatch((object) ['test2' => true], [$envelopeStamp]);
 
         self::assertNull($tokenStorage->getToken());
         self::assertSame($envelopeToken, $tokenStorageRecord->getToken());
-        self::assertSame($envelopeToken, $envelope->last(SecurityStamp::class)?->token);
+        self::assertSame($envelopeStamp, $envelope->last(SecurityStamp::class));
 
         $token = new PreAuthenticatedToken(new InMemoryUser('CurrentTestUser', null), 'main');
         $tokenStorage->setToken($token);
@@ -94,10 +95,18 @@ final class SecurityTest extends TestCase
         self::assertNull($envelope->last(SecurityStamp::class));
 
         $envelopeToken = new PreAuthenticatedToken(new InMemoryUser('TestUser', null), 'main');
-        $envelope = $bus->dispatch((object) ['test4' => true], [new SecurityStamp($envelopeToken)]);
+        $envelopeStamp = new SecurityStamp($envelopeToken);
+        $envelope = $bus->dispatch((object) ['test4' => true], [$envelopeStamp]);
 
         self::assertSame($token, $tokenStorage->getToken());
         self::assertSame($envelopeToken, $tokenStorageRecord->getToken());
-        self::assertSame($envelopeToken, $envelope->last(SecurityStamp::class)?->token);
+        self::assertSame($envelopeStamp, $envelope->last(SecurityStamp::class));
+
+        $envelopeStamp = new SecurityStamp(null);
+        $envelope = $bus->dispatch((object) ['test5' => true], [$envelopeStamp]);
+
+        self::assertSame($token, $tokenStorage->getToken());
+        self::assertNull($tokenStorageRecord->getToken());
+        self::assertSame($envelopeStamp, $envelope->last(SecurityStamp::class));
     }
 }
