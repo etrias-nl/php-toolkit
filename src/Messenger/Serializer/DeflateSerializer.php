@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\Serializer;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class DeflateSerializer implements SerializerInterface
 {
     public function __construct(
+        #[Autowire(service: 'messenger.transport.native_php_serializer')]
         private readonly SerializerInterface $serializer,
     ) {}
 
