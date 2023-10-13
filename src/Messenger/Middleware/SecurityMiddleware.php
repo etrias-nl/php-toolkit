@@ -9,6 +9,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -25,6 +26,7 @@ final class SecurityMiddleware implements MiddlewareInterface
         private readonly FirewallMap $firewallMap,
         private readonly RequestStack $requestStack,
         private readonly ContainerInterface $userProviders,
+        #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
     ) {}
 
