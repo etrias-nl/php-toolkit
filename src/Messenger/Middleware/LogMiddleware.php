@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
-use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\Messenger\Envelope;
@@ -24,18 +23,16 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
             return $record;
         }
 
-        $messengerContext = [
-            'id' => $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId(),
-            'origin' => $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id,
-            'user' => $this->currentEnvelope->last(SecurityStamp::class)?->token->getUserIdentifier(),
-        ];
+        $context = $record->context;
+        $context['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
+        $context['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload) {
-            $messengerContext['payload'] = $this->currentEnvelope->getMessage();
+            $context['messenger']['payload'] = $this->currentEnvelope->getMessage();
             $this->loggedPayload = true;
         }
 
-        return $record->with(context: ['messenger' => $messengerContext] + $record->context);
+        return $record->with(context: $context);
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

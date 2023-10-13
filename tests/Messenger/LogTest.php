@@ -6,7 +6,6 @@ namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Messenger\Middleware\LogMiddleware;
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
-use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Monolog\LogRecord;
@@ -16,8 +15,6 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
-use Symfony\Component\Security\Core\User\InMemoryUser;
 
 /**
  * @internal
@@ -51,24 +48,21 @@ final class LogTest extends TestCase
         $bus = new MessageBus([$logMiddleware, $envelopeMiddleware]);
 
         $logger->info('before');
-        $bus->dispatch((object) ['test1' => true], [new SecurityStamp(new PreAuthenticatedToken(new InMemoryUser('TestUser', null), 'main'))]);
-        $bus->dispatch((object) ['test2' => true, 'bus' => $bus]);
-        $bus->dispatch((object) ['test3' => true, 'bus' => $bus], [new TransportMessageIdStamp('ID'), new OriginTransportMessageIdStamp('OriginID')]);
+        $bus->dispatch((object) ['test1' => true, 'bus' => $bus]);
+        $bus->dispatch((object) ['test2' => true, 'bus' => $bus], [new TransportMessageIdStamp('ID'), new OriginTransportMessageIdStamp('OriginID')]);
         $logger->info('after', ['foo' => 'after']);
 
         self::assertStringMatchesFormat(
             <<<'TXT'
                 [%a] test.INFO: before [] []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":"TestUser","payload":{"stdClass":{"test1":true,"bus":null}}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null,"user":"TestUser"}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":null,"origin":null,"user":null,"payload":{"stdClass":{"test2":true,"bus":null}}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null,"user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":null,"user":null,"payload":{"stdClass":{"nested":true,"bus":null}}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":null,"user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"ID","origin":"OriginID","user":null,"payload":{"stdClass":{"test3":true,"bus":null}}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"ID","origin":"OriginID","user":null}} []
-                [%a] test.INFO: handling1 {"messenger":{"id":"NestedID","origin":"ID","user":null,"payload":{"stdClass":{"nested":true,"bus":null}}},"foo":"handling"} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":"ID","user":null}} []
+                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":null,"origin":null,"payload":{"stdClass":{"test1":true,"bus":null}}}} []
+                [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null}} []
+                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"NestedID","origin":null,"payload":{"stdClass":{"nested":true,"bus":null}}}} []
+                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":null}} []
+                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"ID","origin":"OriginID","payload":{"stdClass":{"test2":true,"bus":null}}}} []
+                [%a] test.INFO: handling2 {"messenger":{"id":"ID","origin":"OriginID"}} []
+                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"NestedID","origin":"ID","payload":{"stdClass":{"nested":true,"bus":null}}}} []
+                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":"ID"}} []
                 [%a] test.INFO: after {"foo":"after"} []
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
