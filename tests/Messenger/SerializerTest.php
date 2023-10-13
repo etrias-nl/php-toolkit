@@ -8,6 +8,7 @@ use Etrias\PhpToolkit\Messenger\Serializer\DeflateSerializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 /**
  * @internal
@@ -16,7 +17,7 @@ final class SerializerTest extends TestCase
 {
     public function testDeflate(): void
     {
-        $deflateSerializer = new DeflateSerializer();
+        $deflateSerializer = new DeflateSerializer(new PhpSerializer());
         $message = (object) ['typeString' => 'string', 'typeInt' => 1, 'typeFloat' => 1.1, 'typeBool' => true, 'typeNull' => null, 'typeArray' => ['nested'], 'typeObject' => (object) ['nested' => true]];
         $messageIdStamp = new TransportMessageIdStamp('ID');
         $envelope = Envelope::wrap($message, [$messageIdStamp]);
