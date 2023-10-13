@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,6 +14,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 final class SecurityMiddleware implements MiddlewareInterface
@@ -23,6 +25,7 @@ final class SecurityMiddleware implements MiddlewareInterface
         private readonly FirewallMap $firewallMap,
         private readonly RequestStack $requestStack,
         private readonly ContainerInterface $userProviders,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -53,14 +56,29 @@ final class SecurityMiddleware implements MiddlewareInterface
             }
         }
 
-        $this->tokenStorage->setToken($newToken);
+        $this->login($prevToken, $newToken);
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
 
             return $stamped ? $envelope : $envelope->withoutAll(SecurityStamp::class);
         } finally {
-            $this->tokenStorage->setToken($prevToken);
+            $this->login($newToken, $prevToken);
+        }
+    }
+
+    private function login(?TokenInterface $prevToken, ?TokenInterface $newToken): void
+    {
+        if ($newToken === $prevToken) {
+            return;
+        }
+
+        $this->tokenStorage->setToken($newToken);
+
+        if (null === $newToken) {
+            $this->logger->info('Logged out as "{previousUser}"', ['previousUser' => $prevToken?->getUserIdentifier()]);
+        } else {
+            $this->logger->info('Logged in as "{user}"', ['user' => $newToken->getUserIdentifier(), 'previousUser' => $prevToken?->getUserIdentifier()]);
         }
     }
 

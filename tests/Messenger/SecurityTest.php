@@ -6,6 +6,9 @@ namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Messenger\Middleware\SecurityMiddleware;
 use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -54,7 +57,8 @@ final class SecurityTest extends TestCase
         $firewallMap = new FirewallMap($firewallConfigs, ['main' => new MethodRequestMatcher([])]);
         $tokenStorage = new TokenStorage();
         $tokenStorageRecord = new TokenStorage();
-        $securityMiddleware = new SecurityMiddleware($tokenStorage, $firewallMap, $requestStack, $userProviders);
+        $logHandler = new TestHandler();
+        $securityMiddleware = new SecurityMiddleware($tokenStorage, $firewallMap, $requestStack, $userProviders, new Logger('test', [$logHandler]));
         $envelopeMiddleware = new class($tokenStorage, $tokenStorageRecord) implements MiddlewareInterface {
             public function __construct(
                 private readonly TokenStorage $tokenStorage,
@@ -108,5 +112,17 @@ final class SecurityTest extends TestCase
         self::assertSame($token, $tokenStorage->getToken());
         self::assertNull($tokenStorageRecord->getToken());
         self::assertSame($envelopeStamp, $envelope->last(SecurityStamp::class));
+
+        self::assertStringMatchesFormat(
+            <<<'TXT'
+                [%a] test.INFO: Logged in as "{user}" {"user":"TestUser","previousUser":null} []
+                [%a] test.INFO: Logged out as "{previousUser}" {"previousUser":"TestUser"} []
+                [%a] test.INFO: Logged in as "{user}" {"user":"TestUser","previousUser":"CurrentTestUser"} []
+                [%a] test.INFO: Logged in as "{user}" {"user":"CurrentTestUser","previousUser":"TestUser"} []
+                [%a] test.INFO: Logged out as "{previousUser}" {"previousUser":"CurrentTestUser"} []
+                [%a] test.INFO: Logged in as "{user}" {"user":"CurrentTestUser","previousUser":null} []
+                TXT,
+            implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
+        );
     }
 }
