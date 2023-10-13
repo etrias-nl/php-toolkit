@@ -17,7 +17,7 @@ final class SerializerTest extends TestCase
 {
     public function testDeflate(): void
     {
-        $deflateSerializer = new DeflateSerializer(new PhpSerializer());
+        $deflateSerializer = new DeflateSerializer($phpSerializer = new PhpSerializer());
         $message = (object) ['typeString' => 'string', 'typeInt' => 1, 'typeFloat' => 1.1, 'typeBool' => true, 'typeNull' => null, 'typeArray' => ['nested'], 'typeObject' => (object) ['nested' => true]];
         $messageIdStamp = new TransportMessageIdStamp('ID');
         $envelope = Envelope::wrap($message, [$messageIdStamp]);
@@ -46,7 +46,7 @@ final class SerializerTest extends TestCase
         $uncompressedFixture = \dirname(__DIR__).'/Fixtures/Messenger/envelope_uncompressed.php';
 
         // file_put_contents($compressedFixture, '<?php return '.var_export($encodedEnvelope, true).';');
-        // file_put_contents($uncompressedFixture, '<?php return '.var_export((new \Symfony\Component\Messenger\Transport\Serialization\PhpSerializer())->encode($envelope), true).';');
+        // file_put_contents($uncompressedFixture, '<?php return '.var_export($phpSerializer->encode($envelope), true).';');
 
         $assertDecodedEnvelope($deflateSerializer->decode(require $compressedFixture));
         $assertDecodedEnvelope($deflateSerializer->decode(require $uncompressedFixture));
