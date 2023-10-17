@@ -47,6 +47,8 @@ final class NatsTest extends TestCase
     {
         $transport = (new NatsTransportFactory())->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
+        $transport->setup();
+
         self::assertSame(0, $transport->getMessageCount());
 
         $message = (object) ['test' => true];
