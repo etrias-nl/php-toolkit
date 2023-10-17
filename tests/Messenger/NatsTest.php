@@ -56,6 +56,8 @@ final class NatsTest extends TestCase
         $envelope = $transport->send(Envelope::wrap($message, [new TransportMessageIdStamp($prevMessageId)]));
         $messageId = $envelope->last(TransportMessageIdStamp::class)?->getId();
 
+        $transport->setup();
+
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame($message, $envelope->getMessage());
         self::assertTrue(\is_string($messageId) && Uuid::isValid($messageId));
