@@ -1,0 +1,13 @@
+/bin export-ignore
+/docker-compose.yaml export-ignore
+/.editorconfig export-ignore
+/.github export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+/Makefile export-ignore
+/.php-cs-fixer.php export-ignore
+/phpunit.xml export-ignore
+/psalm-baseline.xml export-ignore
+/psalm.xml export-ignore
+/rector.php export-ignore
+/tests export-ignore
