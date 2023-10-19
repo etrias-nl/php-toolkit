@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\Config\RectorConfig;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
@@ -17,7 +16,8 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         'tests/Fixtures/Messenger/envelope_compressed.php',
         'tests/Fixtures/Messenger/envelope_uncompressed.php',
-        FlipTypeControlToUseExclusiveTypeRector::class,
+        \Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
+        \Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');
     $rectorConfig->importNames();

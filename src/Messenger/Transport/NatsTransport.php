@@ -12,6 +12,7 @@ use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -26,10 +27,14 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
 
+    /**
+     * @param array<string, array<string, array<string, mixed>>> $transportOptions
+     */
     public function __construct(
         private readonly Client $client,
         private readonly SerializerInterface $serializer,
         private readonly string $streamName,
+        private readonly array $transportOptions,
     ) {}
 
     public function setup(): void
@@ -114,5 +119,14 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $this->consumer;
+    }
+
+    private function getTransportOptions(Envelope $envelope): array
+    {
+        if (null === $sender = $envelope->last(SentStamp::class)?->getSenderAlias()) {
+            return [];
+        }
+
+        return $this->transportOptions[$sender][$envelope->getMessage()::class] ?? [];
     }
 }
