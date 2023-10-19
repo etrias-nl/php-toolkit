@@ -16,6 +16,7 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         'tests/Fixtures/Messenger/envelope_compressed.php',
         'tests/Fixtures/Messenger/envelope_uncompressed.php',
+        \Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         \Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
         \Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
     ]);
