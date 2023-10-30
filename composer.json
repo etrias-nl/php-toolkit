@@ -8,6 +8,9 @@
     "require-dev": {
         "basis-company/nats": "^0.14",
         "monolog/monolog": "^3",
+        "symfony/console": "^6",
+        "symfony/event-dispatcher": "^6",
+        "symfony/http-foundation": "^6",
         "symfony/messenger": "^6",
         "symfony/property-access": "^6",
         "symfony/security-bundle": "^6",
