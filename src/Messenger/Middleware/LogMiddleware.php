@@ -12,6 +12,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
 {
@@ -29,7 +30,7 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
         $context['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
-            $context['messenger']['payload'] = $this->currentEnvelope->getMessage();
+            $context['messenger']['payload'] = (new ObjectNormalizer())->normalize($this->currentEnvelope->getMessage());
             $this->loggedPayload = true;
         }
 
