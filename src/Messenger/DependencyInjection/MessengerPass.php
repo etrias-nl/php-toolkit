@@ -16,6 +16,12 @@ final class MessengerPass implements CompilerPassInterface
         $messageMap = $sendersLocator->getArgument(0);
         $transportOptions = [];
 
+        foreach ($messageMap as $messageClass => $transports) {
+            foreach ($transports as $transport) {
+                $transportOptions[$transport][$messageClass] = [];
+            }
+        }
+
         foreach ($container->findTaggedServiceIds('messenger.bus') as $id => $_) {
             $handlersLocator = $container->getDefinition($id.'.messenger.handlers_locator');
             foreach ($handlersLocator->getArgument(0) as $messageClass => $_) {

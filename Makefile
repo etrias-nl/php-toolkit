@@ -21,3 +21,4 @@ rector-fix: composer-update
 	${exec_docker} php sh -c "rector process --no-progress-bar"
 tools:
 	${exec_docker} php sh -c "rm -rf /app/var/tools && cp -R /usr/local/etc/tools/vendor /app/var/tools"
+qa: composer-update lint cs-fix rector-fix psalm test
