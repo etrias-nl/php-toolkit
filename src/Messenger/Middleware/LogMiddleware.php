@@ -25,18 +25,17 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
             return $record;
         }
 
-        $context = $record->context;
-        $context['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
-        $context['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
+        $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
+        $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
             $message = $this->currentEnvelope->getMessage();
-            $context['messenger']['message'] = $message::class;
-            $context['messenger']['payload'] = (new ObjectNormalizer())->normalize($message);
+            $record->extra['messenger']['message'] = $message::class;
+            $record->extra['messenger']['payload'] = (new ObjectNormalizer())->normalize($message);
             $this->loggedPayload = true;
         }
 
-        return $record->with(context: $context);
+        return $record;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope

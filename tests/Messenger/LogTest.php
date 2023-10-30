@@ -56,18 +56,18 @@ final class LogTest extends TestCase
         self::assertStringMatchesFormat(
             <<<'TXT'
                 [%a] test.INFO: before [] []
-                [%a] test.DEBUG: irrelevant {"messenger":{"id":null,"origin":null}} []
-                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":null,"origin":null,"message":"stdClass","payload":{"test1":true,"bus":null}}} []
-                [%a] test.INFO: handling2 {"messenger":{"id":null,"origin":null}} []
-                [%a] test.DEBUG: irrelevant {"messenger":{"id":"NestedID","origin":null}} []
-                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"NestedID","origin":null,"message":"stdClass","payload":{"nested":true,"bus":null}}} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":null}} []
-                [%a] test.DEBUG: irrelevant {"messenger":{"id":"ID","origin":"OriginID"}} []
-                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"ID","origin":"OriginID","message":"stdClass","payload":{"test2":true,"bus":null}}} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"ID","origin":"OriginID"}} []
-                [%a] test.DEBUG: irrelevant {"messenger":{"id":"NestedID","origin":"ID"}} []
-                [%a] test.INFO: handling1 {"foo":"handling","messenger":{"id":"NestedID","origin":"ID","message":"stdClass","payload":{"nested":true,"bus":null}}} []
-                [%a] test.INFO: handling2 {"messenger":{"id":"NestedID","origin":"ID"}} []
+                [%a] test.DEBUG: irrelevant [] {"messenger":{"id":null,"origin":null}}
+                [%a] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":null,"origin":null,"message":"stdClass","payload":{"test1":true,"bus":null}}}
+                [%a] test.INFO: handling2 [] {"messenger":{"id":null,"origin":null}}
+                [%a] test.DEBUG: irrelevant [] {"messenger":{"id":"NestedID","origin":null}}
+                [%a] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"NestedID","origin":null,"message":"stdClass","payload":{"nested":true,"bus":null}}}
+                [%a] test.INFO: handling2 [] {"messenger":{"id":"NestedID","origin":null}}
+                [%a] test.DEBUG: irrelevant [] {"messenger":{"id":"ID","origin":"OriginID"}}
+                [%a] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass","payload":{"test2":true,"bus":null}}}
+                [%a] test.INFO: handling2 [] {"messenger":{"id":"ID","origin":"OriginID"}}
+                [%a] test.DEBUG: irrelevant [] {"messenger":{"id":"NestedID","origin":"ID"}}
+                [%a] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass","payload":{"nested":true,"bus":null}}}
+                [%a] test.INFO: handling2 [] {"messenger":{"id":"NestedID","origin":"ID"}}
                 [%a] test.INFO: after {"foo":"after"} []
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
