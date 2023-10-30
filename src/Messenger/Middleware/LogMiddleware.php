@@ -30,7 +30,9 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
         $context['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
-            $context['messenger']['payload'] = (new ObjectNormalizer())->normalize($this->currentEnvelope->getMessage());
+            $message = $this->currentEnvelope->getMessage();
+            $context['messenger']['message'] = $message::class;
+            $context['messenger']['payload'] = (new ObjectNormalizer())->normalize($message);
             $this->loggedPayload = true;
         }
 
