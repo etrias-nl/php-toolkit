@@ -3,5 +3,8 @@
     "extends": [
         "github>etrias-nl/renovate"
     ],
-    "rangeStrategy": "auto"
+    "rangeStrategy": "auto",
+    "lockFileMaintenance": {
+        "enabled": false
+    }
 }
