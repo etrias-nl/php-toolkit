@@ -5,31 +5,27 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Counter;
 
 use Predis\ClientInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class RedisCounter implements Counter
 {
     public function __construct(
+        #[Autowire(service: 'cache.default_redis_provider')]
         private readonly ClientInterface $redis,
-        private readonly string $prefix = 'counter:',
     ) {}
 
-    public function increment(string $key, int $step = 1): int
+    public function delta(string $key, int $count): int
     {
-        return $this->redis->incrby($this->prefix.$key, $step);
-    }
-
-    public function decrement(string $key, int $step = 1): int
-    {
-        return $this->redis->decrby($this->prefix.$key, $step);
+        return $count > 0 ? $this->redis->incrby($key, $count) : $this->redis->decrby($key, abs($count));
     }
 
     public function get(string $key): int
     {
-        return (int) ($this->redis->get($this->prefix.$key) ?? 0);
+        return (int) ($this->redis->get($key) ?? 0);
     }
 
-    public function reset(string $key): void
+    public function clear(string $key): void
     {
-        $this->redis->del($this->prefix.$key);
+        $this->redis->del($key);
     }
 }
