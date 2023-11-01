@@ -20,13 +20,18 @@ final class RedisCounter implements Counter
         return $count > 0 ? $this->redis->incrby($this->prefix.$key, $count) : $this->redis->decrby($this->prefix.$key, abs($count));
     }
 
-    public function get(string $key): int
-    {
-        return (int) ($this->redis->get($this->prefix.$key) ?? 0);
-    }
-
     public function clear(string $key): void
     {
         $this->redis->del($this->prefix.$key);
+    }
+
+    public function values(): array
+    {
+        $counts = [];
+        foreach ($this->redis->keys($this->prefix.'*') as $key) {
+            $counts[substr($key, \strlen($this->prefix))] = (int) $this->redis->get($key);
+        }
+
+        return $counts;
     }
 }

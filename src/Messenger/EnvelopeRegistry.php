@@ -12,7 +12,6 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
-use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 
 final class EnvelopeRegistry
 {
@@ -36,35 +35,30 @@ final class EnvelopeRegistry
     }
 
     /**
-     * @return array<string, array<string, int>>
+     * @return array<string, int>
      */
     public function getCounts(): array
     {
-        $counts = [];
+        $counts = $this->counter->values();
+        $receivers = $this->receivers instanceof \Traversable ? iterator_to_array($this->receivers) : $this->receivers;
 
-        foreach ($this->receivers as $name => $receiver) {
-            if ($receiver instanceof SyncTransport) {
-                continue;
-            }
+        foreach ($counts as $key => $_) {
+            [$sender] = explode(':', $key, 2);
+            $receiver = $receivers[$sender] ?? null;
 
-            $isEmpty = $receiver instanceof MessageCountAwareInterface && 0 === $receiver->getMessageCount();
-            $messageCounts = [];
-            foreach ($this->transportOptions[$name] ?? [] as $message => $_) {
-                $counter = sprintf(self::COUNTER_KEY, $name, $message);
-                if ($isEmpty) {
-                    $this->counter->clear($counter);
-                }
-
-                $messageCounts[$message] = $this->counter->get($counter);
-            }
-
-            if ($messageCounts) {
-                arsort($messageCounts, SORT_NUMERIC);
-                $counts[$name] = $messageCounts;
+            if ($receiver instanceof MessageCountAwareInterface && 0 === $receiver->getMessageCount()) {
+                $this->counter->clear($key);
+                $counts[$key] = 0;
             }
         }
 
-        ksort($counts);
+        foreach ($this->transportOptions as $sender => $messages) {
+            foreach ($messages as $message => $_) {
+                $counts[sprintf(self::COUNTER_KEY, $sender, $message)] ??= 0;
+            }
+        }
+
+        uksort($counts, static fn (string $a, string $b): int => $counts[$b] <=> $counts[$a] ?: $a <=> $b);
 
         return $counts;
     }
