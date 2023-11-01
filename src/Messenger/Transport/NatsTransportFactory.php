@@ -6,18 +6,14 @@ namespace Etrias\PhpToolkit\Messenger\Transport;
 
 use Basis\Nats\Client;
 use Basis\Nats\Configuration;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Etrias\PhpToolkit\Messenger\EnvelopeRegistry;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 
 final class NatsTransportFactory implements TransportFactoryInterface
 {
-    /**
-     * @param array<string, array<string, array<string, mixed>>> $transportOptions
-     */
     public function __construct(
-        #[Autowire(param: 'php_toolkit.messenger.transport_options')]
-        private readonly array $transportOptions = [],
+        private readonly EnvelopeRegistry $envelopeRegistry,
     ) {}
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
@@ -37,7 +33,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             new Client(new Configuration($config)),
             $serializer,
             $queryParts['stream'],
-            $this->transportOptions,
+            $this->envelopeRegistry,
         );
     }
 

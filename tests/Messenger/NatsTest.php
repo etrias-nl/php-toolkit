@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
+use Etrias\PhpToolkit\Counter\Counter;
+use Etrias\PhpToolkit\Messenger\EnvelopeRegistry;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +23,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory();
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -37,7 +39,8 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $transport = (new NatsTransportFactory())->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
+        $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
 
@@ -46,7 +49,8 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $transport = (new NatsTransportFactory())->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
+        $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         self::assertSame(0, $transport->getMessageCount());
@@ -60,9 +64,8 @@ final class NatsTest extends TestCase
 
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame($message, $envelope->getMessage());
-        self::assertIsString($messageId);
-        self::assertSame(32, \strlen($messageId));
-        self::assertNotSame($prevMessageId, $messageId);
+        self::assertTrue(\is_string($messageId) && 32 === \strlen($messageId));
+        self::assertNotSame($messageId, $prevMessageId);
 
         $ackedEnvelopes = $transport->get();
 
@@ -79,13 +82,14 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $transport = (new NatsTransportFactory([
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([
             'sender_without_deduplication' => [
                 \stdClass::class => [
                     'deduplicate' => false,
                 ],
             ],
-        ]))->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        ], $this->createMock(Counter::class)));
+        $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_a' => true]))->last(TransportMessageIdStamp::class)?->getId();
@@ -94,10 +98,13 @@ final class NatsTest extends TestCase
         $messageId4 = $transport->send(Envelope::wrap((object) ['test_b' => true]))->last(TransportMessageIdStamp::class)?->getId();
 
         self::assertSame(3, $transport->getMessageCount());
+        self::assertTrue(\is_string($messageId1) && 32 === \strlen($messageId1));
         self::assertSame($messageId1, $messageId2);
-        self::assertNotSame($messageId1, $messageId3);
-        self::assertNotSame($messageId1, $messageId4);
-        self::assertNotSame($messageId3, $messageId4);
+        self::assertTrue(\is_string($messageId3) && Uuid::isValid($messageId3));
+        self::assertNotSame($messageId3, $messageId1);
+        self::assertTrue(\is_string($messageId4) && 32 === \strlen($messageId4));
+        self::assertNotSame($messageId4, $messageId1);
+        self::assertNotSame($messageId4, $messageId3);
 
         $ackedEnvelopes1 = $transport->get();
         $ackedEnvelopes2 = $transport->get();
