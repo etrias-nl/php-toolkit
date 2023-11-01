@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Counter\Counter;
-use Etrias\PhpToolkit\Messenger\EnvelopeRegistry;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +22,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory([], $this->createMock(Counter::class));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -39,7 +38,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory([], $this->createMock(Counter::class));
         $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
@@ -49,7 +48,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory([], $this->createMock(Counter::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -82,13 +81,13 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [
+        $factory = new NatsTransportFactory([
             'sender_without_deduplication' => [
                 \stdClass::class => [
                     'deduplicate' => false,
                 ],
             ],
-        ], $this->createMock(Counter::class)));
+        ], $this->createMock(Counter::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 

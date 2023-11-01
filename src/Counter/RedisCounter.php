@@ -25,11 +25,12 @@ final class RedisCounter implements Counter
         $this->redis->del($this->prefix.$key);
     }
 
-    public function values(): array
+    public function values(string $prefix = ''): array
     {
+        $prefix = $this->prefix.$prefix;
         $counts = [];
-        foreach ($this->redis->keys($this->prefix.'*') as $key) {
-            $counts[substr($key, \strlen($this->prefix))] = (int) $this->redis->get($key);
+        foreach ($this->redis->keys($prefix.'*') as $key) {
+            $counts[substr($key, \strlen($prefix))] = (int) $this->redis->get($key);
         }
 
         return $counts;

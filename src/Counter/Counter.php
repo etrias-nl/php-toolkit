@@ -13,5 +13,5 @@ interface Counter
     /**
      * @return array<string, int>
      */
-    public function values(): array;
+    public function values(string $prefix = ''): array;
 }

@@ -10,9 +10,10 @@ use Basis\Nats\Message\Payload;
 use Basis\Nats\Stream\RetentionPolicy;
 use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
-use Etrias\PhpToolkit\Messenger\EnvelopeRegistry;
+use Etrias\PhpToolkit\Counter\Counter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -26,12 +27,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
+    private ?string $counterPrefix = null;
 
+    /**
+     * @param array<string, array<string, array<string, mixed>>> $transportOptions
+     */
     public function __construct(
         private readonly Client $client,
         private readonly SerializerInterface $serializer,
         private readonly string $streamName,
-        private readonly EnvelopeRegistry $envelopeRegistry,
+        private readonly array $transportOptions,
+        private readonly Counter $counter,
     ) {}
 
     public function setup(): void
@@ -48,9 +54,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->ping();
             $this->getConsumer()->handle(function (Payload $payload) use (&$receivedMessages): void {
-                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])
+                $receivedMessages[] = $envelope = $this->serializer->decode(['body' => $payload->body])
                     ->with(new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID)))
                 ;
+
+                $this->delta($envelope, -1);
             });
         } catch (\Throwable $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -73,8 +81,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $envelope = $envelope->withoutAll(TransportMessageIdStamp::class);
         $encodedMessage = $this->serializer->encode($envelope);
-        $sender = $this->envelopeRegistry->getSenderAlias($envelope);
-        $options = $this->envelopeRegistry->getTransportOptions($sender, $envelope);
+        $options = $this->getTransportOptions($envelope);
         $messageId = $options['deduplicate'] ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v4()->toRfc4122();
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
@@ -87,7 +94,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
 
-        $this->envelopeRegistry->delta($sender, $envelope, 1);
+        $this->delta($envelope, 1);
 
         return $envelope->with(new TransportMessageIdStamp($messageId));
     }
@@ -97,6 +104,26 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->client->ping();
 
         return $this->getStream()->info()?->getValue('state')?->messages ?? 0;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function getMessageCounts(): array
+    {
+        $counts = $this->counter->values($this->getCounterPrefix());
+
+        if (0 === $this->getMessageCount()) {
+            foreach ($counts as $key => $_) {
+                $this->counter->clear($key);
+            }
+
+            return [];
+        }
+
+        krsort($counts);
+
+        return $counts;
     }
 
     private function getStream(): Stream
@@ -120,5 +147,27 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $this->consumer;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getTransportOptions(Envelope $envelope): array
+    {
+        if (null === $sender = $envelope->last(SentStamp::class)?->getSenderAlias()) {
+            return [];
+        }
+
+        return $this->transportOptions[$sender][$envelope->getMessage()::class] ?? [];
+    }
+
+    private function delta(Envelope $envelope, int $count): void
+    {
+        $this->counter->delta($this->getCounterPrefix().$envelope->getMessage()::class, $count);
+    }
+
+    private function getCounterPrefix(): string
+    {
+        return $this->counterPrefix ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName).':';
     }
 }

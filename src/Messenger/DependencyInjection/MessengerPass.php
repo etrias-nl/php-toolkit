@@ -25,13 +25,19 @@ final class MessengerPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('messenger.bus') as $id => $_) {
             $handlersLocator = $container->getDefinition($id.'.messenger.handlers_locator');
             foreach ($handlersLocator->getArgument(0) as $messageClass => $_) {
+                $transportAttributes = $container->getReflectionClass($messageClass)?->getAttributes(WithTransport::class) ?? [];
+
+                if (!$transportAttributes) {
+                    continue;
+                }
+
                 if (isset($messageMap[$messageClass])) {
                     throw new \LogicException('Existing sender mapping found for "'.$messageClass.'", cannot apply "'.WithTransport::class.'".');
                 }
 
                 $messageMap[$messageClass] = [];
 
-                foreach ($container->getReflectionClass($messageClass)?->getAttributes(WithTransport::class) ?? [] as $transportAttribute) {
+                foreach ($transportAttributes as $transportAttribute) {
                     $messageTransportMetadata = $transportAttribute->newInstance();
                     if (\in_array($messageTransportMetadata->name, $messageMap[$messageClass], true)) {
                         throw new \LogicException('Duplicate "'.WithTransport::class.'" found for "'.$messageClass.'" and transport "'.$messageTransportMetadata->name.'".');
