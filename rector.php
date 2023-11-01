@@ -18,6 +18,7 @@ return static function (RectorConfig $rectorConfig): void {
         'tests/Fixtures/Messenger/envelope_uncompressed.php',
         \Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         \Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
+        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
         \Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');
@@ -32,7 +33,6 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::EARLY_RETURN,
         SetList::INSTANCEOF,
         SetList::PRIVATIZATION,
-        SetList::STRICT_BOOLEANS,
         SetList::TYPE_DECLARATION,
         SymfonyLevelSetList::UP_TO_SYMFONY_63,
         SymfonySetList::SYMFONY_CODE_QUALITY,

@@ -23,7 +23,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -39,7 +39,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
         $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
@@ -49,7 +49,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([], $this->createMock(Counter::class)));
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [], $this->createMock(Counter::class)));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -82,7 +82,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new EnvelopeRegistry([
+        $factory = new NatsTransportFactory(new EnvelopeRegistry([], [
             'sender_without_deduplication' => [
                 \stdClass::class => [
                     'deduplicate' => false,
