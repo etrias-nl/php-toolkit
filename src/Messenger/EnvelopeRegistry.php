@@ -12,6 +12,7 @@ use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 
 final class EnvelopeRegistry
 {
@@ -42,6 +43,10 @@ final class EnvelopeRegistry
         $counts = [];
 
         foreach ($this->receivers as $name => $receiver) {
+            if ($receiver instanceof SyncTransport) {
+                continue;
+            }
+
             $isEmpty = $receiver instanceof MessageCountAwareInterface && 0 === $receiver->getMessageCount();
             $messageCounts = [];
             foreach ($this->transportOptions[$name] ?? [] as $message => $_) {
