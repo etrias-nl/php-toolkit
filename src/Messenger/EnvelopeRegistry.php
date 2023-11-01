@@ -34,6 +34,11 @@ final class EnvelopeRegistry
         return $this->counter->delta(sprintf(self::COUNTER_KEY, $sender, $envelope->getMessage()::class), $count);
     }
 
+    public function getTransportOptions(string $sender, Envelope $envelope): array
+    {
+        return $this->transportOptions[$sender][$envelope->getMessage()::class] ?? [];
+    }
+
     /**
      * @return array<string, int>
      */
@@ -66,10 +71,5 @@ final class EnvelopeRegistry
     public function getSenderAlias(Envelope $envelope): string
     {
         return $envelope->last(SentStamp::class)?->getSenderAlias() ?? $envelope->last(ReceivedStamp::class)?->getTransportName() ?? 'sync';
-    }
-
-    public function getTransportOptions(Envelope $envelope): array
-    {
-        return $this->transportOptions[$this->getSenderAlias($envelope)][$envelope->getMessage()::class] ?? [];
     }
 }
