@@ -12,8 +12,6 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 
 final class EnvelopeRegistry
 {
-    private const COUNTER_KEY = 'counter:messenger:%s:%s';
-
     /**
      * @param array<string, array<string, array<string, mixed>>> $transportOptions
      */
@@ -25,7 +23,7 @@ final class EnvelopeRegistry
 
     public function delta(string $sender, Envelope $envelope, int $count): int
     {
-        return $this->counter->delta(sprintf(self::COUNTER_KEY, $sender, $envelope->getMessage()::class), $count);
+        return $this->counter->delta($sender.':'.$envelope->getMessage()::class, $count);
     }
 
     public function getSenderAlias(Envelope $envelope): string
