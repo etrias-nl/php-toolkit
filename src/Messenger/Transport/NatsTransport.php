@@ -11,9 +11,9 @@ use Basis\Nats\Stream\RetentionPolicy;
 use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
 use Etrias\PhpToolkit\Counter\Counter;
+use Etrias\PhpToolkit\Messenger\MessageMap;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
-use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -29,15 +29,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Consumer $consumer = null;
     private ?string $counterPrefix = null;
 
-    /**
-     * @param array<string, array<string, array<string, mixed>>> $transportOptions
-     */
     public function __construct(
         private readonly Client $client,
         private readonly SerializerInterface $serializer,
-        private readonly string $streamName,
-        private readonly array $transportOptions,
+        private readonly MessageMap $messageMap,
         private readonly Counter $counter,
+        private readonly string $streamName,
     ) {}
 
     public function setup(): void
@@ -87,7 +84,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $envelope = $envelope->withoutAll(TransportMessageIdStamp::class);
         $encodedMessage = $this->serializer->encode($envelope);
-        $options = $this->getTransportOptions($envelope);
+        $options = $this->messageMap->getTransportOptions($envelope);
         $messageId = $options['deduplicate'] ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v4()->toRfc4122();
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
@@ -127,8 +124,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [];
         }
 
-        krsort($counts);
-
         return $counts;
     }
 
@@ -154,18 +149,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $this->consumer;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function getTransportOptions(Envelope $envelope): array
-    {
-        if (null === $sender = $envelope->last(SentStamp::class)?->getSenderAlias()) {
-            return [];
-        }
-
-        return $this->transportOptions[$sender][$envelope->getMessage()::class] ?? [];
     }
 
     private function delta(Envelope $envelope, int $count): void
