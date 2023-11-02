@@ -8,6 +8,9 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 
+/**
+ * @internal
+ */
 final class MessageMap
 {
     /**
