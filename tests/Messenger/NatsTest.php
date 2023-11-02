@@ -49,7 +49,8 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter());
+        $counter = new ArrayCounter();
+        $factory = new NatsTransportFactory(new MessageMap([]), $counter);
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -65,6 +66,7 @@ final class NatsTest extends TestCase
 
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
+        self::assertStringMatchesFormat('{"%a:stdClass":1}', json_encode($counter->values(), JSON_THROW_ON_ERROR));
         self::assertSame($message, $envelope->getMessage());
         self::assertTrue(\is_string($messageId) && 32 === \strlen($messageId));
         self::assertNotSame($messageId, $prevMessageId);
@@ -75,6 +77,7 @@ final class NatsTest extends TestCase
         self::assertCount(1, $ackedEnvelopes);
         self::assertSame(0, $transport->getMessageCount());
         self::assertSame([], $transport->getMessageCounts());
+        self::assertSame([], $counter->values());
 
         $ackedEnvelope = $ackedEnvelopes[0];
 

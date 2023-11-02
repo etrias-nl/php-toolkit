@@ -110,15 +110,16 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     }
 
     /**
-     * @return array<string, int>
+     * @return array<class-string, int>
      */
     public function getMessageCounts(): array
     {
-        $counts = $this->counter->values($this->getCounterPrefix());
+        /** @var array<class-string, int> $counts */
+        $counts = $this->counter->values($counterPrefix = $this->getCounterPrefix());
 
         if (0 === $this->getMessageCount()) {
-            foreach ($counts as $key => $_) {
-                $this->counter->clear($key);
+            foreach ($counts as $message => $_) {
+                $this->counter->clear($counterPrefix.$message);
             }
 
             return [];
