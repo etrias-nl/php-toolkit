@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration;
 use Etrias\PhpToolkit\Counter\Counter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 
@@ -19,6 +20,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
     public function __construct(
         #[Autowire(param: 'php_toolkit.messenger.transport_options')]
         private readonly array $transportOptions,
+        #[Target('messenger.counter')]
         private readonly Counter $counter,
     ) {}
 
