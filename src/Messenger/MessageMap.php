@@ -14,13 +14,19 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 final class MessageMap
 {
     /**
-     * @param array<string, string[]>                            $mapping
-     * @param array<string, array<string, array<string, mixed>>> $transportOptions
+     * @param array<string, array<class-string, array<string, mixed>>> $mapping
      */
     public function __construct(
         private readonly array $mapping,
-        private readonly array $transportOptions,
     ) {}
+
+    /**
+     * @return class-string[]
+     */
+    public function getAvailableMessages(string $transport): array
+    {
+        return array_keys($this->mapping[$transport] ?? []);
+    }
 
     /**
      * @return array<string, mixed>
@@ -29,6 +35,6 @@ final class MessageMap
     {
         $transport = $envelope->last(ReceivedStamp::class)?->getTransportName() ?? $envelope->last(SentStamp::class)?->getSenderAlias() ?? null;
 
-        return null === $transport ? [] : ($this->transportOptions[$transport][$envelope->getMessage()::class] ?? []);
+        return null === $transport ? [] : ($this->mapping[$transport][$envelope->getMessage()::class] ?? []);
     }
 }

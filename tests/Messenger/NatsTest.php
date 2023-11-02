@@ -23,7 +23,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([], []), new ArrayCounter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter());
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -39,7 +39,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([], []), new ArrayCounter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter());
         $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
@@ -49,7 +49,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([], []), new ArrayCounter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -85,7 +85,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([], [
+        $factory = new NatsTransportFactory(new MessageMap([
             'sender_without_deduplication' => [
                 \stdClass::class => [
                     'deduplicate' => false,

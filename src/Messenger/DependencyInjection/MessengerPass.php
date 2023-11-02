@@ -16,11 +16,11 @@ final class MessengerPass implements CompilerPassInterface
     {
         $sendersLocator = $container->getDefinition('messenger.senders_locator');
         $messageMap = $sendersLocator->getArgument(0);
-        $transportOptions = [];
+        $messageMapByTransport = [];
 
         foreach ($messageMap as $messageClass => $transports) {
             foreach ($transports as $transport) {
-                $transportOptions[$transport][$messageClass] = [];
+                $messageMapByTransport[$transport][$messageClass] = [];
             }
         }
 
@@ -46,7 +46,7 @@ final class MessengerPass implements CompilerPassInterface
                     }
 
                     $messageMap[$messageClass][] = $messageTransportMetadata->name;
-                    $transportOptions[$messageTransportMetadata->name][$messageClass] = $messageTransportMetadata->options;
+                    $messageMapByTransport[$messageTransportMetadata->name][$messageClass] = $messageTransportMetadata->options;
                 }
             }
         }
@@ -54,8 +54,7 @@ final class MessengerPass implements CompilerPassInterface
         $sendersLocator->replaceArgument(0, $messageMap);
 
         $container->register(MessageMap::class, MessageMap::class)
-            ->setArgument('$mapping', $messageMap)
-            ->setArgument('$transportOptions', $transportOptions)
+            ->setArgument('$mapping', $messageMapByTransport)
         ;
 
         $container->autowire(MessageMonitor::class, MessageMonitor::class);
