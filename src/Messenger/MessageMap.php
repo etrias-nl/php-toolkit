@@ -24,8 +24,8 @@ final class MessageMap
      */
     public function getTransportOptions(Envelope $envelope): array
     {
-        $transport = $envelope->last(ReceivedStamp::class)?->getTransportName() ?? $envelope->last(SentStamp::class)?->getSenderAlias() ?? 'sync';
+        $transport = $envelope->last(ReceivedStamp::class)?->getTransportName() ?? $envelope->last(SentStamp::class)?->getSenderAlias() ?? null;
 
-        return $this->transportOptions[$transport][$envelope->getMessage()::class] ?? [];
+        return null === $transport ? [] : ($this->transportOptions[$transport][$envelope->getMessage()::class] ?? []);
     }
 }
