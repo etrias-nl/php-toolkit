@@ -44,7 +44,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $this->client->ping();
 
-        $this->getStream()->createIfNotExists();
+        $stream = $this->getStream();
+
+        if ($stream->exists()) {
+            $stream->update();
+        } else {
+            $stream->create();
+        }
     }
 
     public function get(): iterable
@@ -133,6 +139,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::MEMORY)
+                ->setDuplicateWindow(10.0)
             ;
         }
 
