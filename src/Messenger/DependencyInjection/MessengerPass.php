@@ -52,7 +52,7 @@ final class MessengerPass implements CompilerPassInterface
 
         $sendersLocator->replaceArgument(0, $messageMap);
 
-        $container->register(MessageMap::class)
+        $container->register(MessageMap::class, MessageMap::class)
             ->setArgument('$mapping', $messageMap)
             ->setArgument('$transportOptions', $transportOptions)
         ;
