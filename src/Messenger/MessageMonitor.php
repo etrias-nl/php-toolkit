@@ -57,4 +57,21 @@ final class MessageMonitor
 
         return $jobs;
     }
+
+    public function isJobOverloaded(string $job, ?int $count): bool
+    {
+        [$transport, $message] = explode(':', $job, 2) + [null, null];
+
+        if (null === $message || null === $count || 0 === $count) {
+            return false;
+        }
+
+        $options = $this->messageMap->getTransportOptions($transport, $message);
+
+        if (null === $threshold = $options['healthcheck_threshold'] ?? null) {
+            return false;
+        }
+
+        return $count >= $threshold;
+    }
 }

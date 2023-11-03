@@ -31,10 +31,18 @@ final class MessageMap
     /**
      * @return array<string, mixed>
      */
-    public function getTransportOptions(Envelope $envelope): array
+    public function getTransportOptions(string $transport, string $message): array
     {
-        $transport = $envelope->last(SentStamp::class)?->getSenderAlias() ?? $envelope->last(ReceivedStamp::class)?->getTransportName() ?? null;
+        return $this->mapping[$transport][$message] ?? [];
+    }
 
-        return null === $transport ? [] : ($this->mapping[$transport][$envelope->getMessage()::class] ?? []);
+    /**
+     * @return array<string, mixed>
+     */
+    public function getTransportOptionsFromEnvelope(Envelope $envelope): array
+    {
+        $transport = $envelope->last(SentStamp::class)?->getSenderAlias() ?? $envelope->last(ReceivedStamp::class)?->getTransportName();
+
+        return null === $transport ? [] : $this->getTransportOptions($transport, $envelope->getMessage()::class);
     }
 }
