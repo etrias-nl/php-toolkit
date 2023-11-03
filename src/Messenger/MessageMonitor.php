@@ -72,6 +72,6 @@ final class MessageMonitor
             return false;
         }
 
-        return $count >= $threshold;
+        return $count > $threshold;
     }
 }
