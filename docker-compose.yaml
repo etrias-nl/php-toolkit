@@ -16,3 +16,4 @@ services:
             - CI
             - GITHUB_ACTIONS
             - RUNNER_DEBUG
+            - XDEBUG_MODE=off
