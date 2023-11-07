@@ -6,7 +6,7 @@ services:
             - '--jetstream'
             - '--debug'
     php:
-        image: etriasnl/dev-php-fpm:8.1.25-93
+        image: etriasnl/dev-php-fpm:8.1.25-95
         depends_on:
             - nats
         volumes:
@@ -16,4 +16,3 @@ services:
             - CI
             - GITHUB_ACTIONS
             - RUNNER_DEBUG
-            - XDEBUG_MODE=off
