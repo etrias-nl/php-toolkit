@@ -19,12 +19,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 #[AsMonologProcessor]
 final class LogProcessor
 {
+    public ?NormalizerInterface $normalizer = null;
     public ?Envelope $currentEnvelope = null;
     public bool $loggedPayload = false;
-
-    public function __construct(
-        private readonly NormalizerInterface $normalizer,
-    ) {}
 
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -36,8 +33,12 @@ final class LogProcessor
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
+            if (null === $this->normalizer) {
+                throw new \LogicException('Normalizer not set.');
+            }
+
             // https://github.com/symfony/symfony/issues/52564
-            $this->normalizer->normalize(new \stdClass());
+            $this->normalizer->normalize(null);
 
             $message = $this->currentEnvelope->getMessage();
             $record->extra['messenger']['message'] = $message::class;

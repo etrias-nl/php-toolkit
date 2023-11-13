@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 /**
  * @internal
@@ -25,8 +26,8 @@ final class LogTest extends TestCase
 {
     public function testMiddleware(): void
     {
-        $logProcessor = new LogProcessor(new ObjectNormalizer());
-        $logMiddleware = new LogMiddleware($logProcessor);
+        $logProcessor = new LogProcessor();
+        $logMiddleware = new LogMiddleware($logProcessor, new Serializer([new ObjectNormalizer()]));
         $logHandler = new TestHandler();
         $logger = new Logger('test', [$logHandler], [$logProcessor]);
         $envelopeMiddleware = new class($logger) implements MiddlewareInterface {

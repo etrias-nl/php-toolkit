@@ -9,11 +9,13 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class LogMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private readonly LogProcessor $processor,
+        private readonly NormalizerInterface $normalizer,
     ) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -27,6 +29,7 @@ final class LogMiddleware implements MiddlewareInterface
             ;
         }
 
+        $this->processor->normalizer = $this->normalizer;
         $this->processor->currentEnvelope = $envelope;
         $this->processor->loggedPayload = false;
 

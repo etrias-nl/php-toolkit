@@ -7,7 +7,6 @@ namespace Etrias\PhpToolkit\Messenger\DependencyInjection;
 use Etrias\PhpToolkit\Messenger\Attribute\WithTransport;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\MessageMonitor;
-use Etrias\PhpToolkit\Messenger\Middleware\LogProcessor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -56,17 +55,8 @@ final class MessengerPass implements CompilerPassInterface
 
         $container->register(MessageMap::class, MessageMap::class)
             ->setArgument('$mapping', $messageMapByTransport)
-            ->setAutoconfigured(true)
         ;
 
-        $container
-            ->autowire(MessageMonitor::class, MessageMonitor::class)
-            ->setAutoconfigured(true)
-        ;
-
-        $container
-            ->autowire(LogProcessor::class, LogProcessor::class)
-            ->setAutoconfigured(true)
-        ;
+        $container->autowire(MessageMonitor::class, MessageMonitor::class);
     }
 }
