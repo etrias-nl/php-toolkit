@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Messenger\Middleware\LogMiddleware;
+use Etrias\PhpToolkit\Messenger\Middleware\LogProcessor;
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
@@ -24,10 +25,10 @@ final class LogTest extends TestCase
 {
     public function testMiddleware(): void
     {
-        $logMiddleware = new LogMiddleware();
-        $logMiddleware->setNormalizer(new ObjectNormalizer());
+        $logProcessor = new LogProcessor(new ObjectNormalizer());
+        $logMiddleware = new LogMiddleware($logProcessor);
         $logHandler = new TestHandler();
-        $logger = new Logger('test', [$logHandler], [$logMiddleware]);
+        $logger = new Logger('test', [$logHandler], [$logProcessor]);
         $envelopeMiddleware = new class($logger) implements MiddlewareInterface {
             public function __construct(private readonly Logger $logger) {}
 
