@@ -12,12 +12,15 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
 {
     private ?Envelope $currentEnvelope = null;
     private bool $loggedPayload = false;
+    private ?NormalizerInterface $normalizer = null;
 
     public function __invoke(LogRecord $record): LogRecord
     {
@@ -29,13 +32,29 @@ final class LogMiddleware implements MiddlewareInterface, ProcessorInterface
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
+            if (null === $this->normalizer) {
+                throw new \LogicException('Normalizer is not set');
+            }
+
+            // https://github.com/symfony/symfony/issues/52564
+            $this->normalizer->normalize(new \stdClass());
+
             $message = $this->currentEnvelope->getMessage();
             $record->extra['messenger']['message'] = $message::class;
-            $record->extra['messenger']['payload'] = (new ObjectNormalizer())->normalize($message);
+            $record->extra['messenger']['payload'] = $this->normalizer->normalize($message, null, [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
+            ]);
             $this->loggedPayload = true;
         }
 
         return $record;
+    }
+
+    #[Required]
+    public function setNormalizer(NormalizerInterface $normalizer): void
+    {
+        $this->normalizer = $normalizer;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
