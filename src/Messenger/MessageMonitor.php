@@ -22,7 +22,7 @@ final class MessageMonitor
     ) {}
 
     /**
-     * @return array<string, null|int>
+     * @return list<array{transport: string, message: null|class-string, count: null|int, options: array<string, mixed>}>
      */
     public function getJobs(): array
     {
@@ -34,44 +34,39 @@ final class MessageMonitor
             }
 
             if ($receiver instanceof NatsTransport) {
-                foreach ($receiver->getMessageCounts() as $message => $count) {
-                    $jobs[$transport.':'.$message] = $count;
-                }
-                foreach ($this->messageMap->getAvailableMessages($transport) as $message) {
-                    $jobs[$transport.':'.$message] ??= 0;
+                foreach ($receiver->getMessageCounts() + array_fill_keys($this->messageMap->getAvailableMessages($transport), 0) as $message => $count) {
+                    $jobs[] = [
+                        'transport' => $transport,
+                        'message' => $message,
+                        'count' => $count,
+                        'options' => $this->messageMap->getTransportOptions($transport, $message),
+                    ];
                 }
 
                 continue;
             }
 
             if ($receiver instanceof MessageCountAwareInterface) {
-                $jobs[$transport] = $receiver->getMessageCount();
+                $jobs[] = [
+                    'transport' => $transport,
+                    'message' => null,
+                    'count' => $receiver->getMessageCount(),
+                    'options' => [],
+                ];
             }
 
             foreach ($this->messageMap->getAvailableMessages($transport) as $message) {
-                $jobs[$transport.':'.$message] = null;
+                $jobs[] = [
+                    'transport' => $transport,
+                    'message' => $message,
+                    'count' => null,
+                    'options' => $this->messageMap->getTransportOptions($transport, $message),
+                ];
             }
         }
 
-        uksort($jobs, static fn (string $a, string $b): int => $jobs[$b] <=> $jobs[$a] ?: $a <=> $b);
+        usort($jobs, static fn (array $a, array $b): int => ($b['count'] ?? 0) <=> ($a['count'] ?? 0) ?: $a['transport'].':'.$a['message'] <=> $b['transport'].':'.$b['message']);
 
         return $jobs;
-    }
-
-    public function isJobOverloaded(string $job, ?int $count): bool
-    {
-        [$transport, $message] = explode(':', $job, 2) + [null, null];
-
-        if (null === $message || null === $count || 0 === $count) {
-            return false;
-        }
-
-        $options = $this->messageMap->getTransportOptions($transport, $message);
-
-        if (null === $threshold = $options['healthcheck_threshold'] ?? null) {
-            return false;
-        }
-
-        return $count > $threshold;
     }
 }
