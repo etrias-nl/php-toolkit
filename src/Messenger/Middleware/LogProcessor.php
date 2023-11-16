@@ -13,17 +13,24 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-/**
- * @internal
- */
 #[AsMonologProcessor]
 final class LogProcessor
 {
     /**
      * @psalm-suppress PropertyNotSetInConstructor
+     *
+     * @internal
      */
     public NormalizerInterface $normalizer;
+
+    /**
+     * @internal
+     */
     public ?Envelope $currentEnvelope = null;
+
+    /**
+     * @internal
+     */
     public bool $loggedPayload = false;
 
     public function __invoke(LogRecord $record): LogRecord
