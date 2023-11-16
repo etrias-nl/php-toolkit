@@ -19,7 +19,10 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 #[AsMonologProcessor]
 final class LogProcessor
 {
-    public ?NormalizerInterface $normalizer = null;
+    /**
+     * @psalm-suppress PropertyNotSetInConstructor
+     */
+    public NormalizerInterface $normalizer;
     public ?Envelope $currentEnvelope = null;
     public bool $loggedPayload = false;
 
@@ -33,10 +36,6 @@ final class LogProcessor
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
-            if (null === $this->normalizer) {
-                throw new \LogicException('Normalizer not set.');
-            }
-
             // https://github.com/symfony/symfony/issues/52564
             $this->normalizer->normalize(null);
 
