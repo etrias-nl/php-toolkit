@@ -8,7 +8,6 @@ use Etrias\PhpToolkit\Cache\CacheInfo;
 use PHPUnit\Framework\TestCase;
 use Predis\ClientInterface;
 use Predis\Configuration\Options;
-use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -72,7 +71,7 @@ final class CacheInfoTest extends TestCase
         $redis->expects(self::any())->method('getOptions')->willReturn(new Options());
 
         $cache = new RedisTagAwareAdapter($redis);
-        $info = new CacheInfo('key', $ttl = new \DateTime('tomorrow'), ['tag1', 'tag2']);
+        $info = new CacheInfo('key', null, ['tag1', 'tag2']);
         $item = $info->toItem($cache);
 
         self::assertInstanceOf(ItemInterface::class, $item);
