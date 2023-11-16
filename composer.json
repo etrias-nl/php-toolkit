@@ -9,6 +9,7 @@
         "basis-company/nats": "^0.14",
         "monolog/monolog": "^3",
         "predis/predis": "^2.2",
+        "symfony/cache": "^6",
         "symfony/console": "^6",
         "symfony/event-dispatcher": "^6",
         "symfony/http-foundation": "^6",
