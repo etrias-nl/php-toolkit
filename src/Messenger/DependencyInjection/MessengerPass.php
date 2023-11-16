@@ -30,6 +30,8 @@ final class MessengerPass implements CompilerPassInterface
                 $transportAttributes = $container->getReflectionClass($messageClass)?->getAttributes(WithTransport::class) ?? [];
 
                 if (!$transportAttributes) {
+                    $messageMapByTransport[''][$messageClass] = [];
+
                     continue;
                 }
 
