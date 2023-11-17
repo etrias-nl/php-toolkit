@@ -39,15 +39,16 @@ final class LogProcessor
             return $record;
         }
 
+        $message = $this->currentEnvelope->getMessage();
+
         $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
+        $record->extra['messenger']['message'] = $message::class;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
             // https://github.com/symfony/symfony/issues/52564
             $this->normalizer->normalize(null);
 
-            $message = $this->currentEnvelope->getMessage();
-            $record->extra['messenger']['message'] = $message::class;
             $record->extra['messenger']['payload'] = $this->normalizer->normalize($message, null, [
                 AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
                 AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
