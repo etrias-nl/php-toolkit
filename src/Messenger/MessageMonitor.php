@@ -34,6 +34,8 @@ final class MessageMonitor
             }
 
             if ($receiver instanceof NatsTransport) {
+                $perMessage = false;
+
                 foreach ($receiver->getMessageCounts() + array_fill_keys($this->messageMap->getAvailableMessages($transport), 0) as $message => $count) {
                     $jobs[] = [
                         'transport' => $transport,
@@ -41,9 +43,12 @@ final class MessageMonitor
                         'count' => $count,
                         'options' => $this->messageMap->getTransportOptions($transport, $message),
                     ];
+                    $perMessage = true;
                 }
 
-                continue;
+                if ($perMessage) {
+                    continue;
+                }
             }
 
             if ($receiver instanceof MessageCountAwareInterface) {
