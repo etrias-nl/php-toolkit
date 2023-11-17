@@ -46,13 +46,16 @@ final class LogProcessor
         $record->extra['messenger']['message'] = $message::class;
 
         if (!$this->loggedPayload && $record->level->isHigherThan(Level::Debug)) {
-            // https://github.com/symfony/symfony/issues/52564
-            $this->normalizer->normalize(null);
+            try {
+                $record->extra['messenger']['payload'] = $this->normalizer->normalize($message, null, [
+                    AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                    AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
+                ]);
+            } catch (\Throwable $e) {
+                $record->extra['messenger']['payload'] = serialize($message);
+                $record->extra['messenger']['payload_normalize_error'] = $e;
+            }
 
-            $record->extra['messenger']['payload'] = $this->normalizer->normalize($message, null, [
-                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-                AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
-            ]);
             $this->loggedPayload = true;
         }
 
