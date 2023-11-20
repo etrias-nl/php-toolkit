@@ -12,6 +12,8 @@ use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
 use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
+use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -34,6 +36,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly SerializerInterface $serializer,
         private readonly MessageMap $messageMap,
         private readonly Counter $counter,
+        private readonly LoggerInterface $logger,
         private readonly string $streamName,
     ) {}
 
@@ -56,13 +59,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             $this->client->ping();
-            $this->getConsumer()->handle(function (Payload $payload) use (&$receivedMessages): void {
-                $receivedMessages[] = $envelope = $this->serializer->decode(['body' => $payload->body])
+            $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
+                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])
                     ->with(new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID)))
+                    ->with(new ReplyToStamp($replyTo))
                 ;
-
-                $this->delta($envelope, -1);
-            });
+            }, null, false);
         } catch (\Throwable $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
         }
@@ -72,12 +74,27 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function ack(Envelope $envelope): void
     {
-        // no-op: acked on read
+        if (null === $replyTo = $envelope->last(ReplyToStamp::class)?->id) {
+            return;
+        }
+
+        try {
+            $this->client->ping();
+            $this->client->publish($replyTo, true);
+        } catch (\Throwable $exception) {
+            throw new TransportException($exception->getMessage(), 0, $exception);
+        }
+
+        $this->delta($envelope, -1);
     }
 
+    /**
+     * @see https://github.com/symfony/symfony/issues/51815
+     * @see https://github.com/symfony/symfony/issues/52642
+     */
     public function reject(Envelope $envelope): void
     {
-        // no-op: acked on read
+        $this->logger->alert('Message rejected, but not acknowledged.');
     }
 
     public function send(Envelope $envelope): Envelope
@@ -125,7 +142,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [];
         }
 
-        return $counts;
+        return array_map(static fn (int $count): int => max(0, $count), $counts);
     }
 
     private function getStream(): Stream
@@ -154,7 +171,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private function delta(Envelope $envelope, int $count): void
     {
-        $this->counter->delta($this->getCounterPrefix().$envelope->getMessage()::class, $count);
+        try {
+            $this->counter->delta($this->getCounterPrefix().$envelope->getMessage()::class, $count);
+        } catch (\Throwable $e) {
+            $this->logger->notice('Unable to update message counter', ['exception' => $e]);
+        }
     }
 
     private function getCounterPrefix(): string
