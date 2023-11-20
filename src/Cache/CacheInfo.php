@@ -8,6 +8,9 @@ final class CacheInfo
 {
     public readonly string $key;
 
+    /**
+     * @param string[] $tags
+     */
     public function __construct(
         array|object|string $key,
         public readonly null|\DateInterval|\DateTimeInterface|int $ttl = null,
