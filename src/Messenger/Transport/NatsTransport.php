@@ -109,6 +109,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             $this->client->ping();
+            $this->getStream()->createIfNotExists();
             $this->client->publish($this->streamName, $payload);
         } catch (\Throwable $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);

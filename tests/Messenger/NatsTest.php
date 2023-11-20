@@ -101,7 +101,6 @@ final class NatsTest extends TestCase
             ],
         ]), new ArrayCounter(), new Logger('test'));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
-        $transport->setup();
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_a' => true]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId2 = $transport->send(Envelope::wrap((object) ['test_a' => true], [new SentStamp(self::class, 'sender')]))->last(TransportMessageIdStamp::class)?->getId();
