@@ -53,7 +53,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
     }
 
-    public function get(): iterable
+    public function get(): array
     {
         $receivedMessages = [];
 
@@ -65,8 +65,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                     ->with(new ReplyToStamp($replyTo))
                 ;
             }, null, false);
-        } catch (\Throwable $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\Throwable $e) {
+            throw new TransportException($e->getMessage(), 0);
         }
 
         return $receivedMessages;
@@ -81,20 +81,23 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->ping();
             $this->client->publish($replyTo, true);
-        } catch (\Throwable $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\Throwable $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
 
         $this->delta($envelope, -1);
     }
 
     /**
-     * @see https://github.com/symfony/symfony/issues/51815
      * @see https://github.com/symfony/symfony/issues/52642
      */
     public function reject(Envelope $envelope): void
     {
-        $this->logger->alert('Message rejected, but not acknowledged.');
+        $this->logger->notice('Message rejected', [
+            'stream' => $this->streamName,
+            'message' => $envelope->getMessage()::class,
+            'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
+        ]);
     }
 
     public function send(Envelope $envelope): Envelope
@@ -106,13 +109,19 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
         ]);
+        $stream = $this->getStream();
 
         try {
             $this->client->ping();
-            $this->getStream()->createIfNotExists();
+
+            $stream->createIfNotExists();
+            if (!$stream->exists()) {
+                throw new \RuntimeException('Missing stream: '.$this->streamName);
+            }
+
             $this->client->publish($this->streamName, $payload);
-        } catch (\Throwable $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\Throwable $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
 
         $this->delta($envelope, 1);

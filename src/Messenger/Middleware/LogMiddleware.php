@@ -16,7 +16,9 @@ final class LogMiddleware implements MiddlewareInterface
     public function __construct(
         private readonly LogProcessor $processor,
         private readonly NormalizerInterface $normalizer,
-    ) {}
+    ) {
+        $this->processor->normalizer = $this->normalizer;
+    }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -29,7 +31,6 @@ final class LogMiddleware implements MiddlewareInterface
             ;
         }
 
-        $this->processor->normalizer = $this->normalizer;
         $this->processor->currentEnvelope = $envelope;
         $this->processor->loggedPayload = false;
 
