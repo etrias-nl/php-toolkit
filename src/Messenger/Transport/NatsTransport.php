@@ -175,7 +175,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
             $this->consumer->setIterations(1);
             $this->consumer->getConfiguration()
-                ->setAckWait(300)
+                ->setAckWait(1_000_000_000 * 300) // 300s
             ;
         }
 
