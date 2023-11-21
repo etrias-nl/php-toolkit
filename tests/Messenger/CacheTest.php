@@ -11,6 +11,7 @@ use Etrias\PhpToolkit\Messenger\Middleware\CacheMiddleware;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\MessageBus;
 
 /**
@@ -24,7 +25,7 @@ final class CacheTest extends TestCase
         $cacheInfoProvider = $this->createMock(CacheInfoProvider::class);
         $cacheMiddleware = new CacheMiddleware(new MessageCache($cache, $cacheInfoProvider));
         $bus = new MessageBus([$cacheMiddleware]);
-        $message = new \stdClass();
+        $message = (object) ['test' => true];
 
         $cacheInfoProvider->expects(self::exactly(3))
             ->method('get')
@@ -40,12 +41,16 @@ final class CacheTest extends TestCase
         self::assertFalse($cache->getItem('key')->isHit());
 
         $envelope = $bus->dispatch($message);
-        $item  = $cache->getItem('key');
+        $item = $cache->getItem('key');
 
         self::assertTrue($item->isHit());
         self::assertSame(['tags' => ['tag' => 'tag']], $item->getMetadata());
-        self::assertNotSame($envelope, $item->get());
-        self::assertEquals($envelope, $item->get());
+
+        $cachedEnvelope = $item->get();
+
+        self::assertInstanceOf(Envelope::class, $cachedEnvelope);
+        self::assertNotSame($envelope, $cachedEnvelope);
+        self::assertSame((array) $message, (array) $cachedEnvelope->getMessage());
 
         $bus->dispatch($message);
 
