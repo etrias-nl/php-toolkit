@@ -39,10 +39,13 @@ final class CacheTest extends TestCase
 
         self::assertFalse($cache->getItem('key')->isHit());
 
-        $bus->dispatch($message);
+        $envelope = $bus->dispatch($message);
+        $item  = $cache->getItem('key');
 
-        self::assertTrue($cache->getItem('key')->isHit());
-        self::assertSame(['tags' => ['tag' => 'tag']], $cache->getItem('key')->getMetadata());
+        self::assertTrue($item->isHit());
+        self::assertSame(['tags' => ['tag' => 'tag']], $item->getMetadata());
+        self::assertNotSame($envelope, $item->get());
+        self::assertEquals($envelope, $item->get());
 
         $bus->dispatch($message);
 
