@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Messenger\Middleware\LogMiddleware;
-use Etrias\PhpToolkit\Messenger\Middleware\LogProcessor;
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
@@ -16,8 +15,6 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @internal
@@ -26,53 +23,42 @@ final class LogTest extends TestCase
 {
     public function testMiddleware(): void
     {
-        $logProcessor = new LogProcessor();
-        $logMiddleware = new LogMiddleware($logProcessor, new Serializer([new ObjectNormalizer()]));
+        $logMiddleware = new LogMiddleware();
         $logHandler = new TestHandler();
-        $logger = new Logger('test', [$logHandler], [$logProcessor]);
-        $envelopeMiddleware = new class($logger) implements MiddlewareInterface {
-            public function __construct(private readonly Logger $logger) {}
+        $envelopeMiddleware = new class(new Logger('test', [$logHandler], [$logMiddleware])) implements MiddlewareInterface {
+            /** @psalm-suppress PropertyNotSetInConstructor */
+            public MessageBus $bus;
+
+            public function __construct(
+                private readonly Logger $logger,
+            ) {}
 
             public function handle(Envelope $envelope, StackInterface $stack): Envelope
             {
                 $message = $envelope->getMessage();
-                $bus = $message->bus ?? null;
-                $message->bus = null;
 
-                $this->logger->debug('irrelevant');
-                $this->logger->info('handling1', ['foo' => 'handling']);
-                $this->logger->info('handling2');
+                $this->logger->info('handling');
 
-                if ($bus) {
-                    $bus->dispatch((object) ['nested' => true], [new TransportMessageIdStamp('NestedID')]);
+                if ($message->nest) {
+                    $this->bus->dispatch((object) ['nest' => false], [new TransportMessageIdStamp('NestedID')]);
                 }
 
                 return $stack->next()->handle($envelope, $stack);
             }
         };
-        $bus = new MessageBus([$logMiddleware, $envelopeMiddleware]);
+        $bus = $envelopeMiddleware->bus = new MessageBus([$logMiddleware, $envelopeMiddleware]);
 
-        $logger->info('before');
-        $bus->dispatch((object) ['test1' => true, 'bus' => $bus]);
-        $bus->dispatch((object) ['test2' => true, 'bus' => $bus], [new TransportMessageIdStamp('ID'), new OriginTransportMessageIdStamp('OriginID')]);
-        $logger->info('after', ['foo' => 'after']);
+        $bus->dispatch((object) ['test1' => true, 'nest' => true]);
+        $bus->dispatch((object) ['test2' => true, 'nest' => false]);
+        $bus->dispatch((object) ['test3' => true, 'nest' => true], [new TransportMessageIdStamp('ID'), new OriginTransportMessageIdStamp('OriginID')]);
 
         self::assertStringMatchesFormat(
             <<<'TXT'
-                [%s] test.INFO: before [] []
-                [%s] test.DEBUG: irrelevant [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
-                [%s] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":null,"origin":null,"message":"stdClass","payload":{"test1":true}}}
-                [%s] test.INFO: handling2 [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
-                [%s] test.DEBUG: irrelevant [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"}}
-                [%s] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"NestedID","origin":null,"message":"stdClass","payload":{"nested":true}}}
-                [%s] test.INFO: handling2 [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"}}
-                [%s] test.DEBUG: irrelevant [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"}}
-                [%s] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass","payload":{"test2":true}}}
-                [%s] test.INFO: handling2 [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"}}
-                [%s] test.DEBUG: irrelevant [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"}}
-                [%s] test.INFO: handling1 {"foo":"handling"} {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass","payload":{"nested":true}}}
-                [%s] test.INFO: handling2 [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"}}
-                [%s] test.INFO: after {"foo":"after"} []
+                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
+                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"}}
+                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
+                [%s] test.INFO: handling [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"}}
+                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"}}
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
         );

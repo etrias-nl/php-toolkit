@@ -13,6 +13,7 @@ use Basis\Nats\Stream\Stream;
 use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
+use Monolog\Level;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -21,6 +22,8 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Uid\Uuid;
 
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
@@ -38,6 +41,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly MessageMap $messageMap,
         private readonly Counter $counter,
         private readonly LoggerInterface $logger,
+        private readonly NormalizerInterface $normalizer,
         private readonly string $streamName,
     ) {}
 
@@ -66,9 +70,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                     $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.self::ACK_WAIT_SECONDS.' seconds'));
                 }
 
-                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])
-                    ->with(...$stamps)
-                ;
+                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
             }, null, false);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0);
@@ -84,10 +86,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         if (new \DateTimeImmutable() >= $replyTo->expiresAt) {
-            $this->logger->warning('Message expired', [
-                'stream' => $this->streamName,
-                'message' => $envelope->getMessage()::class,
-                'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
+            $this->log(Level::Warning, $envelope, 'Message expired', [
                 'expired_at' => $replyTo->expiresAt,
             ]);
         }
@@ -107,11 +106,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
      */
     public function reject(Envelope $envelope): void
     {
-        $this->logger->notice('Message rejected', [
-            'stream' => $this->streamName,
-            'message' => $envelope->getMessage()::class,
-            'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
-        ]);
+        $this->log(Level::Notice, $envelope, 'Message rejected');
     }
 
     public function send(Envelope $envelope): Envelope
@@ -138,9 +133,24 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
+        $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
+        $message = $envelope->getMessage();
+        $context = [];
+
+        try {
+            $context['payload'] = $this->normalizer->normalize($message, null, [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
+            ]);
+        } catch (\Throwable $e) {
+            $context['payload'] = @serialize($message);
+            $context['payload_normalize_error'] = $e;
+        }
+
+        $this->log(Level::Info, $envelope, 'Message sent', $context);
         $this->delta($envelope, 1);
 
-        return $envelope->with(new TransportMessageIdStamp($messageId));
+        return $envelope;
     }
 
     public function getMessageCount(): int
@@ -201,8 +211,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->counter->delta($this->getCounterPrefix().$envelope->getMessage()::class, $count);
         } catch (\Throwable $e) {
-            $this->logger->notice('Unable to update message counter', ['exception' => $e]);
+            $this->log(Level::Notice, $envelope, 'Unable to update message counter', ['exception' => $e]);
         }
+    }
+
+    private function log(Level $level, ?Envelope $envelope, string $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, [
+            'stream' => $this->streamName,
+            'message' => $envelope?->getMessage()::class,
+            'message_id' => $envelope?->last(TransportMessageIdStamp::class)?->getId(),
+        ] + $context);
     }
 
     private function getCounterPrefix(): string

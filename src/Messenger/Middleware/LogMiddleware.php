@@ -5,24 +5,34 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
+use Monolog\Attribute\AsMonologProcessor;
+use Monolog\LogRecord;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+#[AsMonologProcessor]
 final class LogMiddleware implements MiddlewareInterface
 {
-    public function __construct(
-        private readonly LogProcessor $processor,
-        private readonly NormalizerInterface $normalizer,
-    ) {
-        $this->processor->normalizer = $this->normalizer;
+    private ?Envelope $currentEnvelope = null;
+
+    public function __invoke(LogRecord $record): LogRecord
+    {
+        if (null === $this->currentEnvelope) {
+            return $record;
+        }
+
+        $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
+        $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
+        $record->extra['messenger']['message'] = $this->currentEnvelope->getMessage()::class;
+
+        return $record;
     }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
-        $prevEnvelope = $this->processor->currentEnvelope;
+        $prevEnvelope = $this->currentEnvelope;
 
         if (null !== $prevEnvelope) {
             $envelope = $envelope
@@ -31,14 +41,12 @@ final class LogMiddleware implements MiddlewareInterface
             ;
         }
 
-        $this->processor->currentEnvelope = $envelope;
-        $this->processor->loggedPayload = false;
+        $this->currentEnvelope = $envelope;
 
         try {
             return $stack->next()->handle($envelope, $stack);
         } finally {
-            $this->processor->currentEnvelope = $prevEnvelope;
-            $this->processor->loggedPayload = false;
+            $this->currentEnvelope = $prevEnvelope;
         }
     }
 }

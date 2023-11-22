@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 final class NatsTransportFactory implements TransportFactoryInterface
 {
@@ -22,6 +23,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         private readonly Counter $counter,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
+        private readonly NormalizerInterface $normalizer,
     ) {}
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
@@ -43,6 +45,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->messageMap,
             $this->counter,
             $this->logger,
+            $this->normalizer,
             $queryParts['stream'],
         );
     }
