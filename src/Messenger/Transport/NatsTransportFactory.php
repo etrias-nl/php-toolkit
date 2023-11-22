@@ -9,6 +9,7 @@ use Basis\Nats\Configuration;
 use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -17,6 +18,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private readonly MessageMap $messageMap,
+        #[Autowire(service: '.messenger.counter')]
         private readonly Counter $counter,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
