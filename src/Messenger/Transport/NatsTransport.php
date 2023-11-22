@@ -73,14 +73,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         if ($consumer->exists()) {
             if ($refresh) {
-                while ($this->getConsumerWaitingCount() > 0) {
-                    $this->logger->info('Waiting for current consumer');
-                    sleep(3);
-                }
-
                 if (!$dryRun) {
-                    $consumer->delete();
-                    $consumer->create();
+                    // create also updates consumers, but PHP client cannot force it
+                    $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray()) ?? throw new TransportException('Unable to update consumer');
                 }
 
                 $this->log(Level::Info, null, 'Consumer recreated');
@@ -215,13 +210,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return array_map(static fn (int $count): int => max(0, $count), $counts);
-    }
-
-    public function getConsumerWaitingCount(): int
-    {
-        $this->client->ping();
-
-        return $this->getConsumer()->info()?->num_waiting ?? throw new TransportException('Unable to get consumer count');
     }
 
     private function getStream(): Stream

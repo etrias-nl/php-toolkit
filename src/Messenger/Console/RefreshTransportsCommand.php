@@ -39,10 +39,6 @@ final class RefreshTransportsCommand extends Command
         $dryRun = $input->getOption('dry-run');
         $transports = $input->getArgument('transports');
 
-        if (!$dryRun && !$io->confirm('Are you sure?', false)) {
-            return Command::SUCCESS;
-        }
-
         foreach ($this->receivers as $alias => $receiver) {
             if ($transports && !\in_array($alias, $transports, true)) {
                 continue;
@@ -52,6 +48,10 @@ final class RefreshTransportsCommand extends Command
 
             if ($receiver instanceof MessageCountAwareInterface) {
                 $io->info('Current number of messages: '.$receiver->getMessageCount());
+            }
+
+            if (!$dryRun && !$io->confirm('Are you sure?', false)) {
+                continue;
             }
 
             if ($receiver instanceof SetupableTransportInterface && 2 === (new \ReflectionMethod($receiver, 'setup'))->getNumberOfParameters()) {
