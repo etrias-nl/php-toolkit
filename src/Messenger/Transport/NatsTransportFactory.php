@@ -33,7 +33,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
 
         parse_str($urlParts['query'] ?? '', $queryParts);
 
-        if (!isset($queryParts['stream'])) {
+        if (null === $stream = $queryParts['stream'] ?? $options['stream'] ?? $options['transport_name'] ?? null) {
             throw new \RuntimeException('Missing "stream" parameter in connection string.');
         }
 
@@ -46,7 +46,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->counter,
             $this->logger,
             $this->normalizer,
-            $queryParts['stream'],
+            $stream,
         );
     }
 
