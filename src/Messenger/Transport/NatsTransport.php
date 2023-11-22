@@ -45,16 +45,54 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly string $streamName,
     ) {}
 
-    public function setup(): void
+    public function setup(bool $refresh = false, bool $dryRun = false): void
     {
         $this->client->ping();
 
         $stream = $this->getStream();
 
         if ($stream->exists()) {
-            $stream->update();
+            if ($refresh) {
+                if (!$dryRun) {
+                    $stream->update();
+                }
+
+                $this->log(Level::Info, null, 'Stream updated');
+            } else {
+                $this->log(Level::Info, null, 'Stream already exists');
+            }
         } else {
-            $stream->create();
+            if (!$dryRun) {
+                $stream->create();
+            }
+
+            $this->log(Level::Info, null, 'Stream created');
+        }
+
+        $consumer = $this->getConsumer();
+
+        if ($consumer->exists()) {
+            if ($refresh) {
+                while ($this->getConsumerWaitingCount() > 0) {
+                    $this->logger->info('Waiting for current consumer');
+                    sleep(3);
+                }
+
+                if (!$dryRun) {
+                    $consumer->delete();
+                    $consumer->create();
+                }
+
+                $this->log(Level::Info, null, 'Consumer recreated');
+            } else {
+                $this->log(Level::Info, null, 'Consumer already exists');
+            }
+        } else {
+            if (!$dryRun) {
+                $consumer->create();
+            }
+
+            $this->log(Level::Info, null, 'Consumer created');
         }
     }
 
@@ -157,7 +195,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $this->client->ping();
 
-        return $this->getStream()->info()?->getValue('state')?->messages ?? throw new TransportException('Unable to get message count');
+        return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
     }
 
     /**
@@ -177,6 +215,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return array_map(static fn (int $count): int => max(0, $count), $counts);
+    }
+
+    public function getConsumerWaitingCount(): int
+    {
+        $this->client->ping();
+
+        return $this->getConsumer()->info()?->num_waiting ?? throw new TransportException('Unable to get consumer count');
     }
 
     private function getStream(): Stream
@@ -219,7 +264,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $this->logger->log($level, $message, [
             'stream' => $this->streamName,
-            'message' => $envelope?->getMessage()::class,
+            'message' => null === $envelope ? null : $envelope->getMessage()::class,
             'message_id' => $envelope?->last(TransportMessageIdStamp::class)?->getId(),
         ] + $context);
     }
