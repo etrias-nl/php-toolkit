@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Counter\ArrayCounter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
+use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use PHPUnit\Framework\TestCase;
@@ -81,6 +82,7 @@ final class NatsTest extends TestCase
         self::assertStringMatchesFormat('{"%s:stdClass":1}', json_encode($counter->values(), JSON_THROW_ON_ERROR));
         self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
         self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertNotNull($sentEnvelopes[0]->last(ReplyToStamp::class));
 
         $transport->ack($sentEnvelopes[0]);
 

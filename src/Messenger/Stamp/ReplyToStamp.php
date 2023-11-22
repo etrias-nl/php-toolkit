@@ -9,6 +9,7 @@ use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 final class ReplyToStamp implements NonSendableStampInterface
 {
     public function __construct(
-        public readonly ?string $id,
+        public readonly string $id,
+        public readonly \DateTimeImmutable $expiresAt,
     ) {}
 }

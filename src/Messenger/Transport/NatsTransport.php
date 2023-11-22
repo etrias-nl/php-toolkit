@@ -26,6 +26,7 @@ use Symfony\Component\Uid\Uuid;
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
+    private const ACK_WAIT_SECONDS = 300;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -60,9 +61,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->ping();
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
+                $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
+                if (null !== $replyTo) {
+                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.self::ACK_WAIT_SECONDS.' seconds'));
+                }
+
                 $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])
-                    ->with(new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID)))
-                    ->with(new ReplyToStamp($replyTo))
+                    ->with(...$stamps)
                 ;
             }, null, false);
         } catch (\Throwable $e) {
@@ -74,13 +79,22 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function ack(Envelope $envelope): void
     {
-        if (null === $replyTo = $envelope->last(ReplyToStamp::class)?->id) {
+        if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
             return;
+        }
+
+        if (new \DateTimeImmutable() >= $replyTo->expiresAt) {
+            $this->logger->warning('Message expired', [
+                'stream' => $this->streamName,
+                'message' => $envelope->getMessage()::class,
+                'message_id' => $envelope->last(TransportMessageIdStamp::class)?->getId(),
+                'expired_at' => $replyTo->expiresAt,
+            ]);
         }
 
         try {
             $this->client->ping();
-            $this->client->publish($replyTo, true);
+            $this->client->publish($replyTo->id, true);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -133,7 +147,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $this->client->ping();
 
-        return $this->getStream()->info()?->getValue('state')?->messages ?? 0;
+        return $this->getStream()->info()?->getValue('state')?->messages ?? throw new TransportException('Unable to get message count');
     }
 
     /**
@@ -175,7 +189,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
             $this->consumer->setIterations(1);
             $this->consumer->getConfiguration()
-                ->setAckWait(1_000_000_000 * 300) // 300s
+                ->setAckWait(1_000_000_000 * self::ACK_WAIT_SECONDS)
             ;
         }
 
