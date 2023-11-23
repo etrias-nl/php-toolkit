@@ -57,16 +57,16 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                     $stream->update();
                 }
 
-                $this->log(Level::Info, null, 'Stream updated');
+                $this->log(Level::Info, $stream, 'Stream updated');
             } else {
-                $this->log(Level::Info, null, 'Stream already exists');
+                $this->log(Level::Info, $stream, 'Stream already exists');
             }
         } else {
             if (!$dryRun) {
                 $stream->create();
             }
 
-            $this->log(Level::Info, null, 'Stream created');
+            $this->log(Level::Info, $stream, 'Stream created');
         }
 
         $consumer = $this->getConsumer();
@@ -74,20 +74,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if ($consumer->exists()) {
             if ($refresh) {
                 if (!$dryRun) {
-                    // create also updates consumers, but PHP client cannot force it
+                    // $consumer->update() after https://github.com/basis-company/nats.php/pull/52
                     $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray()) ?? throw new TransportException('Unable to update consumer');
                 }
 
-                $this->log(Level::Info, null, 'Consumer recreated');
+                $this->log(Level::Info, $consumer, 'Consumer updated');
             } else {
-                $this->log(Level::Info, null, 'Consumer already exists');
+                $this->log(Level::Info, $consumer, 'Consumer already exists');
             }
         } else {
             if (!$dryRun) {
                 $consumer->create();
             }
 
-            $this->log(Level::Info, null, 'Consumer created');
+            $this->log(Level::Info, $consumer, 'Consumer created');
         }
     }
 
@@ -254,13 +254,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
     }
 
-    private function log(Level $level, ?Envelope $envelope, string $message, array $context = []): void
+    private function log(Level $level, null|Consumer|Envelope|Stream $subject, string $message, array $context = []): void
     {
-        $this->logger->log($level, $message, [
-            'stream' => $this->streamName,
-            'message' => null === $envelope ? null : $envelope->getMessage()::class,
-            'message_id' => $envelope?->last(TransportMessageIdStamp::class)?->getId(),
-        ] + $context);
+        $context['stream'] = $this->streamName;
+
+        if ($subject instanceof Envelope) {
+            $context['message'] = $subject->getMessage()::class;
+            $context['message_id'] = $subject->last(TransportMessageIdStamp::class)?->getId();
+        } elseif ($subject instanceof Stream) {
+            $context['stream_config'] = json_decode(json_encode($subject->info()?->config, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        } elseif ($subject instanceof Consumer) {
+            $context['consumer_config'] = json_decode(json_encode($subject->info()?->config, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        $this->logger->log($level, $message, $context);
     }
 
     private function getCounterPrefix(): string
