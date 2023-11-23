@@ -156,9 +156,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->ping();
 
-            $stream->createIfNotExists();
             if (!$stream->exists()) {
-                throw new \RuntimeException('Missing stream: '.$this->streamName);
+                $stream->create();
+
+                if (!$stream->exists()) {
+                    throw new \RuntimeException('Missing stream: '.$this->streamName);
+                }
             }
 
             $this->client->publish($this->streamName, $payload);
@@ -216,6 +219,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         if (null === $this->stream) {
             $this->stream = $this->client->getApi()->getStream($this->streamName);
+            // note configuration is persisted at server level
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::MEMORY)
@@ -231,6 +235,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if (null === $this->consumer) {
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
             $this->consumer->setIterations(1);
+            $this->consumer->setBatching(1);
+            // note configuration is persisted at server level
             $this->consumer->getConfiguration()
                 ->setAckWait(1_000_000_000 * self::ACK_WAIT_SECONDS)
             ;

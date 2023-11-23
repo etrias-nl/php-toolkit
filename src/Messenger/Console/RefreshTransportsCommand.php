@@ -45,10 +45,7 @@ final class RefreshTransportsCommand extends Command
             }
 
             $io->title($alias);
-
-            if ($receiver instanceof MessageCountAwareInterface) {
-                $io->info('Current number of messages: '.$receiver->getMessageCount());
-            }
+            $io->info('Current number of messages: '.($receiver instanceof MessageCountAwareInterface ? $receiver->getMessageCount() : 'n/a'));
 
             if (!$dryRun && !$io->confirm('Are you sure?', false)) {
                 continue;
@@ -59,7 +56,7 @@ final class RefreshTransportsCommand extends Command
                 $receiver->setup(true, $dryRun);
                 $io->success('Transport was refreshed successfully');
             } else {
-                $io->note('Transport does not support setup');
+                $io->note('Transport does not support refreshing');
             }
         }
 
