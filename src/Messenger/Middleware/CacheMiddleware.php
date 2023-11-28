@@ -8,6 +8,7 @@ use Etrias\PhpToolkit\Messenger\MessageCache;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class CacheMiddleware implements MiddlewareInterface
@@ -22,7 +23,7 @@ final class CacheMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        return $this->messageCache->get($info->key, static function (ItemInterface $item) use ($info, $envelope, $stack): Envelope {
+        $handledStamps = $this->messageCache->get($info->key, static function (ItemInterface $item) use ($info, $envelope, $stack): array {
             $item->tag($info->tags);
 
             if ($info->ttl instanceof \DateTimeInterface) {
@@ -31,7 +32,9 @@ final class CacheMiddleware implements MiddlewareInterface
                 $item->expiresAfter($info->ttl);
             }
 
-            return $stack->next()->handle($envelope, $stack);
+            return $stack->next()->handle($envelope, $stack)->all(HandledStamp::class);
         });
+
+        return $envelope->with(...$handledStamps);
     }
 }
