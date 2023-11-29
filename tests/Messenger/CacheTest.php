@@ -26,30 +26,35 @@ final class CacheTest extends TestCase
         $cache = new TagAwareAdapter(new ArrayAdapter());
         $cacheInfoProvider = $this->createMock(CacheInfoProvider::class);
         $cacheMiddleware = new CacheMiddleware(new MessageCache($cache, $cacheInfoProvider));
-        $bus = new MessageBus([$cacheMiddleware, new HandleMessageMiddleware(new HandlersLocator(['*' => [static fn (): string => 'handler result']]))]);
+        $handlerCount = 0;
+        $bus = new MessageBus([$cacheMiddleware, new HandleMessageMiddleware(new HandlersLocator(['*' => [static function () use (&$handlerCount): string {
+            ++$handlerCount;
+
+            return 'handler result';
+        }]]))]);
         $message = (object) ['test' => true];
 
-        $cacheInfoProvider->expects(self::exactly(3))
+        $cacheInfoProvider->expects(self::exactly(4))
             ->method('get')
             ->with($message)
             ->willReturn(
                 null,
-                new CacheInfo('key', null, ['tag']),
-                new CacheInfo('key_expired', new \DateTime('yesterday')),
+                $info = new CacheInfo('key', new \DateTime('tomorrow'), ['tag']),
+                $info,
+                $info,
             )
         ;
         $bus->dispatch($message);
 
-        self::assertFalse($cache->getItem('key')->isHit());
+        self::assertSame(1, $handlerCount);
 
         $envelope = $bus->dispatch($message);
-        $item = $cache->getItem('key');
+        $cacheItem = $cache->getItem('key');
+        $cachedResult = $cacheItem->get();
 
-        self::assertTrue($item->isHit());
-        self::assertSame(['tags' => ['tag' => 'tag']], $item->getMetadata());
-
-        $cachedResult = $item->get();
-
+        /** @psalm-suppress DocblockTypeContradiction */
+        self::assertSame(2, $handlerCount);
+        self::assertSame(['tags' => ['tag' => 'tag']], $cacheItem->getMetadata());
         self::assertIsArray($cachedResult);
         self::assertCount(1, $cachedResult);
         self::assertContainsOnlyInstancesOf(HandledStamp::class, $cachedResult);
@@ -58,6 +63,13 @@ final class CacheTest extends TestCase
 
         $bus->dispatch($message);
 
-        self::assertFalse($cache->getItem('key_expired')->isHit());
+        /** @psalm-suppress DocblockTypeContradiction */
+        self::assertSame(2, $handlerCount);
+
+        $cache->invalidateTags(['tag']);
+        $bus->dispatch($message);
+
+        /** @psalm-suppress DocblockTypeContradiction */
+        self::assertSame(3, $handlerCount);
     }
 }
