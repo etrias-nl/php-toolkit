@@ -9,4 +9,14 @@
       <code>keys</code>
     </UndefinedMagicMethod>
   </file>
+  <file src="src/Messenger/Transport/NatsTransportFactory.php">
+    <MissingTemplateParam>
+      <code>TransportFactoryInterface</code>
+    </MissingTemplateParam>
+  </file>
+  <file src="tests/Messenger/SecurityTest.php">
+    <MissingTemplateParam>
+      <code>UserProviderInterface</code>
+    </MissingTemplateParam>
+  </file>
 </files>
