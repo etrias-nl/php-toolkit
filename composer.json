@@ -6,7 +6,7 @@
         "php": "^8.1"
     },
     "require-dev": {
-        "basis-company/nats": "^0.15.1",
+        "basis-company/nats": "^0.16.0",
         "monolog/monolog": "^3",
         "predis/predis": "^2.2",
         "symfony/cache": "^6",
