@@ -52,7 +52,6 @@ final class CacheTest extends TestCase
         $cacheItem = $cache->getItem('key');
         $cachedResult = $cacheItem->get();
 
-        /** @psalm-suppress DocblockTypeContradiction */
         self::assertSame(2, $handlerCount);
         self::assertSame(['tags' => ['tag' => 'tag']], $cacheItem->getMetadata());
         self::assertIsArray($cachedResult);
@@ -63,13 +62,11 @@ final class CacheTest extends TestCase
 
         $bus->dispatch($message);
 
-        /** @psalm-suppress DocblockTypeContradiction */
         self::assertSame(2, $handlerCount);
 
         $cache->invalidateTags(['tag']);
         $bus->dispatch($message);
 
-        /** @psalm-suppress DocblockTypeContradiction */
         self::assertSame(3, $handlerCount);
     }
 }
