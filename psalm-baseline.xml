@@ -14,6 +14,13 @@
       <code>TransportFactoryInterface</code>
     </MissingTemplateParam>
   </file>
+  <file src="tests/Messenger/CacheTest.php">
+    <DocblockTypeContradiction>
+      <code>assertSame</code>
+      <code>assertSame</code>
+      <code>assertSame</code>
+    </DocblockTypeContradiction>
+  </file>
   <file src="tests/Messenger/SecurityTest.php">
     <MissingTemplateParam>
       <code>UserProviderInterface</code>
