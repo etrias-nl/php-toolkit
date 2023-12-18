@@ -6,7 +6,7 @@ services:
             - '--jetstream'
             - '--debug'
     php:
-        image: etriasnl/dev-php-fpm:8.1.26-992
+        image: etriasnl/dev-php-fpm:8.1.26-993
         depends_on:
             - nats
         volumes:
