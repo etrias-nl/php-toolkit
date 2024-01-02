@@ -2,7 +2,12 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
+use Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonyLevelSetList;
@@ -16,11 +21,11 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         'tests/Fixtures/Messenger/envelope_compressed.php',
         'tests/Fixtures/Messenger/envelope_uncompressed.php',
-        \Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
-        \Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector::class,
-        \Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
-        \Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector::class,
-        \Rector\CodeQuality\Rector\Foreach_\UnusedForeachValueToArrayKeysRector::class,
+        NullToStrictStringFuncCallArgRector::class,
+        LocallyCalledStaticMethodToNonStaticRector::class,
+        FlipTypeControlToUseExclusiveTypeRector::class,
+        ExplicitBoolCompareRector::class,
+        UnusedForeachValueToArrayKeysRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');
     $rectorConfig->importNames();
