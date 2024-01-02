@@ -39,7 +39,7 @@ jobs:
                         ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-
                         ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}-${{ github.event.pull_request.base.sha || github.sha }}
             -
-                uses: ScribeMD/docker-cache@0.3.6
+                uses: ScribeMD/docker-cache@0.3.7
                 with:
                     key: ${{ runner.os }}-docker-${{ hashFiles('Makefile', 'okteto.yaml') }}
             -
