@@ -7,10 +7,12 @@
     },
     "require-dev": {
         "basis-company/nats": "^0.16.0",
+        "doctrine/orm": "^2",
         "monolog/monolog": "^3",
         "predis/predis": "^2.2",
         "symfony/cache": "^6",
         "symfony/console": "^6",
+        "symfony/doctrine-bridge": "^6",
         "symfony/event-dispatcher": "^6",
         "symfony/http-foundation": "^6",
         "symfony/messenger": "^6",

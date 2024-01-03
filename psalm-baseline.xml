@@ -9,6 +9,11 @@
       <code>keys</code>
     </UndefinedMagicMethod>
   </file>
+  <file src="src/Messenger/Middleware/DoctrineTransactionMiddleware.php">
+    <InternalClass>
+      <code>BaseDoctrineTransactionMiddleware</code>
+    </InternalClass>
+  </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <MissingTemplateParam>
       <code>TransportFactoryInterface</code>
