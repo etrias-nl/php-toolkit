@@ -18,4 +18,9 @@ final class CacheInfo
     ) {
         $this->key = \is_string($key) ? $key : hash('xxh128', serialize($key));
     }
+
+    public static function makeTag(string $segment, string ...$segments): string
+    {
+        return implode('_', array_map(static fn (string $segment): string => str_replace('\\', '-', $segment), [$segment, ...$segments]));
+    }
 }

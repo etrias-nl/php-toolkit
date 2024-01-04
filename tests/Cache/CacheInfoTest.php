@@ -60,4 +60,11 @@ final class CacheInfoTest extends TestCase
         self::assertSame(hash('xxh128', serialize($key)), $info->key);
         self::assertSame('084555216497935884c30637186765a9', $info->key);
     }
+
+    public function testMakeTag(): void
+    {
+        self::assertSame('_Foo_', CacheInfo::makeTag('_Foo_'));
+        self::assertSame('__Foo_____bar__', CacheInfo::makeTag('__Foo__', '__bar__'));
+        self::assertSame('_Foo-_-bar__-foo--bar--', CacheInfo::makeTag('_Foo\\', '\\bar_', '-foo\\\\bar--'));
+    }
 }
