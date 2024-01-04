@@ -24,7 +24,9 @@ final class MessageCache implements TagAwareCacheInterface
 
     public function info(Envelope $envelope): ?CacheInfo
     {
-        return $this->cacheInfoProviders->get($envelope->getMessage()::class)->get($envelope->getMessage());
+        $message = $envelope->getMessage();
+
+        return $this->cacheInfoProviders->has($message::class) ? $this->cacheInfoProviders->get($message::class)->get($message) : null;
     }
 
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
