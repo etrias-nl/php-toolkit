@@ -11,6 +11,7 @@ use Etrias\PhpToolkit\Messenger\Middleware\CacheMiddleware;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
@@ -25,7 +26,7 @@ final class CacheTest extends TestCase
     {
         $cache = new TagAwareAdapter(new ArrayAdapter());
         $cacheInfoProvider = $this->createMock(CacheInfoProvider::class);
-        $cacheMiddleware = new CacheMiddleware(new MessageCache($cache, $cacheInfoProvider));
+        $cacheMiddleware = new CacheMiddleware(new MessageCache($cache, new ServiceLocator([\stdClass::class => static fn (): CacheInfoProvider => $cacheInfoProvider])));
         $handlerCount = 0;
         $bus = new MessageBus([$cacheMiddleware, new HandleMessageMiddleware(new HandlersLocator(['*' => [static function () use (&$handlerCount): string {
             ++$handlerCount;

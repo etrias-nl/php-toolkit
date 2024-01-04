@@ -9,18 +9,22 @@ use Etrias\PhpToolkit\Cache\CacheInfoProvider;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 final class MessageCache implements TagAwareCacheInterface
 {
+    /**
+     * @param ServiceProviderInterface<CacheInfoProvider> $cacheInfoProviders
+     */
     public function __construct(
         #[Target(name: 'messenger.cache')]
         private readonly TagAwareCacheInterface $cache,
-        private readonly CacheInfoProvider $cacheInfoProvider,
+        private readonly ServiceProviderInterface $cacheInfoProviders,
     ) {}
 
     public function info(Envelope $envelope): ?CacheInfo
     {
-        return $this->cacheInfoProvider->get($envelope->getMessage());
+        return $this->cacheInfoProviders->get($envelope->getMessage()::class)->get($envelope->getMessage());
     }
 
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
