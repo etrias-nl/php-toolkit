@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Etrias\PhpToolkit\Messenger\Stamp\SecurityStamp;
-use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -17,18 +16,28 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 final class SecurityMiddleware implements MiddlewareInterface
 {
+    private readonly ?string $defaultUserProviderId;
+
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'security.firewall.map')]
         private readonly FirewallMap $firewallMap,
         private readonly RequestStack $requestStack,
-        private readonly ContainerInterface $userProviders,
+        private readonly ServiceProviderInterface $userProviders,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
-    ) {}
+        ?string $defaultUserProviderId = null,
+    ) {
+        if (null === $defaultUserProviderId && 1 === \count($userProviderServices = $this->userProviders->getProvidedServices())) {
+            $defaultUserProviderId = array_key_first($userProviderServices);
+        }
+
+        $this->defaultUserProviderId = $defaultUserProviderId;
+    }
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -87,13 +96,13 @@ final class SecurityMiddleware implements MiddlewareInterface
     private function getUserProviderId(): string
     {
         if (null === $request = $this->requestStack->getMainRequest()) {
-            throw new \RuntimeException('Cannot determine user provider without a request.');
+            return $this->defaultUserProviderId ?? throw new \RuntimeException('Cannot determine user provider without a request, nor a default.');
         }
         if (null === $firewallConfig = $this->firewallMap->getFirewallConfig($request)) {
-            throw new \RuntimeException('Cannot determine user provider without a firewall config.');
+            return $this->defaultUserProviderId ?? throw new \RuntimeException('Cannot determine user provider without a firewall config, nor a default.');
         }
 
-        return $firewallConfig->getProvider() ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider.', $firewallConfig->getName()));
+        return $firewallConfig->getProvider() ?? $this->defaultUserProviderId ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
     }
 
     private function getUserProvider(?string $id = null): UserProviderInterface
