@@ -10,7 +10,7 @@ cli:
 lint:
 	${exec_docker} php sh -c "phplint --no-progress --cache=var/phplint-cache --warning bin/console src tests"
 cs-fix:
-	${exec_docker} php sh -c "php-cs-fixer fix"
+	${exec_docker} php sh -c "php-cs-fixer fix --show-progress=none"
 psalm:
 	${exec_docker} php sh -c "psalm --no-progress"
 psalm-suppress: composer-update
