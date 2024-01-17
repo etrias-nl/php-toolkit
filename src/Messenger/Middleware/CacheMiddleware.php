@@ -24,7 +24,11 @@ final class CacheMiddleware implements MiddlewareInterface
         }
 
         $handledStamps = $this->messageCache->get($info->key, static function (ItemInterface $item) use ($info, $envelope, $stack): array {
-            $item->tag($info->tags);
+            $result = $stack->next()->handle($envelope, $stack)->all(HandledStamp::class);
+            $values = array_map(static fn (HandledStamp $stamp): mixed => $stamp->getResult(), $result);
+            $tags = array_map(static fn (\Closure|string $tag): string => \is_string($tag) ? $tag : $tag(...$values), $info->tags);
+
+            $item->tag($tags);
 
             if ($info->ttl instanceof \DateTimeInterface) {
                 $item->expiresAt($info->ttl);
@@ -32,7 +36,7 @@ final class CacheMiddleware implements MiddlewareInterface
                 $item->expiresAfter($info->ttl);
             }
 
-            return $stack->next()->handle($envelope, $stack)->all(HandledStamp::class);
+            return $result;
         });
 
         return $envelope->with(...$handledStamps);

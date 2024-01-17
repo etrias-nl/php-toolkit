@@ -9,7 +9,7 @@ final class CacheInfo
     public readonly string $key;
 
     /**
-     * @param string[] $tags
+     * @param (\Closure(mixed):string|string)[] $tags
      */
     public function __construct(
         array|object|string $key,

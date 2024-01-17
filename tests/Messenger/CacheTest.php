@@ -40,7 +40,7 @@ final class CacheTest extends TestCase
             ->with($message)
             ->willReturn(
                 null,
-                $info = new CacheInfo('key', new \DateTime('tomorrow'), ['tag']),
+                $info = new CacheInfo('key', new \DateTime('tomorrow'), ['tag', static fn (string $result): string => 'computed '.$result]),
                 $info,
                 $info,
             )
@@ -54,7 +54,7 @@ final class CacheTest extends TestCase
         $cachedResult = $cacheItem->get();
 
         self::assertSame(2, $handlerCount);
-        self::assertSame(['tags' => ['tag' => 'tag']], $cacheItem->getMetadata());
+        self::assertSame(['tags' => ['tag' => 'tag', 'computed handler result' => 'computed handler result']], $cacheItem->getMetadata());
         self::assertIsArray($cachedResult);
         self::assertCount(1, $cachedResult);
         self::assertContainsOnlyInstancesOf(HandledStamp::class, $cachedResult);
