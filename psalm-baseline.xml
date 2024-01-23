@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.19.1@b9583493b08eb36259c0f6b746a787c4c9b3ac45">
+<files psalm-version="5.20.0@3f284e96c9d9be6fe6b15c79416e1d1903dcfef4">
   <file src="src/Counter/RedisCounter.php">
     <UndefinedMagicMethod>
       <code>decrby</code>
@@ -13,6 +13,11 @@
     <InternalClass>
       <code>BaseDoctrineTransactionMiddleware</code>
     </InternalClass>
+  </file>
+  <file src="src/Messenger/Transport/NatsTransport.php">
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$options['deduplicate'] ?? true]]></code>
+    </RiskyTruthyFalsyComparison>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <MissingTemplateParam>
