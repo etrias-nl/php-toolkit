@@ -57,13 +57,17 @@ final class SecurityMiddleware implements MiddlewareInterface
             if (null !== $newToken) {
                 $userProvider = $this->getUserProvider($stamp->userProvider);
 
-                if (null === $tokenUser = $newToken->getUser()) {
-                    $tokenUser = $userProvider->loadUserByIdentifier($newToken->getUserIdentifier());
-                } else {
-                    $tokenUser = $userProvider->refreshUser($tokenUser);
-                }
+                try {
+                    if (null === $tokenUser = $newToken->getUser()) {
+                        $tokenUser = $userProvider->loadUserByIdentifier($newToken->getUserIdentifier());
+                    } else {
+                        $tokenUser = $userProvider->refreshUser($tokenUser);
+                    }
 
-                $newToken->setUser($tokenUser);
+                    $newToken->setUser($tokenUser);
+                } catch (\Exception $e) {
+                    $this->logger->warning('Cannot load/refresh user for token', ['exception' => $e, 'token' => $newToken::class]);
+                }
             }
         }
 
