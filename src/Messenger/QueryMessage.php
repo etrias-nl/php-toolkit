@@ -21,9 +21,9 @@ final class QueryMessage
         try {
             $envelope = $messageBus->dispatch($message, $stamps);
         } catch (HandlerFailedException $e) {
-            $wrappedExceptions = $e->getWrappedExceptions(null, true);
+            $wrappedExceptions = $e->getWrappedExceptions();
             if (1 === \count($wrappedExceptions)) {
-                throw $wrappedExceptions[0];
+                throw reset($wrappedExceptions);
             }
 
             throw $e;
