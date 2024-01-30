@@ -40,7 +40,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
 
         return new NatsTransport(
-            new Client(new Configuration($config)),
+            new Client(new Configuration($config), $this->logger),
             $serializer,
             $this->messageMap,
             $this->counter,
