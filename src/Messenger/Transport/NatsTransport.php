@@ -204,7 +204,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         /** @var array<class-string, int> $counts */
         $counts = $this->counter->values($counterPrefix = $this->getCounterPrefix());
 
-        if (0 === $this->getMessageCount()) {
+        if (0 === $totalCount = $this->getMessageCount()) {
             foreach ($counts as $message => $_) {
                 $this->counter->clear($counterPrefix.$message);
             }
@@ -212,7 +212,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [];
         }
 
-        return array_map(static fn (int $count): int => max(0, $count), $counts);
+        return array_map(static fn (int $count): int => min($totalCount, $count), $counts);
     }
 
     private function getStream(): Stream

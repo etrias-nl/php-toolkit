@@ -110,7 +110,7 @@ final class NatsTest extends TestCase
         $messageId4 = $transport->send(Envelope::wrap((object) ['test_2' => true]))->last(TransportMessageIdStamp::class)?->getId();
 
         self::assertSame(3, $transport->getMessageCount());
-        self::assertSame([\stdClass::class => 4], $transport->getMessageCounts());
+        self::assertSame([\stdClass::class => 3], $transport->getMessageCounts());
         self::assertTrue(\is_string($messageId1) && 32 === \strlen($messageId1));
         self::assertSame($messageId1, $messageId2);
         self::assertTrue(\is_string($messageId3) && Uuid::isValid($messageId3));
@@ -127,7 +127,7 @@ final class NatsTest extends TestCase
         $transport->ack($sentEnvelopes1[0]);
 
         self::assertSame(2, $transport->getMessageCount());
-        self::assertSame([\stdClass::class => 3], $transport->getMessageCounts());
+        self::assertSame([\stdClass::class => 2], $transport->getMessageCounts());
 
         $sentEnvelopes2 = $transport->get();
 
@@ -137,7 +137,7 @@ final class NatsTest extends TestCase
         $transport->ack($sentEnvelopes2[0]);
 
         self::assertSame(1, $transport->getMessageCount());
-        self::assertSame([\stdClass::class => 2], $transport->getMessageCounts());
+        self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
         $sentEnvelopes3 = $transport->get();
 
