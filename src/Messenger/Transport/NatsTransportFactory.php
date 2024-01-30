@@ -38,6 +38,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         }
 
         $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
+        $config['timeout'] = (float) ($queryParts['timeout'] ?? $options['timeout'] ?? 5.0);
 
         return new NatsTransport(
             new Client(new Configuration($config), $this->logger),
