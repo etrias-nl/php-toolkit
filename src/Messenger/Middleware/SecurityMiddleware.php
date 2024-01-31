@@ -36,6 +36,7 @@ final class SecurityMiddleware implements MiddlewareInterface
             $defaultUserProviderId = array_key_first($userProviderServices);
         }
 
+        // @todo default to ChainUserProvider
         $this->defaultUserProviderId = $defaultUserProviderId;
     }
 
