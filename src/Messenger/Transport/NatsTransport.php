@@ -74,7 +74,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if ($consumer->exists()) {
             if ($refresh) {
                 if (!$dryRun) {
-                    // $consumer->update() after https://github.com/basis-company/nats.php/pull/52
+                    // create also updates consumer
                     $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray()) ?? throw new TransportException('Unable to update consumer');
                 }
 
