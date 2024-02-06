@@ -134,9 +134,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->delta($envelope, -1);
     }
 
+    /**
+     * @see https://github.com/symfony/symfony/issues/52642
+     */
     public function reject(Envelope $envelope): void
     {
-        $this->delta($envelope, -1);
+        $this->log(Level::Notice, $envelope, 'Message rejected');
     }
 
     public function send(Envelope $envelope): Envelope
