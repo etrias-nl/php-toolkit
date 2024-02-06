@@ -35,8 +35,9 @@ final class DoctrineTransactionMiddleware extends BaseDoctrineTransactionMiddlew
 
             return $envelope;
         } catch (\Throwable $exception) {
-            if ($entityManager->getConnection()->isTransactionActive()) {
+            try {
                 $entityManager->getConnection()->rollBack();
+            } catch (\Throwable) {
             }
 
             if ($exception instanceof HandlerFailedException) {
