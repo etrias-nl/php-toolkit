@@ -70,7 +70,7 @@ final class MessageMonitor
             }
         }
 
-        usort($jobs, static fn (array $a, array $b): int => ($b['count'] ?? 0) <=> ($a['count'] ?? 0) ?: $a['transport'].':'.$a['message'] <=> $b['transport'].':'.$b['message']);
+        usort($jobs, static fn (array $a, array $b): int => $a['transport'].':'.$a['message'] <=> $b['transport'].':'.$b['message']);
 
         return $jobs;
     }
