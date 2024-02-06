@@ -139,7 +139,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
      */
     public function reject(Envelope $envelope): void
     {
-        $this->log(Level::Notice, $envelope, 'Message rejected');
     }
 
     public function send(Envelope $envelope): Envelope
