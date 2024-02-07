@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\Messenger\DoctrineTransactionMiddleware as BaseDoctrineTransactionMiddleware;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -18,26 +19,34 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  * @see https://github.com/symfony/symfony/issues/51993
  * @see https://github.com/symfony/symfony/pull/53809
  */
-final class DoctrineTransactionMiddleware extends BaseDoctrineTransactionMiddleware
+final class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
-    protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly ?string $entityManagerName = null,
+    ) {}
+
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null === $envelope->last(ConsumedByWorkerStamp::class)) {
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $entityManager->getConnection()->beginTransaction();
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
+        $connection = $entityManager->getConnection();
+
+        $connection->beginTransaction();
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
             $entityManager->flush();
-            $entityManager->getConnection()->commit();
+            $connection->commit();
 
             return $envelope;
         } catch (\Throwable $exception) {
-            try {
-                $entityManager->getConnection()->rollBack();
-            } catch (\Throwable) {
+            if ($connection->isTransactionActive()) {
+                $connection->rollBack();
             }
 
             if ($exception instanceof HandlerFailedException) {
