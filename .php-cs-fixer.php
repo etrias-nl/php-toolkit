@@ -14,7 +14,7 @@ return (new Config())
         '@PhpCsFixer:risky' => true,
         '@PHP81Migration' => true,
         '@PHP80Migration:risky' => true,
-        '@PHPUnit84Migration:risky' => true,
+        '@PHPUnit100Migration:risky' => true,
         'header_comment' => ['header' => ''],
         'php_unit_test_case_static_method_calls' => ['call_type' => 'self'],
         'php_unit_test_class_requires_covers' => false,
