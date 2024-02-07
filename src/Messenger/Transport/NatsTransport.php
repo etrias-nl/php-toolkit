@@ -119,7 +119,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         if (new \DateTimeImmutable() >= $replyTo->expiresAt) {
-            $this->log(Level::Warning, $envelope, 'Message expired', [
+            $this->log(Level::Warning, $envelope, 'Message "{message}" expired', [
                 'expired_at' => $replyTo->expiresAt,
             ]);
         }
