@@ -9,11 +9,6 @@
       <code>keys</code>
     </UndefinedMagicMethod>
   </file>
-  <file src="src/Messenger/Middleware/DoctrineTransactionMiddleware.php">
-    <InternalClass>
-      <code>BaseDoctrineTransactionMiddleware</code>
-    </InternalClass>
-  </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$options['deduplicate'] ?? true]]></code>
