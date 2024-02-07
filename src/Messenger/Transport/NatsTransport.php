@@ -180,7 +180,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_error'] = $e;
         }
 
-        $this->log(Level::Info, $envelope, 'Message sent', $context);
+        $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
         $this->delta($envelope, 1);
 
         return $envelope;
