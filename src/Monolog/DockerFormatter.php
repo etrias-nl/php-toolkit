@@ -16,6 +16,15 @@ final class DockerFormatter extends JsonFormatter
         parent::__construct(self::BATCH_MODE_NEWLINES, true, false, true);
     }
 
+    protected function normalize(mixed $data, int $depth = 0): mixed
+    {
+        if (\is_array($data) && array_is_list($data)) {
+            return $this->toJson($data, true);
+        }
+
+        return parent::normalize($data, $depth);
+    }
+
     protected function normalizeException(\Throwable $e, int $depth = 0): array
     {
         $data = parent::normalizeException($e, $depth);
