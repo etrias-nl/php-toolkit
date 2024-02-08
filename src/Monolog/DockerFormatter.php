@@ -11,6 +11,8 @@ use Monolog\Formatter\JsonFormatter;
  */
 final class DockerFormatter extends JsonFormatter
 {
+    private bool $inList = false;
+
     public function __construct()
     {
         parent::__construct(self::BATCH_MODE_NEWLINES, true, false, true);
@@ -18,8 +20,14 @@ final class DockerFormatter extends JsonFormatter
 
     protected function normalize(mixed $data, int $depth = 0): mixed
     {
-        if (\is_array($data) && array_is_list($data)) {
-            return $this->toJson($data, true);
+        if (!$this->inList && \is_array($data) && array_is_list($data)) {
+            $this->inList = true;
+
+            try {
+                return $this->toJson(parent::normalize($data, $depth));
+            } finally {
+                $this->inList = false;
+            }
         }
 
         return parent::normalize($data, $depth);
