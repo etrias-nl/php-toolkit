@@ -19,6 +19,8 @@ final class CompactJsonFormatterTest extends TestCase
         self::assertSame([], $formatter->normalizeValue([]));
         self::assertSame(['foo' => 'bar', 123], $formatter->normalizeValue(['foo' => 'bar', 123]));
         self::assertSame('[123,456]', $formatter->normalizeValue([123, 456]));
+        self::assertSame(['foo' => '["bar",123,{"1":2}]'], $formatter->normalizeValue(['foo' => ['bar', 123, [1 => 2]]]));
+        self::assertSame(['foo' => '{"1":2,"2":3}'], $formatter->normalizeValue(['foo' => [1 => 2, 3]]));
         self::assertSame('{"999":123,"1000":{"foo":["bar"]}}', $formatter->normalizeValue([999 => 123, ['foo' => ['bar']]]));
     }
 
