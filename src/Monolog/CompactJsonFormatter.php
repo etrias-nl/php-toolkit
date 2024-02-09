@@ -20,7 +20,7 @@ final class CompactJsonFormatter extends JsonFormatter
 
     protected function normalize(mixed $data, int $depth = 0): mixed
     {
-        if (!$this->inList && \is_array($data) && array_is_list($data)) {
+        if (!$this->inList && \is_array($data) && !array_filter(array_keys($data), fn (mixed $key): bool => !is_numeric($key))) {
             $this->inList = true;
 
             try {
