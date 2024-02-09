@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Monolog\Processor;
 
+use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
-use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CliRunIdProcessor implements ProcessorInterface, EventSubscriberInterface
+#[AsMonologProcessor]
+final class CliRunIdProcessor implements EventSubscriberInterface
 {
     private ?string $runId = null;
 

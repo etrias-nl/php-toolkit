@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Monolog\Processor;
 
+use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
-use Monolog\Processor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class RequestIdProcessor implements ProcessorInterface
+#[AsMonologProcessor]
+final class RequestIdProcessor
 {
     public function __construct(
         private readonly RequestStack $requestStack,

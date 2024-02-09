@@ -29,7 +29,7 @@ final class DockerHandler extends AbstractProcessingHandler
         $this->command = sprintf('cat - >> /proc/%d/fd/%d', $processId, $fileDescriptor);
 
         $this->pushProcessor(new PsrLogMessageProcessor());
-        $this->setFormatter(new DockerFormatter());
+        $this->setFormatter(new CompactJsonFormatter());
     }
 
     public function close(): void

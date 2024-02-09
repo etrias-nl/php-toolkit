@@ -9,7 +9,7 @@ use Monolog\Formatter\JsonFormatter;
 /**
  * @internal
  */
-final class DockerFormatter extends JsonFormatter
+final class CompactJsonFormatter extends JsonFormatter
 {
     private bool $inList = false;
 
