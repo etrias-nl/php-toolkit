@@ -16,6 +16,7 @@ final class CompactJsonFormatterTest extends TestCase
     {
         $formatter = new CompactJsonFormatter();
 
+        self::assertSame([], $formatter->normalizeValue([]));
         self::assertSame(['foo' => 'bar', 123], $formatter->normalizeValue(['foo' => 'bar', 123]));
         self::assertSame('[123,456]', $formatter->normalizeValue([123, 456]));
         self::assertSame('{"999":123,"1000":{"foo":["bar"]}}', $formatter->normalizeValue([999 => 123, ['foo' => ['bar']]]));
@@ -24,13 +25,12 @@ final class CompactJsonFormatterTest extends TestCase
     public function testFormatException(): void
     {
         $formatter = new CompactJsonFormatter();
-        $exception = new \RuntimeException('foo', 213, $prev = new \LogicException('bar'));
-        $formatted = $formatter->normalizeValue($exception);
+        $formatted = $formatter->normalizeValue(new \RuntimeException('foo', 123, new \LogicException('bar')));
 
         self::assertIsArray($formatted);
         self::assertSame('RuntimeException', $formatted['class']);
         self::assertSame('foo', $formatted['message']);
-        self::assertSame(213, $formatted['code']);
+        self::assertSame(123, $formatted['code']);
         self::assertIsString($formatted['file']);
         self::assertIsString($formatted['trace']);
 
