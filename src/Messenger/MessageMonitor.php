@@ -33,24 +33,6 @@ final class MessageMonitor
                 continue;
             }
 
-            if ($receiver instanceof NatsTransport) {
-                $perMessage = false;
-
-                foreach ($receiver->getMessageCounts() + array_fill_keys($this->messageMap->getAvailableMessages($transport), 0) as $message => $count) {
-                    $jobs[] = [
-                        'transport' => $transport,
-                        'message' => $message,
-                        'count' => $count,
-                        'options' => $this->messageMap->getTransportOptions($transport, $message),
-                    ];
-                    $perMessage = true;
-                }
-
-                if ($perMessage) {
-                    continue;
-                }
-            }
-
             if ($receiver instanceof MessageCountAwareInterface) {
                 $jobs[] = [
                     'transport' => $transport,
@@ -60,13 +42,24 @@ final class MessageMonitor
                 ];
             }
 
-            foreach ($this->messageMap->getAvailableMessages($transport) as $message) {
-                $jobs[] = [
-                    'transport' => $transport,
-                    'message' => $message,
-                    'count' => null,
-                    'options' => $this->messageMap->getTransportOptions($transport, $message),
-                ];
+            if ($receiver instanceof NatsTransport) {
+                foreach ($receiver->getMessageCounts() + array_fill_keys($this->messageMap->getAvailableMessages($transport), 0) as $message => $count) {
+                    $jobs[] = [
+                        'transport' => $transport,
+                        'message' => $message,
+                        'count' => $count,
+                        'options' => $this->messageMap->getTransportOptions($transport, $message),
+                    ];
+                }
+            } else {
+                foreach ($this->messageMap->getAvailableMessages($transport) as $message) {
+                    $jobs[] = [
+                        'transport' => $transport,
+                        'message' => $message,
+                        'count' => null,
+                        'options' => $this->messageMap->getTransportOptions($transport, $message),
+                    ];
+                }
             }
         }
 
