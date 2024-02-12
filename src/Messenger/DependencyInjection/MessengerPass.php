@@ -14,7 +14,9 @@ use Etrias\PhpToolkit\Messenger\MessageMonitor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 final class MessengerPass implements CompilerPassInterface
 {
@@ -24,6 +26,7 @@ final class MessengerPass implements CompilerPassInterface
         $messageMap = $sendersLocator->getArgument(0);
         $messageMapByTransport = [];
         $cacheInfoProviders = [];
+        $defaultStamps = [];
 
         foreach ($messageMap as $messageClass => $transports) {
             foreach ($transports as $transport) {
@@ -40,6 +43,10 @@ final class MessengerPass implements CompilerPassInterface
                 if ($cacheInfoProviderAttribute) {
                     $cacheInfoProviderMetadata = $cacheInfoProviderAttribute->newInstance();
                     $cacheInfoProviders[$messageClass] = new Reference($cacheInfoProviderMetadata->name);
+                }
+
+                foreach ($reflectionClass?->getAttributes(StampInterface::class, \ReflectionAttribute::IS_INSTANCEOF) ?? [] as $defaultStampAttribute) {
+                    $defaultStamps[$messageClass][$defaultStampAttribute->getName()][] = new Definition($defaultStampAttribute->getName(), $defaultStampAttribute->getArguments());
                 }
 
                 $transportAttributes = $reflectionClass?->getAttributes(WithTransport::class) ?? [];
@@ -75,6 +82,7 @@ final class MessengerPass implements CompilerPassInterface
         ;
         $container->autowire(MessageMap::class, MessageMap::class)
             ->setArgument('$mapping', $messageMapByTransport)
+            ->setArgument('$defaultStamps', $defaultStamps)
         ;
         $container->autowire(MessageMonitor::class, MessageMonitor::class);
         $container->autowire('.messenger.counter', RedisCounter::class)

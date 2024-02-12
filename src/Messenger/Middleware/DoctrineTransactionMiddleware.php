@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Etrias\PhpToolkit\Messenger\MessageMap;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -22,6 +23,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 final class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
     public function __construct(
+        private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
         private readonly ?string $entityManagerName = null,
     ) {}

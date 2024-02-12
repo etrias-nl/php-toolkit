@@ -7,6 +7,7 @@ namespace Etrias\PhpToolkit\Messenger;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
+use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
  * @internal
@@ -14,10 +15,14 @@ use Symfony\Component\Messenger\Stamp\SentStamp;
 final class MessageMap
 {
     /**
+     * @template T of StampInterface
+     *
      * @param array<string, array<class-string, array<string, mixed>>> $mapping
+     * @param array<class-string, array<class-string<T>, list<T>>>     $defaultStamps
      */
     public function __construct(
         private readonly array $mapping,
+        private readonly array $defaultStamps = [],
     ) {}
 
     /**
@@ -44,5 +49,10 @@ final class MessageMap
         $transport = $envelope->last(SentStamp::class)?->getSenderAlias() ?? $envelope->last(ReceivedStamp::class)?->getTransportName();
 
         return null === $transport ? [] : $this->getTransportOptions($transport, $envelope->getMessage()::class);
+    }
+
+    public function getStamps(Envelope $envelope, string $stamp): array
+    {
+        return [];
     }
 }
