@@ -51,8 +51,29 @@ final class MessageMap
         return null === $transport ? [] : $this->getTransportOptions($transport, $envelope->getMessage()::class);
     }
 
+    /**
+     * @template T of StampInterface
+     *
+     * @param class-string<T> $stamp
+     *
+     * @return list<T>
+     */
     public function getStamps(Envelope $envelope, string $stamp): array
     {
-        return [];
+        return $envelope->all($stamp) ?: $this->defaultStamps[$envelope->getMessage()::class][$stamp] ?? [];
+    }
+
+    /**
+     * @template T of StampInterface
+     *
+     * @param class-string<T> $stamp
+     *
+     * @return null|T
+     */
+    public function getStamp(Envelope $envelope, string $stamp): ?StampInterface
+    {
+        $stamps = $this->getStamps($envelope, $stamp);
+
+        return end($stamps) ?: null;
     }
 }

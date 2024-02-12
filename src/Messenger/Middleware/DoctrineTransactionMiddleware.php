@@ -7,6 +7,7 @@ namespace Etrias\PhpToolkit\Messenger\Middleware;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
+use Etrias\PhpToolkit\Messenger\Stamp\TransactionalStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -31,6 +32,12 @@ final class DoctrineTransactionMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null === $envelope->last(ConsumedByWorkerStamp::class)) {
+            return $stack->next()->handle($envelope, $stack);
+        }
+
+        $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class)?->enabled ?? true;
+
+        if (!$transactional) {
             return $stack->next()->handle($envelope, $stack);
         }
 

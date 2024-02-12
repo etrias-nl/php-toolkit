@@ -9,6 +9,14 @@
       <code>keys</code>
     </UndefinedMagicMethod>
   </file>
+  <file src="src/Messenger/MessageMap.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$envelope->all($stamp) ?: $this->defaultStamps[$envelope->getMessage()::class][$stamp] ?? []]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[list<T>]]></code>
+    </MoreSpecificReturnType>
+  </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$options['deduplicate'] ?? true]]></code>
