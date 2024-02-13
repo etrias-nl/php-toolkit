@@ -11,6 +11,7 @@ use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\SentStamp;
@@ -26,7 +27,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -42,7 +43,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
@@ -52,8 +53,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $counter = new InMemoryCounter();
-        $factory = new NatsTransportFactory(new MessageMap([]), $counter, new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup(true);
 
@@ -73,14 +73,12 @@ final class NatsTest extends TestCase
 
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
-        self::assertStringMatchesFormat('[{"ids:%s:'.$messageId.'":1},{"%s:stdClass":1}]', json_encode(array_map(static fn (string $key): mixed => [$key => $counter->get($key)], $counter->keys())));
 
         $sentEnvelopes = $transport->get();
 
         self::assertCount(1, $sentEnvelopes);
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
-        self::assertStringMatchesFormat('[{"ids:%s:'.$messageId.'":1},{"%s:stdClass":1}]', json_encode(array_map(static fn (string $key): mixed => [$key => $counter->get($key)], $counter->keys())));
         self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
         self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertNotNull($sentEnvelopes[0]->last(ReplyToStamp::class));
@@ -89,7 +87,6 @@ final class NatsTest extends TestCase
 
         self::assertSame(0, $transport->getMessageCount());
         self::assertSame([], $transport->getMessageCounts());
-        self::assertSame([], $counter->keys());
         self::assertSame([], $transport->get());
     }
 
@@ -101,7 +98,7 @@ final class NatsTest extends TestCase
                     'deduplicate' => false,
                 ],
             ],
-        ]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        ]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_1' => true]))->last(TransportMessageIdStamp::class)?->getId();

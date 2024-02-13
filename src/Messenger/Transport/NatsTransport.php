@@ -35,7 +35,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
-    private ?string $streamIdPrefix = null;
+    private ?string $streamId = null;
 
     public function __construct(
         private readonly Client $client,
@@ -203,7 +203,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $counts = [];
 
-        foreach ($this->counter->keys($prefix = $this->getStreamIdPrefix()) as $key) {
+        foreach ($this->counter->keys($prefix = $this->getStreamId().':') as $key) {
             $counts[substr($key, \strlen($prefix))] = $this->counter->get($key) ?? throw new TransportException('Unable to get message count');
         }
 
@@ -242,18 +242,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private function delta(Envelope $envelope, bool $acked): void
     {
-        $prefixType = $this->getStreamIdPrefix();
+        $streamId = $this->getStreamId();
+        $prefixType = $streamId.':';
         $keyType = $prefixType.$envelope->getMessage()::class;
-        $prefixId = 'ids:'.$prefixType;
+        $prefixId = 'ids-'.$streamId.'-';
         $keyId = $prefixId.$envelope->last(TransportMessageIdStamp::class)?->getId();
 
         try {
             if ($acked) {
                 $this->cache->deleteItem($keyId);
-                $this->counter->delta($keyType, -1);
 
                 if (0 === $this->getMessageCount()) {
-                    $this->counter->clear([...$this->counter->keys($prefixType), ...$this->counter->keys($prefixId)]);
+                    $this->counter->clear($this->counter->keys($prefixType));
+                } else {
+                    $this->counter->delta($keyType, -1);
                 }
             } else {
                 $cacheItem = $this->cache->getItem($keyId);
@@ -285,8 +287,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->logger->log($level, $message, $context);
     }
 
-    private function getStreamIdPrefix(): string
+    private function getStreamId(): string
     {
-        return $this->streamIdPrefix ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName).':';
+        return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
     }
 }
