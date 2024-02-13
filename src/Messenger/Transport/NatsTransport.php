@@ -33,7 +33,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
-    private ?string $counterPrefix = null;
+    private ?string $streamIdPrefix = null;
 
     public function __construct(
         private readonly Client $client,
@@ -200,7 +200,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $counts = [];
 
-        foreach ($this->counter->keys($prefix = $this->getCounterPrefix()) as $key) {
+        foreach ($this->counter->keys($prefix = $this->getStreamIdPrefix()) as $key) {
             $counts[substr($key, \strlen($prefix))] = $this->counter->get($key) ?? throw new TransportException('Unable to get message count');
         }
 
@@ -239,10 +239,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private function delta(Envelope $envelope, bool $acked): void
     {
-        $counterPrefix = $this->getCounterPrefix();
-        $idPrefix = 'ids:'.$counterPrefix;
-        $keyType = $counterPrefix.$envelope->getMessage()::class;
-        $keyId = $idPrefix.$envelope->last(TransportMessageIdStamp::class)?->getId();
+        $prefixType = $this->getStreamIdPrefix();
+        $keyType = $prefixType.$envelope->getMessage()::class;
+        $prefixId = 'ids:'.$prefixType;
+        $keyId = $prefixId.$envelope->last(TransportMessageIdStamp::class)?->getId();
 
         try {
             if ($acked) {
@@ -250,7 +250,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->counter->delta($keyType, -1);
 
                 if (0 === $this->getMessageCount()) {
-                    $this->counter->clear([...$this->counter->keys($counterPrefix), ...$this->counter->keys($idPrefix)]);
+                    $this->counter->clear([...$this->counter->keys($prefixType), ...$this->counter->keys($prefixId)]);
                 }
             } elseif (null === $this->counter->get($keyId)) {
                 $this->counter->delta($keyId, 1);
@@ -277,8 +277,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->logger->log($level, $message, $context);
     }
 
-    private function getCounterPrefix(): string
+    private function getStreamIdPrefix(): string
     {
-        return $this->counterPrefix ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName).':';
+        return $this->streamIdPrefix ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName).':';
     }
 }
