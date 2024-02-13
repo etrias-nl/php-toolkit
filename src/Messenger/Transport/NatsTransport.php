@@ -198,7 +198,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
      */
     public function getMessageCounts(): array
     {
-        return $this->counter->values($this->getCounterPrefix());
+        $counts = [];
+
+        foreach ($this->counter->keys($prefix = $this->getCounterPrefix()) as $key) {
+            $counts[substr($key, \strlen($prefix))] = $this->counter->get($key) ?? throw new TransportException('Unable to get message count');
+        }
+
+        return $counts;
     }
 
     private function getStream(): Stream
@@ -244,12 +250,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->counter->delta($keyType, -1);
 
                 if (0 === $this->getMessageCount()) {
-                    foreach ($this->counter->values($counterPrefix) as $messageType => $_) {
-                        $this->counter->clear($counterPrefix.$messageType);
-                    }
-                    foreach ($this->counter->values($idPrefix) as $messageId => $_) {
-                        $this->counter->clear($idPrefix.$messageId);
-                    }
+                    $this->counter->clear([...$this->counter->keys($counterPrefix), ...$this->counter->keys($idPrefix)]);
                 }
             } elseif (null === $this->counter->get($keyId)) {
                 $this->counter->delta($keyId, 1);

@@ -8,9 +8,17 @@ interface Counter
 {
     public function delta(string $key, int $count): int;
 
-    public function clear(string $key): void;
+    /**
+     * @param string|string[] $key
+     */
+    public function clear(array|string $key): void;
 
     public function get(string $key): ?int;
+
+    /**
+     * @return string[]
+     */
+    public function keys(string $prefix = ''): array;
 
     /**
      * @return array<string, int>

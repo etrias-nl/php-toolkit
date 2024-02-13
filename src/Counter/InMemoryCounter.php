@@ -13,14 +13,30 @@ final class InMemoryCounter implements Counter
         return $this->counts[$key] = ($this->counts[$key] ?? 0) + $count;
     }
 
-    public function clear(string $key): void
+    public function clear(array|string $key): void
     {
-        unset($this->counts[$key]);
+        foreach ((array) $key as $k) {
+            unset($this->counts[$k]);
+        }
     }
 
     public function get(string $key): ?int
     {
         return $this->counts[$key] ?? null;
+    }
+
+    public function keys(string $prefix = ''): array
+    {
+        $keys = [];
+        foreach ($this->counts as $key => $_) {
+            if (!str_starts_with($key, $prefix)) {
+                continue;
+            }
+
+            $keys[] = $key;
+        }
+
+        return $keys;
     }
 
     public function values(string $prefix = ''): array
