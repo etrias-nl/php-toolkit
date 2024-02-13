@@ -131,7 +131,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        $this->delta($envelope, -1);
+        $this->delta($envelope, true);
     }
 
     /**
@@ -181,7 +181,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
-        $this->delta($envelope, 1);
+        $this->delta($envelope, false);
 
         return $envelope;
     }
@@ -198,18 +198,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
      */
     public function getMessageCounts(): array
     {
-        /** @var array<class-string, int> $counts */
-        $counts = $this->counter->values($counterPrefix = $this->getCounterPrefix());
-
-        if (0 === $totalCount = $this->getMessageCount()) {
-            foreach ($counts as $message => $_) {
-                $this->counter->clear($counterPrefix.$message);
-            }
-
-            return [];
-        }
-
-        return array_map(static fn (int $count): int => min($totalCount, $count), $counts);
+        return $this->counter->values($this->getCounterPrefix());
     }
 
     private function getStream(): Stream
@@ -242,10 +231,30 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->consumer;
     }
 
-    private function delta(Envelope $envelope, int $count): void
+    private function delta(Envelope $envelope, bool $acked): void
     {
+        $counterPrefix = $this->getCounterPrefix();
+        $idPrefix = 'ids:'.$counterPrefix;
+        $keyType = $counterPrefix.$envelope->getMessage()::class;
+        $keyId = $idPrefix.$envelope->last(TransportMessageIdStamp::class)?->getId();
+
         try {
-            $this->counter->delta($this->getCounterPrefix().$envelope->getMessage()::class, $count);
+            if ($acked) {
+                $this->counter->clear($keyId);
+                $this->counter->delta($keyType, -1);
+
+                if (0 === $this->getMessageCount()) {
+                    foreach ($this->counter->values($counterPrefix) as $messageType => $_) {
+                        $this->counter->clear($counterPrefix.$messageType);
+                    }
+                    foreach ($this->counter->values($idPrefix) as $messageId => $_) {
+                        $this->counter->clear($idPrefix.$messageId);
+                    }
+                }
+            } elseif (null === $this->counter->get($keyId)) {
+                $this->counter->delta($keyId, 1);
+                $this->counter->delta($keyType, 1);
+            }
         } catch (\Throwable $e) {
             $this->log(Level::Notice, $envelope, 'Unable to update message counter', ['exception' => $e]);
         }
