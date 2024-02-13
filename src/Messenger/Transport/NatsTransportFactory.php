@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration;
 use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -24,6 +25,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
+        #[Target(name: 'messenger.cache')]
+        private readonly CacheItemPoolInterface $cache,
     ) {}
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
@@ -47,6 +50,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->counter,
             $this->logger,
             $this->normalizer,
+            $this->cache,
             $stream,
         );
     }

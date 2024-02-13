@@ -14,6 +14,7 @@ use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Monolog\Level;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -30,6 +31,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const ACK_WAIT_SECONDS = 300;
+    private const DEDUPLICATE_WINDOW_SECONDS = 10;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -42,6 +44,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly Counter $counter,
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
+        private readonly CacheItemPoolInterface $cache,
         private readonly string $streamName,
     ) {}
 
@@ -215,7 +218,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::MEMORY)
-                ->setDuplicateWindow(10.0)
+                ->setDuplicateWindow(self::DEDUPLICATE_WINDOW_SECONDS)
             ;
         }
 
@@ -246,15 +249,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             if ($acked) {
-                $this->counter->clear($keyId);
+                $this->cache->deleteItem($keyId);
                 $this->counter->delta($keyType, -1);
 
                 if (0 === $this->getMessageCount()) {
                     $this->counter->clear([...$this->counter->keys($prefixType), ...$this->counter->keys($prefixId)]);
                 }
-            } elseif (null === $this->counter->get($keyId)) {
-                $this->counter->delta($keyId, 1);
-                $this->counter->delta($keyType, 1);
+            } else {
+                $cacheItem = $this->cache->getItem($keyId);
+                if (!$cacheItem->isHit()) {
+                    $cacheItem->set(true);
+                    $cacheItem->expiresAfter(self::ACK_WAIT_SECONDS);
+                    $this->cache->save($cacheItem);
+                    $this->counter->delta($keyType, 1);
+                }
             }
         } catch (\Throwable $e) {
             $this->log(Level::Notice, $envelope, 'Unable to update message counter', ['exception' => $e]);
