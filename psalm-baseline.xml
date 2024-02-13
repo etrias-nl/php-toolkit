@@ -19,6 +19,12 @@
     </MoreSpecificReturnType>
   </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
+    <LessSpecificReturnStatement>
+      <code><![CDATA[$this->counter->values($this->getCounterPrefix())]]></code>
+    </LessSpecificReturnStatement>
+    <MoreSpecificReturnType>
+      <code><![CDATA[array<class-string, int>]]></code>
+    </MoreSpecificReturnType>
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$options['deduplicate'] ?? true]]></code>
     </RiskyTruthyFalsyComparison>
