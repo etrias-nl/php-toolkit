@@ -19,9 +19,4 @@ interface Counter
      * @return string[]
      */
     public function keys(string $prefix = ''): array;
-
-    /**
-     * @return array<string, int>
-     */
-    public function values(string $prefix = ''): array;
 }

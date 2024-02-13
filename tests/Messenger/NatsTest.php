@@ -73,14 +73,14 @@ final class NatsTest extends TestCase
 
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
-        self::assertStringMatchesFormat('{"%s:stdClass":1}', json_encode($counter->values(), JSON_THROW_ON_ERROR));
+        self::assertStringMatchesFormat('[{"ids:%s:'.$messageId.'":1},{"%s:stdClass":1}]', json_encode(array_map(static fn (string $key): mixed => [$key => $counter->get($key)], $counter->keys())));
 
         $sentEnvelopes = $transport->get();
 
         self::assertCount(1, $sentEnvelopes);
         self::assertSame(1, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
-        self::assertStringMatchesFormat('{"%s:stdClass":1}', json_encode($counter->values(), JSON_THROW_ON_ERROR));
+        self::assertStringMatchesFormat('[{"ids:%s:'.$messageId.'":1},{"%s:stdClass":1}]', json_encode(array_map(static fn (string $key): mixed => [$key => $counter->get($key)], $counter->keys())));
         self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
         self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertNotNull($sentEnvelopes[0]->last(ReplyToStamp::class));
@@ -89,7 +89,7 @@ final class NatsTest extends TestCase
 
         self::assertSame(0, $transport->getMessageCount());
         self::assertSame([], $transport->getMessageCounts());
-        self::assertSame([], $counter->values());
+        self::assertSame([], $counter->keys());
         self::assertSame([], $transport->get());
     }
 

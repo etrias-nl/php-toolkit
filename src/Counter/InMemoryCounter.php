@@ -38,18 +38,4 @@ final class InMemoryCounter implements Counter
 
         return $keys;
     }
-
-    public function values(string $prefix = ''): array
-    {
-        $counts = [];
-        foreach ($this->counts as $key => $count) {
-            if (!str_starts_with($key, $prefix)) {
-                continue;
-            }
-
-            $counts[substr($key, \strlen($prefix))] = $count;
-        }
-
-        return $counts;
-    }
 }

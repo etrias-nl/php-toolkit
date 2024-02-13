@@ -5,7 +5,6 @@
       <code>decrby</code>
       <code>del</code>
       <code>get</code>
-      <code>get</code>
       <code>incrby</code>
       <code>keys</code>
     </UndefinedMagicMethod>
@@ -20,7 +19,7 @@
   </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <LessSpecificReturnStatement>
-      <code><![CDATA[$this->counter->values($this->getCounterPrefix())]]></code>
+      <code>$counts</code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
       <code><![CDATA[array<class-string, int>]]></code>
