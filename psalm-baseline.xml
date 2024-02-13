@@ -5,6 +5,7 @@
       <code>decrby</code>
       <code>del</code>
       <code>get</code>
+      <code>get</code>
       <code>incrby</code>
       <code>keys</code>
     </UndefinedMagicMethod>

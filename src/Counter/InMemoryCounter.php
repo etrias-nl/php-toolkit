@@ -18,6 +18,11 @@ final class InMemoryCounter implements Counter
         unset($this->counts[$key]);
     }
 
+    public function get(string $key): ?int
+    {
+        return $this->counts[$key] ?? null;
+    }
+
     public function values(string $prefix = ''): array
     {
         $counts = [];

@@ -10,6 +10,8 @@ interface Counter
 
     public function clear(string $key): void;
 
+    public function get(string $key): ?int;
+
     /**
      * @return array<string, int>
      */
