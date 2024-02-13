@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
-use Etrias\PhpToolkit\Counter\ArrayCounter;
+use Etrias\PhpToolkit\Counter\InMemoryCounter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
@@ -26,7 +26,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -42,7 +42,7 @@ final class NatsTest extends TestCase
 
     public function testServiceUnavailable(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new ArrayCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         self::expectException(TransportException::class);
@@ -52,7 +52,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $counter = new ArrayCounter();
+        $counter = new InMemoryCounter();
         $factory = new NatsTransportFactory(new MessageMap([]), $counter, new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup(true);
@@ -101,7 +101,7 @@ final class NatsTest extends TestCase
                     'deduplicate' => false,
                 ],
             ],
-        ]), new ArrayCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        ]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_1' => true]))->last(TransportMessageIdStamp::class)?->getId();

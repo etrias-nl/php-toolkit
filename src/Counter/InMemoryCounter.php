@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Counter;
 
-final class ArrayCounter implements Counter
+final class InMemoryCounter implements Counter
 {
     private array $counts = [];
 
