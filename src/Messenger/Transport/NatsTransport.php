@@ -261,7 +261,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $cacheItem = $this->cache->getItem($keyId);
                 if (!$cacheItem->isHit()) {
                     $cacheItem->set(true);
-                    $cacheItem->expiresAfter(self::ACK_WAIT_SECONDS);
+                    $cacheItem->expiresAfter(self::DEDUPLICATE_WINDOW_SECONDS);
                     $this->cache->save($cacheItem);
                     $this->counter->delta($keyType, 1);
                 }
