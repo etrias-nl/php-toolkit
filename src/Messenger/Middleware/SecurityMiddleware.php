@@ -20,6 +20,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 final class SecurityMiddleware implements MiddlewareInterface
 {
+    private ?string $currentUserProviderId = null;
     private readonly ?string $defaultUserProviderId;
 
     public function __construct(
@@ -49,14 +50,14 @@ final class SecurityMiddleware implements MiddlewareInterface
             $newToken = $prevToken;
 
             if (null !== $prevToken) {
-                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->getUserProviderId()));
+                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->currentUserProviderId ?? $this->getUserProviderId()));
             }
         } else {
             $stamped = true;
             $newToken = $stamp->token;
 
             if (null !== $newToken) {
-                $userProvider = $this->getUserProvider($stamp->userProvider);
+                $userProvider = $this->getUserProvider($stamp->userProvider ?? $this->getUserProviderId());
 
                 try {
                     if (null === $tokenUser = $newToken->getUser()) {
@@ -70,6 +71,8 @@ final class SecurityMiddleware implements MiddlewareInterface
                     $this->logger->warning('Cannot load/refresh user for token', ['exception' => $e, 'token' => $newToken::class]);
                 }
             }
+
+            $this->currentUserProviderId = $stamp->userProvider;
         }
 
         $this->authenticate($prevToken, $newToken);
@@ -80,6 +83,7 @@ final class SecurityMiddleware implements MiddlewareInterface
             return $stamped ? $envelope : $envelope->withoutAll(SecurityStamp::class);
         } finally {
             $this->authenticate($newToken, $prevToken);
+            $this->currentUserProviderId = null;
         }
     }
 
@@ -110,10 +114,8 @@ final class SecurityMiddleware implements MiddlewareInterface
         return $firewallConfig->getProvider() ?? $this->defaultUserProviderId ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
     }
 
-    private function getUserProvider(?string $id = null): UserProviderInterface
+    private function getUserProvider(string $id): UserProviderInterface
     {
-        $id ??= $this->getUserProviderId();
-
         if (!str_starts_with($id, $prefix = 'security.user.provider.concrete.')) {
             $id = $prefix.$id;
         }
