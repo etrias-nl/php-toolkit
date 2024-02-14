@@ -72,18 +72,18 @@ final class SecurityMiddleware implements MiddlewareInterface
             }
         }
 
-        $this->login($prevToken, $newToken);
+        $this->authenticate($prevToken, $newToken);
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
 
             return $stamped ? $envelope : $envelope->withoutAll(SecurityStamp::class);
         } finally {
-            $this->login($newToken, $prevToken);
+            $this->authenticate($newToken, $prevToken);
         }
     }
 
-    private function login(?TokenInterface $prevToken, ?TokenInterface $newToken): void
+    private function authenticate(?TokenInterface $prevToken, ?TokenInterface $newToken): void
     {
         if ($newToken === $prevToken) {
             return;
