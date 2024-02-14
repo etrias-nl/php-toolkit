@@ -21,8 +21,10 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 final class SecurityMiddleware implements MiddlewareInterface
 {
     private ?string $currentUserProviderId = null;
-    private readonly ?string $defaultUserProviderId;
 
+    /**
+     * @param ServiceProviderInterface<UserProviderInterface> $userProviders
+     */
     public function __construct(
         private readonly TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'security.firewall.map')]
@@ -31,15 +33,7 @@ final class SecurityMiddleware implements MiddlewareInterface
         private readonly ServiceProviderInterface $userProviders,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
-        ?string $defaultUserProviderId = null,
-    ) {
-        if (null === $defaultUserProviderId && 1 === \count($userProviderServices = $this->userProviders->getProvidedServices())) {
-            $defaultUserProviderId = array_key_first($userProviderServices);
-        }
-
-        // @todo default to ChainUserProvider
-        $this->defaultUserProviderId = $defaultUserProviderId;
-    }
+    ) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
@@ -50,14 +44,14 @@ final class SecurityMiddleware implements MiddlewareInterface
             $newToken = $prevToken;
 
             if (null !== $prevToken) {
-                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->currentUserProviderId ?? $this->getUserProviderId()));
+                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->currentUserProviderId ?? $this->getUserProviderIdFromContext($prevToken)));
             }
         } else {
             $stamped = true;
             $newToken = $stamp->token;
 
             if (null !== $newToken) {
-                $userProvider = $this->getUserProvider($stamp->userProvider ?? $this->getUserProviderId());
+                $userProvider = $this->getUserProvider($stamp->userProvider ?? $this->getUserProviderIdFromContext($newToken));
 
                 try {
                     if (null === $tokenUser = $newToken->getUser()) {
@@ -102,16 +96,36 @@ final class SecurityMiddleware implements MiddlewareInterface
         }
     }
 
-    private function getUserProviderId(): string
+    private function getUserProviderIdFromContext(?TokenInterface $token): string
     {
+        $getDefaultUserProviderId = function () use ($token): ?string {
+            if (null === $user = $token?->getUser()) {
+                $this->logger->info('Cannot determine default user provider without a token user.');
+
+                return null;
+            }
+
+            foreach ($this->userProviders->getProvidedServices() as $id => $_) {
+                if ($this->userProviders->get($id)->supportsClass($user::class)) {
+                    $this->logger->info('Using default user provider "{user_provider}" for user "{user}"', ['user_provider' => $id, 'user' => $user::class]);
+
+                    return $id;
+                }
+            }
+
+            $this->logger->info('No default user provider found for user "{user}"', ['user' => $user::class]);
+
+            return null;
+        };
+
         if (null === $request = $this->requestStack->getMainRequest()) {
-            return $this->defaultUserProviderId ?? throw new \RuntimeException('Cannot determine user provider without a request, nor a default.');
+            return $getDefaultUserProviderId() ?? throw new \RuntimeException('Cannot determine user provider without a request, nor a default.');
         }
         if (null === $firewallConfig = $this->firewallMap->getFirewallConfig($request)) {
-            return $this->defaultUserProviderId ?? throw new \RuntimeException('Cannot determine user provider without a firewall config, nor a default.');
+            return $getDefaultUserProviderId() ?? throw new \RuntimeException('Cannot determine user provider without a firewall config, nor a default.');
         }
 
-        return $firewallConfig->getProvider() ?? $this->defaultUserProviderId ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
+        return $firewallConfig->getProvider() ?? $getDefaultUserProviderId() ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
     }
 
     private function getUserProvider(string $id): UserProviderInterface
@@ -120,6 +134,6 @@ final class SecurityMiddleware implements MiddlewareInterface
             $id = $prefix.$id;
         }
 
-        return $this->userProviders->get($id) ?? throw new \RuntimeException(sprintf('User provider "%s" not found.', $id));
+        return $this->userProviders->get($id);
     }
 }
