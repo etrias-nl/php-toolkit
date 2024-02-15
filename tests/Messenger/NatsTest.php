@@ -100,11 +100,14 @@ final class NatsTest extends TestCase
             ],
         ]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport->setup();
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_1' => true]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId2 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new SentStamp(self::class, 'sender')]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId3 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new SentStamp(self::class, 'sender_without_deduplication')]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId4 = $transport->send(Envelope::wrap((object) ['test_2' => true]))->last(TransportMessageIdStamp::class)?->getId();
+
+        usleep(50_000); // wait for updated message count
 
         self::assertSame(3, $transport->getMessageCount());
         self::assertSame([\stdClass::class => 3], $transport->getMessageCounts());

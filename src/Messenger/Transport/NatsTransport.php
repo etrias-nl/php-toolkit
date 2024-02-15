@@ -50,8 +50,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function setup(bool $refresh = false, bool $dryRun = false): void
     {
-        $this->client->ping();
-
         $stream = $this->getStream();
 
         if ($stream->exists()) {
@@ -99,7 +97,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $receivedMessages = [];
 
         try {
-            $this->client->ping();
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
@@ -128,7 +125,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
-            $this->client->ping();
             $this->client->publish($replyTo->id, true);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
@@ -151,17 +147,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
         ]);
-        $stream = $this->getStream();
 
         try {
-            $this->client->ping();
-
-            if (!$stream->exists()) {
-                $stream->create();
-
-                if (!$stream->exists()) {
-                    throw new \RuntimeException('Missing stream: '.$this->streamName);
-                }
+            if (!$this->getStream()->exists()) {
+                throw new \RuntimeException('Missing stream: '.$this->streamName);
             }
 
             $this->client->publish($this->streamName, $payload);
@@ -191,8 +180,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function getMessageCount(): int
     {
-        $this->client->ping();
-
         return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
     }
 
@@ -251,11 +238,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             if ($acked) {
                 $this->cache->deleteItem($keyId);
+                $this->counter->delta($keyType, -1);
 
+                usleep(50_000); // wait for updated message count
                 if (0 === $this->getMessageCount()) {
                     $this->counter->clear($this->counter->keys($prefixType));
-                } else {
-                    $this->counter->delta($keyType, -1);
                 }
             } else {
                 $cacheItem = $this->cache->getItem($keyId);
