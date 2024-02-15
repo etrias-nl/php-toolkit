@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="5.20.0@3f284e96c9d9be6fe6b15c79416e1d1903dcfef4">
+<files psalm-version="5.22.0@fe2c67ec89f358940f90db05efd2d663388b45a6">
   <file src="src/Counter/RedisCounter.php">
     <UndefinedMagicMethod>
-      <code>decrby</code>
-      <code>del</code>
-      <code>get</code>
-      <code>incrby</code>
-      <code>keys</code>
+      <code><![CDATA[decrby]]></code>
+      <code><![CDATA[del]]></code>
+      <code><![CDATA[get]]></code>
+      <code><![CDATA[incrby]]></code>
+      <code><![CDATA[keys]]></code>
     </UndefinedMagicMethod>
   </file>
   <file src="src/Messenger/MessageMap.php">
@@ -19,7 +19,7 @@
   </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <LessSpecificReturnStatement>
-      <code>$counts</code>
+      <code><![CDATA[$counts]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
       <code><![CDATA[array<class-string, int>]]></code>
@@ -30,19 +30,19 @@
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <MissingTemplateParam>
-      <code>TransportFactoryInterface</code>
+      <code><![CDATA[TransportFactoryInterface]]></code>
     </MissingTemplateParam>
   </file>
   <file src="tests/Messenger/CacheTest.php">
     <DocblockTypeContradiction>
-      <code>assertSame</code>
-      <code>assertSame</code>
-      <code>assertSame</code>
+      <code><![CDATA[assertSame]]></code>
+      <code><![CDATA[assertSame]]></code>
+      <code><![CDATA[assertSame]]></code>
     </DocblockTypeContradiction>
   </file>
   <file src="tests/Messenger/SecurityTest.php">
     <MissingTemplateParam>
-      <code>UserProviderInterface</code>
+      <code><![CDATA[UserProviderInterface]]></code>
     </MissingTemplateParam>
   </file>
 </files>
