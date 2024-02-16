@@ -202,9 +202,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if (null === $this->stream) {
             $this->stream = $this->client->getApi()->getStream($this->streamName);
             // note configuration is persisted at server level
+            // https://docs.nats.io/nats-concepts/jetstream/streams#configuration
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
-                ->setStorageBackend(StorageBackend::MEMORY)
+                ->setStorageBackend(StorageBackend::FILE)
                 ->setDuplicateWindow(self::DEDUPLICATE_WINDOW_SECONDS)
             ;
         }
@@ -219,6 +220,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->consumer->setIterations(1);
             $this->consumer->setBatching(1);
             // note configuration is persisted at server level
+            // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
                 ->setAckWait(1_000_000_000 * self::ACK_WAIT_SECONDS)
             ;
