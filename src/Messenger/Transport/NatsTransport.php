@@ -58,7 +58,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                     $stream->update();
                 }
 
-                $this->log(Level::Info, $stream, 'Stream updated');
+                $this->log(Level::Notice, $stream, 'Stream updated');
             } else {
                 $this->log(Level::Info, $stream, 'Stream already exists');
             }
@@ -67,7 +67,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $stream->create();
             }
 
-            $this->log(Level::Info, $stream, 'Stream created');
+            $this->log(Level::Notice, $stream, 'Stream created');
         }
 
         $consumer = $this->getConsumer();
@@ -76,10 +76,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             if ($refresh) {
                 if (!$dryRun) {
                     // create also updates consumer
-                    $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray()) ?? throw new TransportException('Unable to update consumer');
+                    $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray());
                 }
 
-                $this->log(Level::Info, $consumer, 'Consumer updated');
+                $this->log(Level::Notice, $consumer, 'Consumer updated');
             } else {
                 $this->log(Level::Info, $consumer, 'Consumer already exists');
             }
@@ -88,7 +88,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $consumer->create();
             }
 
-            $this->log(Level::Info, $consumer, 'Consumer created');
+            $this->log(Level::Notice, $consumer, 'Consumer created');
         }
     }
 
