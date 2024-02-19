@@ -32,16 +32,23 @@ final class NatsTransportFactory implements TransportFactoryInterface
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
     {
         $urlParts = parse_url($dsn);
+        $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
         $queryParts = [];
-
         parse_str($urlParts['query'] ?? '', $queryParts);
+        $name = $options['transport_name'] ?? null;
+        unset($options['transport_name']);
+        $options = $queryParts + $options + [
+            'timeout' => 2.0,
+        ];
 
-        if (null === $stream = $queryParts['stream'] ?? $options['stream'] ?? $options['transport_name'] ?? null) {
-            throw new \RuntimeException('Missing "stream" parameter in connection string.');
+        if ($diff = array_diff_key($options, array_flip(['stream', 'timeout']))) {
+            throw new \RuntimeException(sprintf('Unsupported transport options: %s', implode(', ', array_keys($diff))));
+        }
+        if (!\is_string($stream = $options['stream'] ?? $name)) {
+            throw new \RuntimeException('Missing stream name.');
         }
 
-        $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
-        $config['timeout'] = (float) ($queryParts['timeout'] ?? $options['timeout'] ?? 2.0);
+        $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid timeout for stream "'.$stream.'".');
 
         return new NatsTransport(
             new Client(new Configuration($config), $this->logger),
