@@ -22,6 +22,7 @@ return (new Config())
         'global_namespace_import' => ['import_classes' => false, 'import_constants' => false, 'import_functions' => false],
         'nullable_type_declaration_for_default_null_value' => true,
         'phpdoc_to_comment' => ['ignored_tags' => ['todo', 'psalm-suppress']],
+        'comment_to_phpdoc' => ['ignored_tags' => ['todo']],
     ])
     ->setCacheFile(__DIR__.'/var/phpcsfixer-cache')
     ->setFinder(
