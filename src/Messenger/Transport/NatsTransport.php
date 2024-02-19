@@ -31,6 +31,7 @@ use Symfony\Component\Uid\Uuid;
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
+    private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -126,14 +127,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $messageId = $this->messageMap->getStamp($envelope, DeduplicateStamp::class)?->enabled ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v4()->toRfc4122();
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
+            self::HEADER_EXPECTED_STREAM => $this->streamName,
         ]);
 
         try {
-            if (!$this->getStream()->exists()) {
-                throw new \RuntimeException('Missing stream: '.$this->streamName);
-            }
-
-            $this->client->publish($this->streamName, $payload);
+            $this->client->dispatch($this->streamName, $payload);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
