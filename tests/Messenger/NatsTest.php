@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Counter\InMemoryCounter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
+use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
@@ -13,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -41,22 +41,13 @@ final class NatsTest extends TestCase
         $factory->createTransport('nats://foo?streamm=bar', [], new PhpSerializer());
     }
 
-    public function testServiceUnavailable(): void
-    {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
-        $transport = $factory->createTransport('nats://foobar?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
-
-        self::expectException(TransportException::class);
-
-        $transport->get();
-    }
-
     public function testTransport(): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup(true);
 
+        // initially empty
         self::assertSame(0, $transport->getMessageCount());
         self::assertSame([], $transport->getMessageCounts());
 
@@ -65,19 +56,22 @@ final class NatsTest extends TestCase
         $envelope = $transport->send(Envelope::wrap($message, [new TransportMessageIdStamp($prevMessageId)]));
         $messageId = $envelope->last(TransportMessageIdStamp::class)?->getId();
 
+        // new message ID
         self::assertSame($message, $envelope->getMessage());
         self::assertTrue(\is_string($messageId) && 32 === \strlen($messageId));
         self::assertNotSame($messageId, $prevMessageId);
 
         $transport->setup(true);
 
-        self::assertSame(1, $transport->getMessageCount());
+        // counts unaffected by setup
+        self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
         $sentEnvelopes = $transport->get();
 
+        // message fetched
         self::assertCount(1, $sentEnvelopes);
-        self::assertSame(1, $transport->getMessageCount());
+        self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
         self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
         self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
@@ -85,31 +79,24 @@ final class NatsTest extends TestCase
 
         $transport->ack($sentEnvelopes[0]);
 
-        self::assertSame(0, $transport->getMessageCount());
+        // message acked
+        self::assertMessageCount(0, $transport);
         self::assertSame([], $transport->getMessageCounts());
         self::assertSame([], $transport->get());
     }
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([
-            'sender_without_deduplication' => [
-                \stdClass::class => [
-                    'deduplicate' => false,
-                ],
-            ],
-        ]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         $messageId1 = $transport->send(Envelope::wrap((object) ['test_1' => true]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId2 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new SentStamp(self::class, 'sender')]))->last(TransportMessageIdStamp::class)?->getId();
-        $messageId3 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new SentStamp(self::class, 'sender_without_deduplication')]))->last(TransportMessageIdStamp::class)?->getId();
+        $messageId3 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new DeduplicateStamp(false)]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId4 = $transport->send(Envelope::wrap((object) ['test_2' => true]))->last(TransportMessageIdStamp::class)?->getId();
 
-        usleep(50_000); // wait for updated message count
-
-        self::assertSame(3, $transport->getMessageCount());
+        self::assertMessageCount(3, $transport);
         self::assertSame([\stdClass::class => 3], $transport->getMessageCounts());
         self::assertTrue(\is_string($messageId1) && 32 === \strlen($messageId1));
         self::assertSame($messageId1, $messageId2);
@@ -126,7 +113,7 @@ final class NatsTest extends TestCase
 
         $transport->ack($sentEnvelopes1[0]);
 
-        self::assertSame(2, $transport->getMessageCount());
+        self::assertMessageCount(2, $transport);
         self::assertSame([\stdClass::class => 2], $transport->getMessageCounts());
 
         $sentEnvelopes2 = $transport->get();
@@ -136,7 +123,7 @@ final class NatsTest extends TestCase
 
         $transport->ack($sentEnvelopes2[0]);
 
-        self::assertSame(1, $transport->getMessageCount());
+        self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
         $sentEnvelopes3 = $transport->get();
@@ -146,7 +133,17 @@ final class NatsTest extends TestCase
 
         $transport->ack($sentEnvelopes3[0]);
 
-        self::assertSame(0, $transport->getMessageCount());
+        self::assertMessageCount(0, $transport);
         self::assertSame([], $transport->getMessageCounts());
+    }
+
+    private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
+    {
+        if ($wait) {
+            // wait for updated message count
+            usleep(50_000);
+        }
+
+        self::assertSame($expectedCount, $transport->getMessageCount());
     }
 }

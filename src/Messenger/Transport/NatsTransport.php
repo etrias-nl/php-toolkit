@@ -31,8 +31,12 @@ use Symfony\Component\Uid\Uuid;
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
+    // @todo configurable
     private const ACK_WAIT_SECONDS = 300;
+    // @todo configurable
     private const DEDUPLICATE_WINDOW_SECONDS = 10;
+    // @todo configurable
+    private const STREAM_REPLICAS = 1;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -205,8 +209,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // https://docs.nats.io/nats-concepts/jetstream/streams#configuration
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
-                ->setStorageBackend(StorageBackend::FILE)
+                ->setStorageBackend(StorageBackend::FILE) // @todo configurable
                 ->setDuplicateWindow(self::DEDUPLICATE_WINDOW_SECONDS)
+                ->setReplicas(self::STREAM_REPLICAS)
             ;
         }
 
