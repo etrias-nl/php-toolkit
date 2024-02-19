@@ -99,9 +99,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function get(): array
     {
+        $this->checkMessageCount();
+
         $receivedMessages = [];
 
         try {
+            // @todo inline handle, batch lazy (yield) per 50 (config)
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
@@ -153,6 +156,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         ]);
 
         try {
+            // @todo test send to non-existing stream, but created later (using file storage)
             if (!$this->getStream()->exists()) {
                 throw new \RuntimeException('Missing stream: '.$this->streamName);
             }
@@ -185,6 +189,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function getMessageCount(): int
     {
         return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+    }
+
+    public function checkMessageCount(): void
+    {
+        try {
+            if (0 === $this->getMessageCount()) {
+                $this->counter->clear($this->counter->keys($this->getStreamId().':'));
+            }
+        } catch (\Throwable $e) {
+            $this->log(Level::Notice, null, 'Unable to check message count', ['exception' => $e]);
+        }
     }
 
     /**
@@ -236,20 +251,15 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private function delta(Envelope $envelope, bool $acked): void
     {
-        $streamId = $this->getStreamId();
-        $prefixType = $streamId.':';
-        $keyType = $prefixType.$envelope->getMessage()::class;
-        $prefixId = 'ids-'.$streamId.'-';
-        $keyId = $prefixId.$envelope->last(TransportMessageIdStamp::class)?->getId();
-
         try {
+            $streamId = $this->getStreamId();
+            $keyType = $streamId.':'.$envelope->getMessage()::class;
+            $keyId = 'ids-'.$streamId.'-'.$envelope->last(TransportMessageIdStamp::class)?->getId();
+
             if ($acked) {
                 $this->cache->deleteItem($keyId);
-                $this->counter->delta($keyType, -1);
-
-                usleep(50_000); // wait for updated message count
-                if (0 === $this->getMessageCount()) {
-                    $this->counter->clear($this->counter->keys($prefixType));
+                if (0 === $this->counter->delta($keyType, -1)) {
+                    $this->counter->clear($keyType);
                 }
             } else {
                 $cacheItem = $this->cache->getItem($keyId);
