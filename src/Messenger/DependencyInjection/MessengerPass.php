@@ -7,7 +7,6 @@ namespace Etrias\PhpToolkit\Messenger\DependencyInjection;
 use Etrias\PhpToolkit\Cache\Attribute\WithCacheInfoProvider;
 use Etrias\PhpToolkit\Counter\RedisCounter;
 use Etrias\PhpToolkit\Messenger\Attribute\WithTransport;
-use Etrias\PhpToolkit\Messenger\Console\RefreshTransportsCommand;
 use Etrias\PhpToolkit\Messenger\MessageCache;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\MessageMonitor;
@@ -87,9 +86,6 @@ final class MessengerPass implements CompilerPassInterface
         $container->autowire(MessageMonitor::class, MessageMonitor::class);
         $container->autowire('.messenger.counter', RedisCounter::class)
             ->setArgument('$prefix', 'counter:messenger:')
-        ;
-        $container->autowire(RefreshTransportsCommand::class, RefreshTransportsCommand::class)
-            ->addTag('console.command')
         ;
     }
 }
