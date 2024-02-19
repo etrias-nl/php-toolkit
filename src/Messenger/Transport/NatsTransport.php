@@ -191,17 +191,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
     }
 
-    public function checkMessageCount(): void
-    {
-        try {
-            if (0 === $this->getMessageCount()) {
-                $this->counter->clear($this->counter->keys($this->getStreamId().':'));
-            }
-        } catch (\Throwable $e) {
-            $this->log(Level::Notice, null, 'Unable to check message count', ['exception' => $e]);
-        }
-    }
-
     /**
      * @return array<class-string, int>
      */
@@ -294,5 +283,16 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private function getStreamId(): string
     {
         return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
+    }
+
+    private function checkMessageCount(): void
+    {
+        try {
+            if (0 === $this->getMessageCount()) {
+                $this->counter->clear($this->counter->keys($this->getStreamId().':'));
+            }
+        } catch (\Throwable $e) {
+            $this->log(Level::Notice, null, 'Unable to check message count', ['exception' => $e]);
+        }
     }
 }
