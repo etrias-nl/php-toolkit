@@ -156,7 +156,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         ]);
 
         try {
-            // @todo test send to non-existing stream, but created later (using file storage)
             if (!$this->getStream()->exists()) {
                 throw new \RuntimeException('Missing stream: '.$this->streamName);
             }
