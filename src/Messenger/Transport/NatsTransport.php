@@ -31,12 +31,6 @@ use Symfony\Component\Uid\Uuid;
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
-    // @todo configurable
-    private const ACK_WAIT_SECONDS = 300;
-    // @todo configurable
-    private const DEDUPLICATE_WINDOW_SECONDS = 10;
-    // @todo configurable
-    private const STREAM_REPLICAS = 1;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -51,48 +45,27 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly NormalizerInterface $normalizer,
         private readonly CacheItemPoolInterface $cache,
         private readonly string $streamName,
+        private readonly int $ackWait,
+        private readonly int $deduplicateWindow,
     ) {}
 
-    public function setup(bool $refresh = false, bool $dryRun = false): void
+    public function setup(): void
     {
         $stream = $this->getStream();
 
         if ($stream->exists()) {
-            if ($refresh) {
-                if (!$dryRun) {
-                    $stream->update();
-                }
-
-                $this->log(Level::Notice, $stream, 'Stream updated');
-            } else {
-                $this->log(Level::Info, $stream, 'Stream already exists');
-            }
+            $this->log(Level::Info, $stream, 'Stream already exists');
         } else {
-            if (!$dryRun) {
-                $stream->create();
-            }
-
+            $stream->create();
             $this->log(Level::Notice, $stream, 'Stream created');
         }
 
         $consumer = $this->getConsumer();
 
         if ($consumer->exists()) {
-            if ($refresh) {
-                if (!$dryRun) {
-                    // create also updates consumer
-                    $this->client->api('CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName(), $consumer->getConfiguration()->toArray());
-                }
-
-                $this->log(Level::Notice, $consumer, 'Consumer updated');
-            } else {
-                $this->log(Level::Info, $consumer, 'Consumer already exists');
-            }
+            $this->log(Level::Info, $consumer, 'Consumer already exists');
         } else {
-            if (!$dryRun) {
-                $consumer->create();
-            }
-
+            $consumer->create();
             $this->log(Level::Notice, $consumer, 'Consumer created');
         }
     }
@@ -108,7 +81,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
-                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.self::ACK_WAIT_SECONDS.' seconds'));
+                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.$this->ackWait.' seconds'));
                 }
 
                 $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
@@ -212,9 +185,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // https://docs.nats.io/nats-concepts/jetstream/streams#configuration
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
-                ->setStorageBackend(StorageBackend::FILE) // @todo configurable
-                ->setDuplicateWindow(self::DEDUPLICATE_WINDOW_SECONDS)
-                ->setReplicas(self::STREAM_REPLICAS)
+                ->setStorageBackend(StorageBackend::FILE)
+                ->setDuplicateWindow($this->deduplicateWindow)
             ;
         }
 
@@ -230,7 +202,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
-                ->setAckWait(1_000_000_000 * self::ACK_WAIT_SECONDS)
+                ->setAckWait(1_000_000_000 * $this->ackWait)
             ;
         }
 
@@ -253,7 +225,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $cacheItem = $this->cache->getItem($keyId);
                 if (!$cacheItem->isHit()) {
                     $cacheItem->set(true);
-                    $cacheItem->expiresAfter(self::DEDUPLICATE_WINDOW_SECONDS);
+                    $cacheItem->expiresAfter($this->deduplicateWindow);
                     $this->cache->save($cacheItem);
                     $this->counter->delta($keyType, 1);
                 }
@@ -270,10 +242,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if ($subject instanceof Envelope) {
             $context['message'] = $subject->getMessage()::class;
             $context['message_id'] = $subject->last(TransportMessageIdStamp::class)?->getId();
-        } elseif ($subject instanceof Stream) {
-            $context['stream_config'] = json_decode(json_encode($subject->info()?->config, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
-        } elseif ($subject instanceof Consumer) {
-            $context['consumer_config'] = json_decode(json_encode($subject->info()?->config, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
+        } elseif ($subject instanceof Stream || $subject instanceof Consumer) {
+            try {
+                $context[$subject instanceof Stream ? 'stream_config' : 'consumer_config'] = json_encode($subject->info()?->config, JSON_THROW_ON_ERROR);
+            } catch (\Throwable) {
+            }
         }
 
         $this->logger->log($level, $message, $context);

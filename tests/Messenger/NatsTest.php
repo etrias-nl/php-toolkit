@@ -45,7 +45,7 @@ final class NatsTest extends TestCase
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
-        $transport->setup(true);
+        $transport->setup();
 
         // initially empty
         self::assertSame(0, $transport->getMessageCount());
@@ -61,7 +61,7 @@ final class NatsTest extends TestCase
         self::assertTrue(\is_string($messageId) && 32 === \strlen($messageId));
         self::assertNotSame($messageId, $prevMessageId);
 
-        $transport->setup(true);
+        $transport->setup();
 
         // counts unaffected by setup
         self::assertMessageCount(1, $transport);

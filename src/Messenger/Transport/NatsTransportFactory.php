@@ -39,16 +39,18 @@ final class NatsTransportFactory implements TransportFactoryInterface
         unset($options['transport_name']);
         $options = $queryParts + $options + [
             'timeout' => 2.0,
+            'ack_wait' => 300,
+            'deduplicate_window' => 10,
         ];
 
-        if ($diff = array_diff_key($options, array_flip(['stream', 'timeout']))) {
+        if ($diff = array_diff_key($options, array_flip(['stream', 'timeout', 'ack_wait', 'deduplicate_window']))) {
             throw new \RuntimeException(sprintf('Unsupported transport options: %s', implode(', ', array_keys($diff))));
         }
         if (!\is_string($stream = $options['stream'] ?? $name)) {
             throw new \RuntimeException('Missing stream name.');
         }
 
-        $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid timeout for stream "'.$stream.'".');
+        $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid option "timeout" for stream "'.$stream.'".');
 
         return new NatsTransport(
             new Client(new Configuration($config), $this->logger),
@@ -59,6 +61,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->normalizer,
             $this->cache,
             $stream,
+            \is_int($options['ack_wait']) || ctype_digit($options['ack_wait']) ? (int) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
+            \is_int($options['deduplicate_window']) || ctype_digit($options['deduplicate_window']) ? (int) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
         );
     }
 
