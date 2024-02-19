@@ -24,9 +24,6 @@
     <MoreSpecificReturnType>
       <code><![CDATA[array<class-string, int>]]></code>
     </MoreSpecificReturnType>
-    <RiskyTruthyFalsyComparison>
-      <code><![CDATA[$options['deduplicate'] ?? true]]></code>
-    </RiskyTruthyFalsyComparison>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <MissingTemplateParam>
