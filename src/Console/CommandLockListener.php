@@ -22,7 +22,7 @@ final class CommandLockListener implements EventSubscriberInterface
         private readonly LoggerInterface $logger,
     ) {}
 
-    public function logTmpSignal(ConsoleSignalEvent $event): void
+    public function logSignal(ConsoleSignalEvent $event): void
     {
         $this->logger->notice('Received signal '.$event->getHandlingSignal());
     }
@@ -51,7 +51,7 @@ final class CommandLockListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConsoleSignalEvent::class => 'logTmpSignal',
+            ConsoleSignalEvent::class => 'logSignal',
             ConsoleCommandEvent::class => 'acquireLock',
             ConsoleErrorEvent::class => 'releaseLock',
             ConsoleTerminateEvent::class => 'releaseLock',
