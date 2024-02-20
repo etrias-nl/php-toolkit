@@ -43,6 +43,6 @@ final class DockerHandler extends AbstractProcessingHandler
     {
         $this->resource ??= popen($this->command, 'w');
 
-        fwrite($this->resource, (string) $record->formatted);
+        @fwrite($this->resource, (string) $record->formatted);
     }
 }
