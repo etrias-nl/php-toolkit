@@ -15,6 +15,7 @@
         "symfony/doctrine-bridge": "^6",
         "symfony/event-dispatcher": "^6",
         "symfony/http-foundation": "^6",
+        "symfony/lock": "^6",
         "symfony/messenger": "^6",
         "symfony/property-access": "^6",
         "symfony/security-bundle": "^6",
