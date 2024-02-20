@@ -24,7 +24,7 @@ final class CommandLockListener implements EventSubscriberInterface
 
     public function logSignal(ConsoleSignalEvent $event): void
     {
-        $this->logger->notice('Received signal '.$event->getHandlingSignal());
+        $this->logger->warning('Received signal '.$event->getHandlingSignal().' during command "'.$event->getCommand()->getName().'".');
     }
 
     public function acquireLock(ConsoleCommandEvent $event): void
