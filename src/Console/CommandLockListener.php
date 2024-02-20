@@ -31,7 +31,7 @@ final class CommandLockListener implements EventSubscriberInterface
     {
         $command = $event->getCommand();
 
-        if (!$command instanceof LockableCommandInterface || !$command->shouldLock($event->getInput())) {
+        if (!$command instanceof LockableCommand || !$command->shouldLock($event->getInput())) {
             return;
         }
 

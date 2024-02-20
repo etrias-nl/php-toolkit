@@ -6,7 +6,7 @@ namespace Etrias\PhpToolkit\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
 
-interface LockableCommandInterface
+interface LockableCommand
 {
     public function shouldLock(InputInterface $input): bool;
 
