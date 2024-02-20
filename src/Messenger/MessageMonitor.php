@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Messenger;
 
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
@@ -34,32 +35,41 @@ final class MessageMonitor
             }
 
             if ($receiver instanceof MessageCountAwareInterface) {
+                try {
+                    $count = $receiver->getMessageCount();
+                } catch (TransportException) {
+                    $count = null;
+                }
+
                 $jobs[] = [
                     'transport' => $transport,
                     'message' => null,
-                    'count' => $receiver->getMessageCount(),
+                    'count' => $count,
                     'options' => [],
                 ];
             }
 
+            $availableMessages = $this->messageMap->getAvailableMessages($transport);
+
             if ($receiver instanceof NatsTransport) {
-                foreach ($receiver->getMessageCounts() + array_fill_keys($this->messageMap->getAvailableMessages($transport), 0) as $message => $count) {
-                    $jobs[] = [
-                        'transport' => $transport,
-                        'message' => $message,
-                        'count' => $count,
-                        'options' => $this->messageMap->getTransportOptions($transport, $message),
-                    ];
+                try {
+                    $counts = $receiver->getMessageCounts();
+                } catch (TransportException) {
+                    $counts = [];
                 }
+
+                $counts += array_fill_keys($availableMessages, 0);
             } else {
-                foreach ($this->messageMap->getAvailableMessages($transport) as $message) {
-                    $jobs[] = [
-                        'transport' => $transport,
-                        'message' => $message,
-                        'count' => null,
-                        'options' => $this->messageMap->getTransportOptions($transport, $message),
-                    ];
-                }
+                $counts = array_fill_keys($availableMessages, null);
+            }
+
+            foreach ($counts as $message => $count) {
+                $jobs[] = [
+                    'transport' => $transport,
+                    'message' => $message,
+                    'count' => $count,
+                    'options' => $this->messageMap->getTransportOptions($transport, $message),
+                ];
             }
         }
 

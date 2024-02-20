@@ -22,7 +22,7 @@
       <code><![CDATA[$counts]]></code>
     </LessSpecificReturnStatement>
     <MoreSpecificReturnType>
-      <code><![CDATA[array<class-string, int>]]></code>
+      <code><![CDATA[array<class-string, null|int>]]></code>
     </MoreSpecificReturnType>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
