@@ -6,7 +6,7 @@
         "php": "^8.1"
     },
     "require-dev": {
-        "basis-company/nats": "^0.17.0",
+        "basis-company/nats": "^0.18.0",
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
         "predis/predis": "^2.2",
