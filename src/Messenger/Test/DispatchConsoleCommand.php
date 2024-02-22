@@ -26,31 +26,39 @@ class DispatchConsoleCommand extends Command
     {
         $this
             ->addOption('sync', null, InputOption::VALUE_NONE)
+            ->addOption('sleep', null, InputOption::VALUE_REQUIRED, '', 0)
             ->addOption('failure', null, InputOption::VALUE_NONE)
             ->addOption('nest', null, InputOption::VALUE_NONE)
             ->addOption('nest-failure', null, InputOption::VALUE_NONE)
             ->addOption('nest-sync', null, InputOption::VALUE_NONE)
-            ->addArgument('payload', InputArgument::OPTIONAL, '', 'Hello World!')
+            ->addOption('batch', null, InputOption::VALUE_REQUIRED)
+            ->addArgument('payload', InputArgument::OPTIONAL)
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $payload = $input->getArgument('payload');
-
-        try {
-            $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
+        if (null !== $payload = $input->getArgument('payload')) {
+            try {
+                $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+            }
         }
 
-        $message = new DummyCommandMessage($payload, $input->getOption('failure'), $input->getOption('nest'), $input->getOption('nest-failure'), $input->getOption('nest-sync'));
-        $stamps = [];
+        for ($i = 1; $i <= (int) $input->getOption('batch') ?? 1; ++$i) {
+            $output->writeln('Dispatching message #'.$i);
+            $message = new DummyCommandMessage(
+                $payload ?? 'Batch message #'.$i,
+                (int) $input->getOption('sleep'),
+                $input->getOption('failure'),
+                $input->getOption('nest'),
+                $input->getOption('nest-failure'),
+                $input->getOption('nest-sync'),
+            );
+            $stamps = $input->getOption('sync') ? [new TransportNamesStamp('sync')] : [];
 
-        if ($input->getOption('sync')) {
-            $stamps[] = new TransportNamesStamp('sync');
+            $this->messageBus->dispatch($message, $stamps);
         }
-
-        $this->messageBus->dispatch($message, $stamps);
 
         return 0;
     }

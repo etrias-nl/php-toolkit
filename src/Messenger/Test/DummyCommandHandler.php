@@ -19,9 +19,17 @@ class DummyCommandHandler
 
     public function __invoke(DummyCommandMessage $message): void
     {
+        $this->logger->notice('HANDLING MESSAGE', ['payload' => $message->payload]);
+
+        if ($message->sleep) {
+            $this->logger->notice('Sleeping '.$message->sleep.'s');
+            sleep($message->sleep);
+        }
+
         if ($message->nest) {
+            $this->logger->notice('Dispatching nested message');
             $this->messageBus->dispatch(
-                new DummyCommandMessage(['NESTED' => $message->payload], $message->nestFailure),
+                new DummyCommandMessage(['NESTED' => $message->payload], 0, $message->nestFailure),
                 $message->nestSync ? [new TransportNamesStamp('sync')] : []
             );
         }
@@ -29,7 +37,5 @@ class DummyCommandHandler
         if ($message->failure) {
             throw new \RuntimeException($message->payload);
         }
-
-        $this->logger->notice('HANDLING MESSAGE', ['payload' => $message->payload]);
     }
 }
