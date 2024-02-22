@@ -17,11 +17,6 @@
       <code><![CDATA[list<T>]]></code>
     </MoreSpecificReturnType>
   </file>
-  <file src="src/Messenger/Test/DispatchConsoleCommand.php">
-    <InvalidArgument>
-      <code><![CDATA[$i <= (int) $input->getOption('batch')]]></code>
-    </InvalidArgument>
-  </file>
   <file src="src/Messenger/Test/DummyCommandHandler.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[$message->sleep]]></code>

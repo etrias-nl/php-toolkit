@@ -45,7 +45,7 @@ class DispatchConsoleCommand extends Command
             }
         }
 
-        for ($i = 1; $i <= (int) $input->getOption('batch'); $i++) {
+        for ($i = 1; $i <= (int) $input->getOption('batch'); ++$i) {
             $output->writeln('Dispatching message #'.$i);
             $message = new DummyCommandMessage(
                 $payload ?? 'Batch message #'.$i,
