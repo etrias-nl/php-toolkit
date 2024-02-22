@@ -134,26 +134,28 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             self::HEADER_MESSAGE_ID => $messageId,
             self::HEADER_EXPECTED_STREAM => $this->streamName,
         ]);
-
-        try {
-            $this->client->dispatch($this->streamName, $payload);
-        } catch (\Throwable $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
-        }
-
-        $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
-        $message = $envelope->getMessage();
         $context = [];
 
         try {
-            $context['payload'] = $this->normalizer->normalize($message, null, [
+            $context['payload'] = $this->normalizer->normalize($envelope->getMessage(), null, [
                 AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
                 AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
             ]);
         } catch (\Throwable $e) {
-            $context['payload'] = @serialize($message);
+            $context['payload'] = @serialize($envelope->getMessage());
             $context['payload_normalize_error'] = $e;
         }
+
+        try {
+            $result = $this->client->dispatch($this->streamName, $payload);
+            self::assertPayload($result);
+        } catch (\Throwable $e) {
+            $this->log(Level::Error, $envelope, 'Unable to send message "{message}": '.$e->getMessage(), ['exception' => $e] + $context);
+
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
         $this->delta($envelope, false);
@@ -178,6 +180,21 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $counts;
+    }
+
+    private static function assertPayload(mixed $payload): void
+    {
+        if (!$payload instanceof Payload) {
+            throw new \RuntimeException('Expected payload, got '.get_debug_type($payload));
+        }
+        if (null !== $error = $payload->getValue('error')) {
+            $message = $error->description ?? $payload->body;
+            if (isset($error->err_code)) {
+                $message .= ' ['.$error->err_code.']';
+            }
+
+            throw new \RuntimeException($message);
+        }
     }
 
     private function getStream(): Stream
