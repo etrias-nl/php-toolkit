@@ -31,7 +31,7 @@ class DispatchConsoleCommand extends Command
             ->addOption('nest', null, InputOption::VALUE_NONE)
             ->addOption('nest-failure', null, InputOption::VALUE_NONE)
             ->addOption('nest-sync', null, InputOption::VALUE_NONE)
-            ->addOption('batch', null, InputOption::VALUE_REQUIRED)
+            ->addOption('batch', null, InputOption::VALUE_REQUIRED, '', 1)
             ->addArgument('payload', InputArgument::OPTIONAL)
         ;
     }
@@ -45,7 +45,7 @@ class DispatchConsoleCommand extends Command
             }
         }
 
-        for ($i = 1; $i <= (int) $input->getOption('batch') ?? 1; ++$i) {
+        for ($i = 1; $i <= (int) $input->getOption('batch'); $i++) {
             $output->writeln('Dispatching message #'.$i);
             $message = new DummyCommandMessage(
                 $payload ?? 'Batch message #'.$i,
