@@ -243,17 +243,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $streamId = $this->getStreamId();
             $keyType = $streamId.':'.$envelope->getMessage()::class;
+            $keyAck = 'ack:'.$streamId.':'.$envelope->last(TransportMessageIdStamp::class)?->getId();
             $keySequence = 'sequence:'.$streamId;
 
             if ($acked) {
-                if (0 === $this->counter->delta($keyType, -1)) {
+                if (null !== $this->counter->get($keyAck) && $this->counter->delta($keyType, -1) <= 0) {
                     $this->counter->clear($keyType);
                 }
+                $this->counter->clear($keyAck);
             } else {
                 $currentSequence = $this->counter->get($keySequence) ?? 0;
                 $sequence ??= $currentSequence + 1;
                 if ($sequence > $currentSequence) {
                     $this->counter->delta($keyType, 1);
+                    $this->counter->delta($keyAck, 1);
                     $this->counter->delta($keySequence, $sequence - $currentSequence);
                 }
             }
