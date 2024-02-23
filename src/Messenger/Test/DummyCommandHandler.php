@@ -23,7 +23,7 @@ class DummyCommandHandler
 
         if ($message->sleep) {
             $this->logger->notice('Calling external service to simulate slow process for '.$message->sleep.'s');
-            $this->logger->notice(file_get_contents('https://httpstat.us/200?sleep='.($message->sleep * 1000), false, stream_context_create(['http'=> ['timeout' => $message->sleep + 1]])));
+            $this->logger->notice(file_get_contents('https://httpstat.us/200?sleep='.($message->sleep * 1000), false, stream_context_create(['http' => ['timeout' => $message->sleep + 1]])));
         }
 
         if ($message->nest) {
