@@ -32,6 +32,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
+    private const NANOSECOND = 1_000_000_000;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -52,22 +53,28 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function setup(): void
     {
+        // setup stream
         $stream = $this->getStream();
+        $streamCreated = $stream->exists() ? null : $stream->create();
+        $streamConfig = $stream->info()?->config;
 
-        if ($stream->exists()) {
-            $this->log(Level::Info, $stream, 'Stream already exists');
-        } else {
-            $stream->create();
-            $this->log(Level::Notice, $stream, 'Stream created');
+        $this->log(Level::Info, $stream, $streamCreated ? 'Stream created' : 'Stream already exists', ['config' => json_encode($streamConfig)]);
+
+        // verify stream
+        if ($streamConfig?->duplicate_window !== ($this->deduplicateWindow * self::NANOSECOND)) {
+            $this->logger->error('Stream configuration mismatch: duplicate_window', ['client' => $this->deduplicateWindow * self::NANOSECOND, 'server' => $streamConfig?->duplicate_window]);
         }
 
+        // setup consumer
         $consumer = $this->getConsumer();
+        $consumerCreated = $consumer->exists() ? null : $consumer->create();
+        $consumerConfig = $consumer->info()?->config;
 
-        if ($consumer->exists()) {
-            $this->log(Level::Info, $consumer, 'Consumer already exists');
-        } else {
-            $consumer->create();
-            $this->log(Level::Notice, $consumer, 'Consumer created');
+        $this->log(Level::Info, $consumer, $consumerCreated ? 'Consumer created' : 'Consumer already exists', ['config' => json_encode($consumerConfig)]);
+
+        // verify consumer
+        if ($consumerConfig?->ack_wait !== ($this->ackWait * self::NANOSECOND)) {
+            $this->logger->error('Consumer configuration mismatch: ack_wait', ['client' => $this->ackWait * self::NANOSECOND, 'server' => $consumerConfig?->ack_wait]);
         }
     }
 
@@ -222,7 +229,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
-                ->setAckWait(1_000_000_000 * $this->ackWait)
+                ->setAckWait(self::NANOSECOND * $this->ackWait)
             ;
         }
 
@@ -255,18 +262,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
     }
 
-    private function log(Level $level, null|Consumer|Envelope|Stream $subject, string $message, array $context = []): void
+    private function log(Level $level, mixed $subject, string $message, array $context = []): void
     {
         $context['stream'] = $this->streamName;
 
         if ($subject instanceof Envelope) {
             $context['message'] = $subject->getMessage()::class;
             $context['message_id'] = $subject->last(TransportMessageIdStamp::class)?->getId();
-        } elseif ($subject instanceof Stream || $subject instanceof Consumer) {
-            try {
-                $context[$subject instanceof Stream ? 'stream_config' : 'consumer_config'] = json_encode($subject->info()?->config, JSON_THROW_ON_ERROR);
-            } catch (\Throwable) {
-            }
         }
 
         $this->logger->log($level, $message, $context);
