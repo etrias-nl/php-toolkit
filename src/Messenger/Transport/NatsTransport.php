@@ -32,6 +32,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
+    private const BATCH_SIZE = 100;
+    private const NANOSECONDS = 1_000_000_000;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -71,32 +73,46 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
     }
 
-    public function get(): array
+    public function get(): \Generator
     {
         try {
             if (0 === $this->getMessageCount()) {
                 $this->counter->clear($this->counter->keys($this->getStreamId().':'));
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
 
-        $receivedMessages = [];
+        $requestSubject = '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName;
+        $handlerSubject = 'handler.'.bin2hex(random_bytes(4));
 
         try {
-            // @todo inline handle, batch lazy (yield) per 50 (config)
-            $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
+            $this->client->subscribe($handlerSubject, function (Payload $payload, ?string $replyTo): ?Envelope {
+                if ($payload->isEmpty()) {
+                    return null;
+                }
+
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
                     $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.$this->ackWait.' seconds'));
                 }
 
-                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
-            }, null, false);
-        } catch (\Throwable $e) {
-            throw new TransportException($e->getMessage(), 0);
-        }
+                return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
+            });
 
-        return $receivedMessages;
+            $this->client->publish($requestSubject, ['batch' => self::BATCH_SIZE, 'no_wait' => true], $handlerSubject);
+
+            for ($i = 0; $i < self::BATCH_SIZE; ++$i) {
+                if (null === $message = $this->client->process(PHP_INT_MAX, false, false)) {
+                    break;
+                }
+
+                yield $message;
+            }
+        } catch (\Throwable $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        } finally {
+            $this->client->unsubscribe($handlerSubject);
+        }
     }
 
     public function ack(Envelope $envelope): void
@@ -218,12 +234,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         if (null === $this->consumer) {
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
-            $this->consumer->setIterations(1);
-            $this->consumer->setBatching(1);
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
-                ->setAckWait(1_000_000_000 * $this->ackWait)
+                ->setAckWait(self::NANOSECONDS * $this->ackWait)
             ;
         }
 
