@@ -17,6 +17,11 @@
       <code><![CDATA[list<T>]]></code>
     </MoreSpecificReturnType>
   </file>
+  <file src="src/Messenger/Test/DummyCommandHandler.php">
+    <ArgumentTypeCoercion>
+      <code><![CDATA[$message->sleep]]></code>
+    </ArgumentTypeCoercion>
+  </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <LessSpecificReturnStatement>
       <code><![CDATA[$counts]]></code>
