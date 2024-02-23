@@ -80,8 +80,8 @@ final class NatsTest extends TestCase
 
         // message acked
         self::assertMessageCount(0, $transport);
-        self::assertSame([], $transport->getMessageCounts());
         self::assertSame([], $transport->get());
+        self::assertSame([], $transport->getMessageCounts());
     }
 
     public function testDeduplication(): void
@@ -133,6 +133,7 @@ final class NatsTest extends TestCase
         $transport->ack($sentEnvelopes3[0]);
 
         self::assertMessageCount(0, $transport);
+        self::assertSame([], $transport->get());
         self::assertSame([], $transport->getMessageCounts());
     }
 
