@@ -247,10 +247,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $keySequence = 'sequence:'.$streamId;
 
             if ($acked) {
-                if (null !== $this->counter->get($keyAck) && $this->counter->delta($keyType, -1) <= 0) {
-                    $this->counter->clear($keyType);
+                $isPendingAck = null !== $this->counter->get($keyAck);
+                if ($isPendingAck) {
+                    if ($this->counter->delta($keyType, -1) <= 0) {
+                        $this->counter->clear($keyType);
+                    }
+                    $this->counter->delta($keyAck, -1);
                 }
-                $this->counter->clear($keyAck);
             } else {
                 $currentSequence = $this->counter->get($keySequence) ?? 0;
                 $sequence ??= $currentSequence + 1;
