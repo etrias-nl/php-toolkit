@@ -15,7 +15,6 @@ use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Monolog\Level;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
@@ -45,7 +44,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly Counter $counter,
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
-        private readonly CacheItemPoolInterface $cache,
         private readonly string $streamName,
         private readonly int $ackWait,
         private readonly int $deduplicateWindow,
@@ -60,11 +58,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         $this->log(Level::Info, $stream, $streamCreated ? 'Stream created' : 'Stream already exists', ['config' => json_encode($streamConfig)]);
 
-        // verify stream
-        if ($streamConfig?->duplicate_window !== ($this->deduplicateWindow * self::NANOSECOND)) {
-            $this->logger->error('Stream configuration mismatch: duplicate_window', ['client' => $this->deduplicateWindow * self::NANOSECOND, 'server' => $streamConfig?->duplicate_window]);
-        }
-
         // setup consumer
         $consumer = $this->getConsumer();
         $consumerCreated = $consumer->exists() ? null : $consumer->create();
@@ -72,9 +65,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         $this->log(Level::Info, $consumer, $consumerCreated ? 'Consumer created' : 'Consumer already exists', ['config' => json_encode($consumerConfig)]);
 
-        // verify consumer
-        if ($consumerConfig?->ack_wait !== ($this->ackWait * self::NANOSECOND)) {
-            $this->logger->error('Consumer configuration mismatch: ack_wait', ['client' => $this->ackWait * self::NANOSECOND, 'server' => $consumerConfig?->ack_wait]);
+        // verify config
+        $mismatches = [];
+
+        if ($streamConfig?->duplicate_window !== $deduplicateWindowClient = ($this->deduplicateWindow * self::NANOSECOND)) {
+            $mismatches['deduplicate_window'] = ['client' => $deduplicateWindowClient, 'server' => $streamConfig?->duplicate_window];
+        }
+        if ($consumerConfig?->ack_wait !== $ackWaitClient = ($this->ackWait * self::NANOSECOND)) {
+            $mismatches['ack_wait'] = ['client' => $ackWaitClient, 'server' => $consumerConfig?->ack_wait];
+        }
+        if ($mismatches) {
+            throw new TransportException('Server/client configuration mismatch: '.json_encode($mismatches));
         }
     }
 
@@ -158,11 +159,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        $context['sequence'] = $result->getValue('seq');
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
+        $sequence = $context['sequence'] = $result->getValue('seq');
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
-        $this->delta($envelope, false);
+        $this->delta($envelope, false, $sequence);
 
         return $envelope;
     }
@@ -180,7 +181,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $counts = [];
 
         foreach ($this->counter->keys($prefix = $this->getStreamId().':') as $key) {
-            $counts[substr($key, \strlen($prefix))] = $this->counter->get($key);
+            $count = $this->counter->get($key) ?? -1;
+            $counts[substr($key, \strlen($prefix))] = $count < 0 ? null : $count;
         }
 
         return $counts;
@@ -236,25 +238,23 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->consumer;
     }
 
-    private function delta(Envelope $envelope, bool $acked): void
+    private function delta(Envelope $envelope, bool $acked, ?int $sequence = null): void
     {
         try {
             $streamId = $this->getStreamId();
             $keyType = $streamId.':'.$envelope->getMessage()::class;
-            $keyId = 'ids-'.$streamId.'-'.$envelope->last(TransportMessageIdStamp::class)?->getId();
+            $keySequence = 'sequence:'.$streamId;
 
             if ($acked) {
-                $this->cache->deleteItem($keyId);
                 if (0 === $this->counter->delta($keyType, -1)) {
                     $this->counter->clear($keyType);
                 }
             } else {
-                $cacheItem = $this->cache->getItem($keyId);
-                if (!$cacheItem->isHit()) {
-                    $cacheItem->set(true);
-                    $cacheItem->expiresAfter($this->deduplicateWindow);
-                    $this->cache->save($cacheItem);
+                $currentSequence = $this->counter->get($keySequence) ?? 0;
+                $sequence ??= $currentSequence + 1;
+                if ($sequence > $currentSequence) {
                     $this->counter->delta($keyType, 1);
+                    $this->counter->delta($keySequence, $sequence - $currentSequence);
                 }
             }
         } catch (\Throwable $e) {

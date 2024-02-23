@@ -8,7 +8,6 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration;
 use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -25,8 +24,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
-        #[Target(name: 'messenger.cache')]
-        private readonly CacheItemPoolInterface $cache,
     ) {}
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
@@ -59,7 +56,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->counter,
             $this->logger,
             $this->normalizer,
-            $this->cache,
             $stream,
             \is_int($options['ack_wait']) || ctype_digit($options['ack_wait']) ? (int) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
             \is_int($options['deduplicate_window']) || ctype_digit($options['deduplicate_window']) ? (int) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),

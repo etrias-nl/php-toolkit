@@ -12,7 +12,6 @@ use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -27,7 +26,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -43,7 +42,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -87,7 +86,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class), new ArrayAdapter());
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
