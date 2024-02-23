@@ -54,11 +54,13 @@ final class MessageMonitor
             if ($receiver instanceof NatsTransport) {
                 try {
                     $counts = $receiver->getMessageCounts();
+                    $restCount = 0;
                 } catch (TransportException) {
                     $counts = [];
+                    $restCount = null;
                 }
 
-                $counts += array_fill_keys($availableMessages, 0);
+                $counts += array_fill_keys($availableMessages, $restCount);
             } else {
                 $counts = array_fill_keys($availableMessages, null);
             }
