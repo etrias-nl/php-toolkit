@@ -248,7 +248,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
             if ($acked) {
                 if (null !== $this->counter->get($keyAck)) {
-                    $this->counter->delta($keyType, -1)
+                    $this->counter->delta($keyType, -1);
                     $this->counter->clear($keyAck);
                 }
             } else {
