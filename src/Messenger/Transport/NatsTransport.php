@@ -77,13 +77,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             if (0 === $this->getMessageCount()) {
                 $this->counter->clear($this->counter->keys($this->getStreamId().':'));
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
         }
 
         $receivedMessages = [];
 
         try {
-            // @todo inline handle, batch lazy (yield) per 50 (config)
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
