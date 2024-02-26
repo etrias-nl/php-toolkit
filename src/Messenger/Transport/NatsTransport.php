@@ -108,7 +108,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
-            $this->client->publish($replyTo->id, true);
+            $this->client->publish($replyTo->id, '+ACK');
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -116,7 +116,18 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->delta($envelope, true);
     }
 
-    public function reject(Envelope $envelope): void {}
+    public function reject(Envelope $envelope): void
+    {
+        if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
+            return;
+        }
+
+        try {
+            $this->client->publish($replyTo->id, '-NAK');
+        } catch (\Throwable $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+    }
 
     public function send(Envelope $envelope): Envelope
     {

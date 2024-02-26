@@ -152,13 +152,32 @@ final class NatsTest extends TestCase
         $transport->setup();
 
         $messageId = $transport->send(Envelope::wrap((object) ['test1' => true]))->last(TransportMessageIdStamp::class)?->getId();
+        $sentEnvelopes = $transport->get();
 
-        self::assertSame($messageId, $transport->get()[0]?->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $sentEnvelopes);
+        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertSame([], $transport->get());
 
-        usleep(70_000);
+        usleep(30_000);
 
-        self::assertSame($messageId, $transport->get()[0]?->last(TransportMessageIdStamp::class)?->getId());
+        self::assertSame([], $transport->get());
+
+        usleep(40_000);
+
+        $sentEnvelopes = $transport->get();
+
+        self::assertCount(1, $sentEnvelopes);
+        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertSame([], $transport->get());
+
+        $transport->reject($sentEnvelopes[0]);
+
+        usleep(30_000);
+
+        $sentEnvelopes = $transport->get();
+
+        self::assertCount(1, $sentEnvelopes);
+        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
     }
 
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
