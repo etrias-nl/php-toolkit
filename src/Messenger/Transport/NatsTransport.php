@@ -53,30 +53,18 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         // setup stream
         $stream = $this->getStream();
-        $streamCreated = $stream->exists() ? null : $stream->create();
-        $streamConfig = $stream->info()?->config;
-
-        $this->log(Level::Info, $stream, $streamCreated ? 'Stream created' : 'Stream already exists', ['config' => json_encode($streamConfig)]);
+        $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
+        $result = $this->client->api($command, $stream->getConfiguration()->toArray());
+        self::assertPayload($result);
+        $this->log(Level::Notice, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
 
         // setup consumer
         $consumer = $this->getConsumer();
-        $consumerCreated = $consumer->exists() ? null : $consumer->create();
-        $consumerConfig = $consumer->info()?->config;
-
-        $this->log(Level::Info, $consumer, $consumerCreated ? 'Consumer created' : 'Consumer already exists', ['config' => json_encode($consumerConfig)]);
-
-        // verify config
-        $mismatches = [];
-
-        if ($streamConfig?->duplicate_window !== $deduplicateWindowClient = ($this->deduplicateWindow * self::NANOSECOND)) {
-            $mismatches['deduplicate_window'] = ['client' => $deduplicateWindowClient, 'server' => $streamConfig?->duplicate_window];
-        }
-        if ($consumerConfig?->ack_wait !== $ackWaitClient = ($this->ackWait * self::NANOSECOND)) {
-            $mismatches['ack_wait'] = ['client' => $ackWaitClient, 'server' => $consumerConfig?->ack_wait];
-        }
-        if ($mismatches) {
-            throw new TransportException('Server/client configuration mismatch: '.json_encode($mismatches));
-        }
+        // create also updates
+        $command = 'CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName();
+        $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
+        self::assertPayload($result);
+        $this->log(Level::Notice, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
     }
 
     public function get(): array
