@@ -145,6 +145,22 @@ final class NatsTest extends TestCase
         self::assertSame([], $transport->getMessageCounts());
     }
 
+    public function testRedelivery(): void
+    {
+        $factory = new NatsTransportFactory(new MessageMap([]), new InMemoryCounter(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $transport = $factory->createTransport('nats://nats?ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport->setup();
+
+        $messageId = $transport->send(Envelope::wrap((object) ['test1' => true]))->last(TransportMessageIdStamp::class)?->getId();
+
+        self::assertSame($messageId, $transport->get()[0]?->last(TransportMessageIdStamp::class)?->getId());
+        self::assertSame([], $transport->get());
+
+        usleep(70_000);
+
+        self::assertSame($messageId, $transport->get()[0]?->last(TransportMessageIdStamp::class)?->getId());
+    }
+
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
     {
         if ($wait) {
