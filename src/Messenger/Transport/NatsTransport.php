@@ -140,6 +140,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
+            try {
+                $oldSequence = $this->getStream()->info()?->state?->last_seq;
+            } catch (\Throwable) {
+                $oldSequence = null;
+            }
+
             $result = $this->client->dispatch($this->streamName, $payload);
             self::assertPayload($result);
         } catch (\Throwable $e) {
@@ -149,10 +155,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
-        $sequence = $context['sequence'] = $result->getValue('seq');
+        $newSequence = $context['sequence'] = $result->getValue('seq');
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
-        $this->delta($envelope, false, $sequence);
+        $this->delta($envelope, false, $oldSequence, $newSequence);
 
         return $envelope;
     }
@@ -227,27 +233,21 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->consumer;
     }
 
-    private function delta(Envelope $envelope, bool $acked, ?int $sequence = null): void
+    private function delta(Envelope $envelope, bool $acked, ?int $oldSequence = null, ?int $newSequence = null): void
     {
         try {
             $streamId = $this->getStreamId();
             $keyType = $streamId.':'.$envelope->getMessage()::class;
             $keyAck = 'ack:'.$streamId.':'.$envelope->last(TransportMessageIdStamp::class)?->getId();
-            $keySequence = 'sequence:'.$streamId;
+            $oldSequence ??= 0;
+            $newSequence ??= $oldSequence + 1;
 
-            if ($acked) {
-                if (null !== $this->counter->get($keyAck)) {
-                    $this->counter->delta($keyType, -1);
-                    $this->counter->clear($keyAck);
-                }
-            } else {
-                $currentSequence = $this->counter->get($keySequence) ?? 0;
-                $sequence ??= $currentSequence + 1;
-                if ($sequence > $currentSequence) {
-                    $this->counter->delta($keySequence, $sequence - $currentSequence);
-                    $this->counter->delta($keyType, 1);
-                    $this->counter->delta($keyAck, 1);
-                }
+            if ($acked && null !== $this->counter->get($keyAck)) {
+                $this->counter->delta($keyType, -1);
+                $this->counter->clear($keyAck);
+            } elseif (!$acked && $newSequence > $oldSequence) {
+                $this->counter->delta($keyType, 1);
+                $this->counter->set($keyAck, 1);
             }
         } catch (\Throwable $e) {
             $this->log(Level::Notice, $envelope, 'Unable to update message counter', ['exception' => $e]);
