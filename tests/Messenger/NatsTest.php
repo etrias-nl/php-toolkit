@@ -66,7 +66,9 @@ final class NatsTest extends TestCase
         self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
+        $ackWaitTimeoutMin = new \DateTime($ackWaitTimeout = '+5 minutes');
         $sentEnvelopes = $transport->get();
+        $ackWaitTimeoutMax = new \DateTime($ackWaitTimeout);
 
         // message fetched
         self::assertCount(1, $sentEnvelopes);
@@ -74,7 +76,13 @@ final class NatsTest extends TestCase
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
         self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
         self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
-        self::assertNotNull($sentEnvelopes[0]->last(ReplyToStamp::class));
+
+        $replyTo = $sentEnvelopes[0]->last(ReplyToStamp::class);
+
+        self::assertNotNull($replyTo);
+        self::assertStringStartsWith('$JS.ACK.', $replyTo->id);
+        self::assertGreaterThanOrEqual($ackWaitTimeoutMin, $replyTo->expiresAt);
+        self::assertLessThanOrEqual($ackWaitTimeoutMax, $replyTo->expiresAt);
 
         $transport->ack($sentEnvelopes[0]);
 
