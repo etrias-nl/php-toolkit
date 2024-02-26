@@ -220,7 +220,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
-                ->setAckWait(self::NANOSECOND * $this->ackWait)
+                ->setAckWait((int) (self::NANOSECOND * $this->ackWait))
             ;
         }
 
