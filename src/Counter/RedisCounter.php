@@ -25,6 +25,11 @@ final class RedisCounter implements Counter
         $this->redis->del(array_map(fn (string $k): string => $this->prefix.$k, (array) $key));
     }
 
+    public function set(string $key, int $count): void
+    {
+        $this->redis->set($this->prefix.$key, $count);
+    }
+
     public function get(string $key): ?int
     {
         return null === ($count = $this->redis->get($this->prefix.$key)) ? null : (int) $count;

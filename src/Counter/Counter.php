@@ -13,6 +13,8 @@ interface Counter
      */
     public function clear(array|string $key): void;
 
+    public function set(string $key, int $count): void;
+
     public function get(string $key): ?int;
 
     /**

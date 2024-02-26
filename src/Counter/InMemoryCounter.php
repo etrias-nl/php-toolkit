@@ -20,6 +20,11 @@ final class InMemoryCounter implements Counter
         }
     }
 
+    public function set(string $key, int $count): void
+    {
+        $this->counts[$key] = $count;
+    }
+
     public function get(string $key): ?int
     {
         return $this->counts[$key] ?? null;
