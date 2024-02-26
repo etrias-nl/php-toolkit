@@ -15,7 +15,7 @@ class DummyCommandMessage
 {
     public function __construct(
         public readonly mixed $payload,
-        public readonly int $sleep = 0,
+        public readonly float|int $sleep = 0,
         public readonly bool $failure = false,
         public readonly bool $nest = false,
         public readonly bool $nestFailure = false,

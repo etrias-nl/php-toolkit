@@ -49,7 +49,7 @@ class DispatchConsoleCommand extends Command
             $output->writeln('Dispatching message #'.$i);
             $message = new DummyCommandMessage(
                 $payload ?? 'Batch message #'.$i,
-                (int) $input->getOption('sleep'),
+                (float) $input->getOption('sleep'),
                 $input->getOption('failure'),
                 $input->getOption('nest'),
                 $input->getOption('nest-failure'),

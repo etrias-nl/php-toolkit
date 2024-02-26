@@ -19,23 +19,26 @@ class DummyCommandHandler
 
     public function __invoke(DummyCommandMessage $message): void
     {
-        $this->logger->notice('HANDLING MESSAGE', ['payload' => $message->payload]);
+        $this->logger->notice('HANDLING MESSAGE');
+        $this->logger->notice(json_encode($message->payload));
 
-        if ($message->sleep) {
-            $this->logger->notice('Calling external service to simulate slow process for '.$message->sleep.'s');
-            $this->logger->notice(file_get_contents('https://httpstat.us/200?sleep='.($message->sleep * 1000), false, stream_context_create(['http' => ['timeout' => $message->sleep + 1]])));
+        if ($message->sleep > 0) {
+            $this->logger->notice('Sleeping for '.$message->sleep.'s');
+            usleep((int) ($message->sleep * 1_000_000));
         }
 
         if ($message->nest) {
             $this->logger->notice('Dispatching nested message');
             $this->messageBus->dispatch(
-                new DummyCommandMessage(['NESTED' => $message->payload], 0, $message->nestFailure),
+                new DummyCommandMessage(['NESTED' => $message->payload], $message->sleep, $message->nestFailure),
                 $message->nestSync ? [new TransportNamesStamp('sync')] : []
             );
         }
 
         if ($message->failure) {
-            throw new \RuntimeException($message->payload);
+            throw new \RuntimeException(json_encode($message->payload));
         }
+
+        $this->logger->notice('DONE');
     }
 }
