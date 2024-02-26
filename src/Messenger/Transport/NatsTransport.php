@@ -57,7 +57,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
         $result = $this->client->api($command, $stream->getConfiguration()->toArray());
         self::assertPayload($result);
-        $this->log(Level::Notice, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
+        $this->log(Level::Info, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
 
         // setup consumer
         $consumer = $this->getConsumer();
@@ -65,7 +65,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $command = 'CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName();
         $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
         self::assertPayload($result);
-        $this->log(Level::Notice, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
+        $this->log(Level::Info, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
     }
 
     public function get(): array
@@ -261,7 +261,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->counter->set($keyAck, 1);
             }
         } catch (\Throwable $e) {
-            $this->log(Level::Notice, $envelope, 'Unable to update message counter', ['exception' => $e]);
+            $this->log(Level::Warning, $envelope, 'Unable to update message counter', ['exception' => $e]);
         }
     }
 
