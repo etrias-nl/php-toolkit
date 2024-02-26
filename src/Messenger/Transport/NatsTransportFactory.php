@@ -34,16 +34,17 @@ final class NatsTransportFactory implements TransportFactoryInterface
         parse_str($urlParts['query'] ?? '', $queryParts);
         $name = $options['transport_name'] ?? null;
         unset($options['transport_name']);
-        $options = $queryParts + $options + [
+        $options = $queryParts + $options + $defaults = [
+            'stream' => $name,
             'timeout' => 2.0,
             'ack_wait' => 300,
             'deduplicate_window' => 10,
         ];
 
-        if ($diff = array_diff_key($options, array_flip(['stream', 'timeout', 'ack_wait', 'deduplicate_window']))) {
+        if ($diff = array_diff_key($options, $defaults)) {
             throw new \RuntimeException(sprintf('Unsupported transport options: %s', implode(', ', array_keys($diff))));
         }
-        if (!\is_string($stream = $options['stream'] ?? $name)) {
+        if (!\is_string($stream = $options['stream']) || '' === trim($stream)) {
             throw new \RuntimeException('Missing stream name.');
         }
 
@@ -57,8 +58,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->logger,
             $this->normalizer,
             $stream,
-            \is_int($options['ack_wait']) || ctype_digit($options['ack_wait']) ? (int) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
-            \is_int($options['deduplicate_window']) || ctype_digit($options['deduplicate_window']) ? (int) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
+            is_numeric($options['ack_wait']) ? (float) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
+            is_numeric($options['deduplicate_window']) ? (float) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
         );
     }
 

@@ -32,6 +32,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
     private const NANOSECOND = 1_000_000_000;
+    private const MICROSECOND = 1_000_000;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -45,8 +46,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
         private readonly string $streamName,
-        private readonly int $ackWait,
-        private readonly int $deduplicateWindow,
+        private readonly float|int $ackWait,
+        private readonly float|int $deduplicateWindow,
     ) {}
 
     public function setup(): void
@@ -82,7 +83,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
-                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.$this->ackWait.' seconds'));
+                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
                 }
 
                 $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
@@ -203,7 +204,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::FILE)
-                ->setDuplicateWindow($this->deduplicateWindow)
+                ->setDuplicateWindow((float) $this->deduplicateWindow)
             ;
         }
 
