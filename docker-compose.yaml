@@ -1,12 +1,12 @@
 version: '3'
 services:
     nats:
-        image: nats:2.10.11
+        image: 'nats:2.10.11'
         command:
             - '--jetstream'
             - '--debug'
     php:
-        image: etriasnl/dev-php-fpm:8.1.27-10
+        image: 'etriasnl/dev-php-fpm:8.1.27-11'
         depends_on:
             - nats
         volumes:
