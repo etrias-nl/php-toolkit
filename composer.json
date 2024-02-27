@@ -20,6 +20,7 @@
         "symfony/property-access": "^6",
         "symfony/security-bundle": "^6",
         "symfony/serializer": "^6",
+        "symfony/stopwatch": "^6",
         "symfony/uid": "^6",
         "symfony/var-dumper": "^6"
     },
