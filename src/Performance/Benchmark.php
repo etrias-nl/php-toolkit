@@ -29,13 +29,13 @@ final class Benchmark
     {
         $prevRunId = $this->runId;
         $this->runId ??= uniqid('bench_', true);
-        $event = $this->stopwatch->start($name);
+        $event = $this->stopwatch->start($this->runId.uniqid($name, true));
 
         try {
             return $callback();
         } finally {
             $event->stop();
-            $this->logger->info(sprintf('%s (%.2F MiB - %d ms)', $event->getName(), $event->getMemory() / 1024 / 1024, $event->getDuration()), [
+            $this->logger->info(sprintf('%s (%.2F MiB - %d ms)', $name, $event->getMemory() / 1024 / 1024, $event->getDuration()), [
                 'benchmark' => $this->runId,
                 'duration' => $event->getDuration(),
                 'memory' => $event->getMemory(),
