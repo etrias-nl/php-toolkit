@@ -141,6 +141,7 @@ final class NatsTest extends TestCase
         $transport->ack($sentEnvelopes3[0]);
 
         self::assertMessageCount(0, $transport);
+        self::assertSame([\stdClass::class => 0], $transport->getMessageCounts());
         self::assertSame([], $transport->get());
         self::assertSame([], $transport->getMessageCounts());
     }
