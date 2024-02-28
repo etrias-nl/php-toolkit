@@ -67,24 +67,24 @@ final class NatsTest extends TestCase
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
         $ackWaitTimeoutMin = new \DateTime($ackWaitTimeout = '+5 minutes');
-        $sentEnvelopes = $transport->get();
+        $receivedEnvelopes = $transport->get();
         $ackWaitTimeoutMax = new \DateTime($ackWaitTimeout);
 
         // message fetched
-        self::assertCount(1, $sentEnvelopes);
+        self::assertCount(1, $receivedEnvelopes);
         self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
-        self::assertSame((array) $message, (array) $sentEnvelopes[0]->getMessage());
-        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertSame((array) $message, (array) $receivedEnvelopes[0]->getMessage());
+        self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
 
-        $replyTo = $sentEnvelopes[0]->last(ReplyToStamp::class);
+        $replyTo = $receivedEnvelopes[0]->last(ReplyToStamp::class);
 
         self::assertNotNull($replyTo);
         self::assertStringStartsWith('$JS.ACK.', $replyTo->id);
         self::assertGreaterThanOrEqual($ackWaitTimeoutMin, $replyTo->expiresAt);
         self::assertLessThanOrEqual($ackWaitTimeoutMax, $replyTo->expiresAt);
 
-        $transport->ack($sentEnvelopes[0]);
+        $transport->ack($receivedEnvelopes[0]);
 
         // message acked
         self::assertMessageCount(0, $transport);
@@ -98,7 +98,8 @@ final class NatsTest extends TestCase
         $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
-        $messageId1 = $transport->send(Envelope::wrap((object) ['test_1' => true]))->last(TransportMessageIdStamp::class)?->getId();
+        $envelope1 = $transport->send(Envelope::wrap((object) ['test_1' => true]));
+        $messageId1 = $envelope1->last(TransportMessageIdStamp::class)?->getId();
         $messageId2 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new SentStamp(self::class, 'sender')]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId3 = $transport->send(Envelope::wrap((object) ['test_1' => true], [new DeduplicateStamp(false)]))->last(TransportMessageIdStamp::class)?->getId();
         $messageId4 = $transport->send(Envelope::wrap((object) ['test_2' => true]))->last(TransportMessageIdStamp::class)?->getId();
@@ -113,32 +114,38 @@ final class NatsTest extends TestCase
         self::assertNotSame($messageId4, $messageId1);
         self::assertNotSame($messageId4, $messageId3);
 
-        $sentEnvelopes1 = $transport->get();
+        $receivedEnvelopes1 = $transport->get();
 
-        self::assertCount(1, $sentEnvelopes1);
-        self::assertSame($messageId1, $sentEnvelopes1[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $receivedEnvelopes1);
+        self::assertSame($messageId1, $receivedEnvelopes1[0]->last(TransportMessageIdStamp::class)?->getId());
 
-        $transport->ack($sentEnvelopes1[0]);
+        $transport->ack($receivedEnvelopes1[0]);
 
         self::assertMessageCount(2, $transport);
         self::assertSame([\stdClass::class => 2], $transport->getMessageCounts());
 
-        $sentEnvelopes2 = $transport->get();
+        // deduplicated after ack by NATS due hard window limit
+        $transport->send($envelope1);
 
-        self::assertCount(1, $sentEnvelopes2);
-        self::assertSame($messageId3, $sentEnvelopes2[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertMessageCount(2, $transport);
+        self::assertSame([\stdClass::class => 2], $transport->getMessageCounts());
 
-        $transport->ack($sentEnvelopes2[0]);
+        $receivedEnvelopes2 = $transport->get();
+
+        self::assertCount(1, $receivedEnvelopes2);
+        self::assertSame($messageId3, $receivedEnvelopes2[0]->last(TransportMessageIdStamp::class)?->getId());
+
+        $transport->ack($receivedEnvelopes2[0]);
 
         self::assertMessageCount(1, $transport);
         self::assertSame([\stdClass::class => 1], $transport->getMessageCounts());
 
-        $sentEnvelopes3 = $transport->get();
+        $receivedEnvelopes3 = $transport->get();
 
-        self::assertCount(1, $sentEnvelopes3);
-        self::assertSame($messageId4, $sentEnvelopes3[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $receivedEnvelopes3);
+        self::assertSame($messageId4, $receivedEnvelopes3[0]->last(TransportMessageIdStamp::class)?->getId());
 
-        $transport->ack($sentEnvelopes3[0]);
+        $transport->ack($receivedEnvelopes3[0]);
 
         self::assertMessageCount(0, $transport);
         self::assertSame([\stdClass::class => 0], $transport->getMessageCounts());
@@ -153,10 +160,10 @@ final class NatsTest extends TestCase
         $transport->setup();
 
         $messageId = $transport->send(Envelope::wrap((object) ['test1' => true]))->last(TransportMessageIdStamp::class)?->getId();
-        $sentEnvelopes = $transport->get();
+        $receivedEnvelopes = $transport->get();
 
-        self::assertCount(1, $sentEnvelopes);
-        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $receivedEnvelopes);
+        self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertSame([], $transport->get());
 
         usleep(30_000);
@@ -165,20 +172,20 @@ final class NatsTest extends TestCase
 
         usleep(40_000);
 
-        $sentEnvelopes = $transport->get();
+        $receivedEnvelopes = $transport->get();
 
-        self::assertCount(1, $sentEnvelopes);
-        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $receivedEnvelopes);
+        self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertSame([], $transport->get());
 
-        $transport->reject($sentEnvelopes[0]);
+        $transport->reject($receivedEnvelopes[0]);
 
         usleep(30_000);
 
-        $sentEnvelopes = $transport->get();
+        $receivedEnvelopes = $transport->get();
 
-        self::assertCount(1, $sentEnvelopes);
-        self::assertSame($messageId, $sentEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+        self::assertCount(1, $receivedEnvelopes);
+        self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
     }
 
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
