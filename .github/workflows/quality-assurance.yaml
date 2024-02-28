@@ -43,7 +43,8 @@ jobs:
             -
                 uses: ScribeMD/docker-cache@0.3.7
                 with:
-                    key: ${{ runner.os }}-docker-${{ hashFiles('Makefile', 'okteto.yaml') }}
+                    key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yaml') }}
+                    restore-keys: ${{ runner.os }}-docker-
             -
                 id: install
                 run: make composer-update
