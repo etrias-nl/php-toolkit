@@ -150,6 +150,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_error'] = $e;
         }
 
+        $retries = 3;
+        do_send:
         try {
             try {
                 $oldSequence = $this->getStream()->info()?->state?->last_seq;
@@ -160,6 +162,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $result = $this->client->dispatch($this->streamName, $payload);
             self::assertPayload($result);
         } catch (\Throwable $e) {
+            if (--$retries > 0) {
+                goto do_send;
+            }
+
             $this->log(Level::Error, $envelope, 'Unable to send message "{message}": '.$e->getMessage(), ['exception' => $e] + $context);
 
             throw new TransportException($e->getMessage(), 0, $e);
