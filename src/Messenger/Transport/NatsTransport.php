@@ -150,7 +150,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_error'] = $e;
         }
 
-        $retries = 3;
+        $retries = 5;
         $timeout = $this->client->configuration->timeout;
         do_send:
         try {
@@ -164,7 +164,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             self::assertPayload($result);
         } catch (\Throwable $e) {
             if (--$retries > 0) {
-                $timeout += $timeout;
+                usleep(self::MICROSECOND / $retries);
+                $timeout *= 2;
 
                 goto do_send;
             }
