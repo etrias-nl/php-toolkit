@@ -30,6 +30,9 @@
     <MoreSpecificReturnType>
       <code><![CDATA[array<class-string, null|int>]]></code>
     </MoreSpecificReturnType>
+    <RedundantCast>
+      <code><![CDATA[(int) (self::MICROSECOND / $retries)]]></code>
+    </RedundantCast>
     <UnusedVariable>
       <code><![CDATA[$timeout]]></code>
     </UnusedVariable>
