@@ -164,7 +164,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             self::assertPayload($result);
         } catch (\Throwable $e) {
             if (--$retries > 0) {
-                usleep(self::MICROSECOND / $retries);
+                usleep((int) (self::MICROSECOND / $retries));
                 $timeout *= 2;
 
                 goto do_send;
