@@ -30,6 +30,9 @@
     <MoreSpecificReturnType>
       <code><![CDATA[array<class-string, null|int>]]></code>
     </MoreSpecificReturnType>
+    <UnusedVariable>
+      <code><![CDATA[$timeout]]></code>
+    </UnusedVariable>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <MissingTemplateParam>

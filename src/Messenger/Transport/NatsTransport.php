@@ -151,6 +151,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $retries = 3;
+        $timeout = $this->client->configuration->timeout;
         do_send:
         try {
             try {
@@ -159,10 +160,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $oldSequence = null;
             }
 
-            $result = $this->client->dispatch($this->streamName, $payload);
+            $result = $this->client->dispatch($this->streamName, $payload, $timeout);
             self::assertPayload($result);
         } catch (\Throwable $e) {
             if (--$retries > 0) {
+                $timeout += $timeout;
+
                 goto do_send;
             }
 
