@@ -36,7 +36,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         unset($options['transport_name']);
         $options = $queryParts + $options + $defaults = [
             'stream' => $name,
-            'timeout' => 2.0,
+            'timeout' => 5.0,
             'ack_wait' => 300,
             'deduplicate_window' => 10,
         ];
