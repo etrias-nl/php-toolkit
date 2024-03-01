@@ -77,19 +77,38 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         } catch (\Throwable) {
         }
 
+        $requestSubject = '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName;
+        $handlerSubject = 'handler.'.bin2hex(random_bytes(4));
+        $subscribed = false;
         $receivedMessages = [];
 
         try {
-            $this->getConsumer()->handle(function (Payload $payload, ?string $replyTo) use (&$receivedMessages): void {
+            $this->client->subscribe($handlerSubject, function (Payload $payload, ?string $replyTo): ?Envelope {
+                if ($payload->isEmpty()) {
+                    return null;
+                }
+
                 $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
                 if (null !== $replyTo) {
                     $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
                 }
 
-                $receivedMessages[] = $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
-            }, null, false);
+                return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
+            });
+
+            $subscribed = true;
+
+            $this->client->publish($requestSubject, ['batch' => 1, 'no_wait' => true], $handlerSubject);
+
+            if (null !== $receivedMessage = $this->client->process(PHP_INT_MAX, false, false)) {
+                $receivedMessages[] = $receivedMessage;
+            }
         } catch (\Throwable $e) {
-            throw new TransportException($e->getMessage(), 0);
+            throw new TransportException($e->getMessage(), 0, $e);
+        } finally {
+            if ($subscribed) {
+                $this->client->unsubscribe($handlerSubject);
+            }
         }
 
         return $receivedMessages;
@@ -242,8 +261,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         if (null === $this->consumer) {
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
-            $this->consumer->setIterations(1);
-            $this->consumer->setBatching(1);
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
