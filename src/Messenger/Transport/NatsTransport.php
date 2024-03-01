@@ -78,13 +78,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function get(): array
     {
-        try {
-            if (0 === $this->getMessageCount()) {
-                $this->counter->clear($this->counter->keys($this->getStreamId().':'));
-            }
-        } catch (\Throwable) {
-        }
-
         $receivedMessages = [];
 
         try {
@@ -110,7 +103,14 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->subscription
             );
 
-            if (null !== $receivedMessage = $this->client->process(PHP_INT_MAX, false, false)) {
+            if (null === $receivedMessage = $this->client->process(PHP_INT_MAX, false, false)) {
+                try {
+                    if (0 === $this->getMessageCount()) {
+                        $this->counter->clear($this->counter->keys($this->getStreamId().':'));
+                    }
+                } catch (\Throwable) {
+                }
+            } else {
                 $receivedMessages[] = $receivedMessage;
             }
         } catch (\Throwable $e) {
