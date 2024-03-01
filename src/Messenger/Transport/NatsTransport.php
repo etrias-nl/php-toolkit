@@ -37,6 +37,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
     private ?string $streamId = null;
+    private ?string $subscription = null;
 
     public function __construct(
         private readonly Client $client,
@@ -49,6 +50,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly float|int $ackWait,
         private readonly float|int $deduplicateWindow,
     ) {}
+
+    public function __destruct()
+    {
+        if (null !== $this->subscription) {
+            $this->client->unsubscribe($this->subscription);
+        }
+    }
 
     public function setup(): void
     {
@@ -77,38 +85,36 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         } catch (\Throwable) {
         }
 
-        $requestSubject = '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName;
-        $handlerSubject = 'handler.'.bin2hex(random_bytes(4));
-        $subscribed = false;
         $receivedMessages = [];
 
         try {
-            $this->client->subscribe($handlerSubject, function (Payload $payload, ?string $replyTo): ?Envelope {
-                if ($payload->isEmpty()) {
-                    return null;
-                }
+            if (null === $this->subscription) {
+                $this->subscription = 'handler.'.bin2hex(random_bytes(4));
+                $this->client->subscribe($this->subscription, function (Payload $payload, ?string $replyTo): ?Envelope {
+                    if ($payload->isEmpty()) {
+                        return null;
+                    }
 
-                $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
-                if (null !== $replyTo) {
-                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
-                }
+                    $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
+                    if (null !== $replyTo) {
+                        $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
+                    }
 
-                return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
-            });
+                    return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
+                });
+            }
 
-            $subscribed = true;
-
-            $this->client->publish($requestSubject, ['batch' => 1, 'no_wait' => true], $handlerSubject);
+            $this->client->publish(
+                '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName,
+                ['batch' => 1, 'no_wait' => true],
+                $this->subscription
+            );
 
             if (null !== $receivedMessage = $this->client->process(PHP_INT_MAX, false, false)) {
                 $receivedMessages[] = $receivedMessage;
             }
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
-        } finally {
-            if ($subscribed) {
-                $this->client->unsubscribe($handlerSubject);
-            }
         }
 
         return $receivedMessages;
