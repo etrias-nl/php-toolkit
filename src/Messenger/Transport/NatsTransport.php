@@ -53,9 +53,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function __destruct()
     {
-        if (null !== $this->subscription) {
-            $this->client->unsubscribe($this->subscription);
-        }
+        $this->unsubscribe();
     }
 
     public function setup(): void
@@ -114,6 +112,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $receivedMessages[] = $receivedMessage;
             }
         } catch (\Throwable $e) {
+            $this->unsubscribe();
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -277,6 +277,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->consumer;
     }
 
+    private function getStreamId(): string
+    {
+        return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
+    }
+
     private function delta(Envelope $envelope, bool $acked, ?int $oldSequence = null, ?int $newSequence = null): void
     {
         try {
@@ -310,8 +315,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $this->logger->log($level, $message, $context);
     }
 
-    private function getStreamId(): string
+    private function unsubscribe(): void
     {
-        return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
+        if (null === $this->subscription) {
+            return;
+        }
+
+        try {
+            $this->client->unsubscribe($this->subscription);
+        } catch (\Throwable) {
+        }
+
+        $this->subscription = null;
     }
 }
