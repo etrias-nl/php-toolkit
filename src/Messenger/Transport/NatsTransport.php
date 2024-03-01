@@ -103,7 +103,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->subscription
             );
 
-            if (null === $receivedMessage = $this->client->process(PHP_INT_MAX, false, false)) {
+            if (null === $receivedMessage = $this->client->process(120, false, false)) {
                 try {
                     if (0 === $this->getMessageCount()) {
                         $this->counter->clear($this->counter->keys($this->getStreamId().':'));
