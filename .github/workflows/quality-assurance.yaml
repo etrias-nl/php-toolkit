@@ -23,9 +23,8 @@ jobs:
             -
                 uses: actions/checkout@v4.1.1
             -
-                uses: actions/cache@v4.0.0
+                uses: actions/cache/restore@v4.0.0
                 with:
-                    save-always: true
                     path: var/composer
                     key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
                     restore-keys: ${{ runner.os }}-composer-
@@ -70,3 +69,9 @@ jobs:
                     commit_user_email: it@etrias.nl
                     commit_author: etrias <it@etrias.nl>
                 if: github.ref_name == 'main'
+            -
+                uses: actions/cache/save@v4.0.0
+                with:
+                    path: var/composer
+                    key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+                if: "always() && steps.install.outcome == 'success'"

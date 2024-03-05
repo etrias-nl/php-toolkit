@@ -9,7 +9,7 @@
         "basis-company/nats": "^0.18.1",
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
-        "predis/predis": "^2.2",
+        "predis/predis": "^2",
         "symfony/cache": "^6",
         "symfony/console": "^6",
         "symfony/doctrine-bridge": "^6",
