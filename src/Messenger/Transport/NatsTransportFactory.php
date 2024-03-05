@@ -6,10 +6,8 @@ namespace Etrias\PhpToolkit\Messenger\Transport;
 
 use Basis\Nats\Client;
 use Basis\Nats\Configuration;
-use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -19,8 +17,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private readonly MessageMap $messageMap,
-        #[Autowire(service: '.messenger.counter')]
-        private readonly Counter $counter,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
@@ -56,7 +52,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
             new Client(new Configuration($config), $this->logger),
             $serializer,
             $this->messageMap,
-            $this->counter,
             $this->logger,
             $this->normalizer,
             $stream,

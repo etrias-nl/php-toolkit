@@ -10,7 +10,6 @@ use Basis\Nats\Message\Payload;
 use Basis\Nats\Stream\RetentionPolicy;
 use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
-use Etrias\PhpToolkit\Counter\Counter;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
@@ -43,7 +42,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly Client $client,
         private readonly SerializerInterface $serializer,
         private readonly MessageMap $messageMap,
-        private readonly Counter $counter,
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
         private readonly string $streamName,
@@ -61,16 +59,14 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         // setup stream
         $stream = $this->getStream();
         $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
-        $result = $this->client->api($command, $stream->getConfiguration()->toArray());
-        self::assertPayload($result);
+        $this->client->api($command, $stream->getConfiguration()->toArray());
         $this->log(Level::Info, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
 
         // setup consumer
         $consumer = $this->getConsumer();
         // create also updates
         $command = 'CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName();
-        $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
-        self::assertPayload($result);
+        $this->client->api($command, $consumer->getConfiguration()->toArray());
         $this->log(Level::Info, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
     }
 
@@ -101,14 +97,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->subscription
             );
 
-            if (null === $receivedMessage = $this->client->process(120, false, false)) {
-                try {
-                    if (0 === $this->getMessageCount()) {
-                        $this->counter->clear($this->counter->keys($this->getStreamId().':'));
-                    }
-                } catch (\Throwable) {
-                }
-            } else {
+            if (null !== $receivedMessage = $this->client->process(120, false, false)) {
                 $receivedMessages[] = $receivedMessage;
             }
         } catch (\Throwable $e) {
@@ -137,8 +126,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
-
-        $this->delta($envelope, true);
     }
 
     public function reject(Envelope $envelope): void
@@ -175,36 +162,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_error'] = $e;
         }
 
-        $retries = 5;
-        $timeout = $this->client->configuration->timeout;
-        do_send:
         try {
-            try {
-                $oldSequence = $this->getStream()->info()?->state?->last_seq;
-            } catch (\Throwable) {
-                $oldSequence = null;
-            }
-
-            $result = $this->client->dispatch($this->streamName, $payload, $timeout);
-            self::assertPayload($result);
+            $this->client->publish($this->streamName, $payload);
         } catch (\Throwable $e) {
-            if (--$retries > 0) {
-                usleep((int) (self::MICROSECOND / $retries));
-                $timeout *= 2;
-
-                goto do_send;
-            }
-
             $this->log(Level::Error, $envelope, 'Unable to send message "{message}": '.$e->getMessage(), ['exception' => $e] + $context);
 
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
-        $newSequence = $context['sequence'] = $result->getValue('seq');
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
-        $this->delta($envelope, false, $oldSequence, $newSequence);
 
         return $envelope;
     }
@@ -212,39 +180,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function getMessageCount(): int
     {
         return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
-    }
-
-    /**
-     * @return array<class-string, null|int>
-     */
-    public function getMessageCounts(): array
-    {
-        $counts = [];
-
-        foreach ($this->counter->keys($prefix = $this->getStreamId().':') as $key) {
-            $count = $this->counter->get($key) ?? -1;
-            $counts[substr($key, \strlen($prefix))] = $count < 0 ? null : $count;
-        }
-
-        return $counts;
-    }
-
-    /**
-     * @psalm-assert Payload $payload
-     */
-    private static function assertPayload(mixed $payload): void
-    {
-        if (!$payload instanceof Payload) {
-            throw new \RuntimeException('Expected payload, got '.get_debug_type($payload));
-        }
-        if (null !== $error = $payload->getValue('error')) {
-            $message = $error->description ?? $payload->body;
-            if (isset($error->err_code)) {
-                $message .= ' ['.$error->err_code.']';
-            }
-
-            throw new \RuntimeException($message);
-        }
     }
 
     private function getStream(): Stream
@@ -280,27 +215,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private function getStreamId(): string
     {
         return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
-    }
-
-    private function delta(Envelope $envelope, bool $acked, ?int $oldSequence = null, ?int $newSequence = null): void
-    {
-        try {
-            $streamId = $this->getStreamId();
-            $keyType = $streamId.':'.$envelope->getMessage()::class;
-            $keyAck = 'ack:'.$streamId.':'.$envelope->last(TransportMessageIdStamp::class)?->getId();
-            $oldSequence ??= 0;
-            $newSequence ??= $oldSequence + 1;
-
-            if ($acked && null !== $this->counter->get($keyAck)) {
-                $this->counter->delta($keyType, -1);
-                $this->counter->clear($keyAck);
-            } elseif (!$acked && $newSequence > $oldSequence) {
-                $this->counter->delta($keyType, 1);
-                $this->counter->set($keyAck, 1);
-            }
-        } catch (\Throwable $e) {
-            $this->log(Level::Warning, $envelope, 'Unable to update message counter', ['exception' => $e]);
-        }
     }
 
     private function log(Level $level, mixed $subject, string $message, array $context = []): void
