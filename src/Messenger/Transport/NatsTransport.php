@@ -36,7 +36,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
     private ?string $streamId = null;
-    private ?string $subscription = null;
 
     public function __construct(
         private readonly Client $client,
@@ -48,11 +47,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly float|int $ackWait,
         private readonly float|int $deduplicateWindow,
     ) {}
-
-    public function __destruct()
-    {
-        $this->unsubscribe();
-    }
 
     public function setup(): void
     {
@@ -72,41 +66,41 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function get(): array
     {
-        $receivedMessages = [];
+        $subscription = 'handler.'.bin2hex(random_bytes(4));
 
         try {
-            if (null === $this->subscription) {
-                $this->subscription = 'handler.'.bin2hex(random_bytes(4));
-                $this->client->subscribe($this->subscription, function (Payload $payload, ?string $replyTo): ?Envelope {
-                    if ($payload->isEmpty()) {
-                        return null;
-                    }
+            $this->client->subscribe($subscription, function (Payload $payload, ?string $replyTo): ?Envelope {
+                if ($payload->isEmpty()) {
+                    return null;
+                }
 
-                    $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
-                    if (null !== $replyTo) {
-                        $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
-                    }
+                $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
+                if (null !== $replyTo) {
+                    $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
+                }
 
-                    return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
-                });
-            }
+                return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
+            });
 
             $this->client->publish(
                 '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName,
                 ['batch' => 1, 'no_wait' => true],
-                $this->subscription
+                $subscription
             );
 
-            if (null !== $receivedMessage = $this->client->process(120, false, false)) {
-                $receivedMessages[] = $receivedMessage;
+            if (null === $receivedMessage = $this->client->process(120, false, false)) {
+                return [];
             }
+
+            return [$receivedMessage];
         } catch (\Throwable $e) {
-            $this->unsubscribe();
-
             throw new TransportException($e->getMessage(), 0, $e);
+        } finally {
+            try {
+                $this->client->unsubscribe($subscription);
+            } catch (\Throwable) {
+            }
         }
-
-        return $receivedMessages;
     }
 
     public function ack(Envelope $envelope): void
@@ -227,19 +221,5 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $this->logger->log($level, $message, $context);
-    }
-
-    private function unsubscribe(): void
-    {
-        if (null === $this->subscription) {
-            return;
-        }
-
-        try {
-            $this->client->unsubscribe($this->subscription);
-        } catch (\Throwable) {
-        }
-
-        $this->subscription = null;
     }
 }
