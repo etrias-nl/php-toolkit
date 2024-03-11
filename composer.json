@@ -25,7 +25,7 @@
         "symfony/var-dumper": "^6"
     },
     "conflict": {
-        "basis-company/nats": "<0.18.1"
+        "basis-company/nats": "<0.18.4"
     },
     "autoload": {
         "psr-4": {
