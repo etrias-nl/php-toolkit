@@ -94,7 +94,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $this->subscription
             );
 
-            if (null === $receivedMessage = $this->client->process(120, false, false)) {
+            if (null === $receivedMessage = $this->client->process(120, false)) {
                 return [];
             }
 
