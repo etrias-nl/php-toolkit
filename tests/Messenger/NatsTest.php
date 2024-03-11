@@ -172,7 +172,7 @@ final class NatsTest extends TestCase
 
         $transport->reject($receivedEnvelopes[0]);
 
-        usleep(30_000);
+        usleep(50_000);
 
         $receivedEnvelopes = $transport->get();
 

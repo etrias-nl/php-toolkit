@@ -35,7 +35,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
-    private ?string $streamId = null;
 
     public function __construct(
         private readonly Client $client,
@@ -204,11 +203,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $this->consumer;
-    }
-
-    private function getStreamId(): string
-    {
-        return $this->streamId ??= hash('xxh128', $this->client->configuration->host.':'.$this->client->configuration->port.':'.$this->streamName);
     }
 
     private function log(Level $level, mixed $subject, string $message, array $context = []): void
