@@ -101,8 +101,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [$receivedMessage];
         } catch (\Throwable $e) {
             $this->unsubscribe();
+            $this->log(Level::Error, null, $e);
 
-            throw new TransportException($e->getMessage(), 0, $e);
+            return [];
         }
     }
 
@@ -134,7 +135,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->publish($replyTo->id, '-NAK');
         } catch (\Throwable $e) {
-            throw new TransportException($e->getMessage(), 0, $e);
+            $this->log(Level::Error, $envelope, $e);
         }
     }
 
@@ -162,7 +163,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->publish($this->streamName, $payload);
         } catch (\Throwable $e) {
-            $this->log(Level::Error, $envelope, 'Unable to send message "{message}": '.$e->getMessage(), ['exception' => $e] + $context);
+            $this->log(Level::Error, $envelope, $e, $context);
 
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -209,13 +210,18 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         return $this->consumer;
     }
 
-    private function log(Level $level, mixed $subject, string $message, array $context = []): void
+    private function log(Level $level, mixed $subject, string|\Throwable $message, array $context = []): void
     {
         $context['stream'] = $this->streamName;
 
         if ($subject instanceof Envelope) {
             $context['message'] = $subject->getMessage()::class;
             $context['message_id'] = $subject->last(TransportMessageIdStamp::class)?->getId();
+        }
+
+        if ($message instanceof \Throwable) {
+            $context['exception'] = $message;
+            $message = $message->getMessage();
         }
 
         $this->logger->log($level, $message, $context);
