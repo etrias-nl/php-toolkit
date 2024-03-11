@@ -45,8 +45,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
         }
 
         $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid option "timeout" for stream "'.$stream.'".');
-        $config['pingInterval'] = 10;
-        $config['delay'] = 0.005;
 
         return new NatsTransport(
             new Client(new Configuration($config), $this->logger),
