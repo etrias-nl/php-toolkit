@@ -23,7 +23,13 @@ final class LogTest extends TestCase
 {
     public function testMiddleware(): void
     {
-        $logMiddleware = new LogMiddleware();
+        $logMiddleware = new LogMiddleware([
+            static function (LogRecord $record, Envelope $envelope): LogRecord {
+                $record->extra['extra_processor'] = $envelope->getMessage()::class;
+
+                return $record;
+            },
+        ]);
         $logHandler = new TestHandler();
         $envelopeMiddleware = new class(new Logger('test', [$logHandler], [$logMiddleware])) implements MiddlewareInterface {
             /** @psalm-suppress PropertyNotSetInConstructor */
@@ -54,11 +60,11 @@ final class LogTest extends TestCase
 
         self::assertStringMatchesFormat(
             <<<'TXT'
-                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
-                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"}}
-                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"}}
-                [%s] test.INFO: handling [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"}}
-                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"}}
+                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: handling [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"},"extra_processor":"stdClass"}
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
         );

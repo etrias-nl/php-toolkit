@@ -17,6 +17,13 @@ final class LogMiddleware implements MiddlewareInterface
 {
     private ?Envelope $currentEnvelope = null;
 
+    /**
+     * @param list<callable(LogRecord, Envelope): LogRecord> $extraEnvelopeProcessors
+     */
+    public function __construct(
+        private readonly array $extraEnvelopeProcessors = [],
+    ) {}
+
     public function __invoke(LogRecord $record): LogRecord
     {
         if (null === $this->currentEnvelope) {
@@ -26,6 +33,10 @@ final class LogMiddleware implements MiddlewareInterface
         $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
         $record->extra['messenger']['message'] = $this->currentEnvelope->getMessage()::class;
+
+        foreach ($this->extraEnvelopeProcessors as $processor) {
+            $record = $processor($record, $this->currentEnvelope);
+        }
 
         return $record;
     }
