@@ -7,6 +7,7 @@ namespace Etrias\PhpToolkit\Messenger\Transport;
 use Basis\Nats\Client;
 use Basis\Nats\Consumer\Consumer;
 use Basis\Nats\Message\Payload;
+use Basis\Nats\Queue;
 use Basis\Nats\Stream\RetentionPolicy;
 use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
@@ -35,7 +36,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
-    private ?string $subscription = null;
+    private ?Queue $queue = null;
 
     public function __construct(
         private readonly Client $client,
@@ -72,33 +73,20 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function get(): array
     {
         try {
-            if (null === $this->subscription) {
-                $this->subscription = 'handler.'.bin2hex(random_bytes(4));
-                $this->client->subscribe($this->subscription, function (Payload $payload, ?string $replyTo): ?Envelope {
-                    if ($payload->isEmpty()) {
-                        return null;
-                    }
+            $this->queue ??= $this->getConsumer()->getQueue();
+            $message = $this->queue->next();
+            $payload = $message->payload;
 
-                    $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
-                    if (null !== $replyTo) {
-                        $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
-                    }
-
-                    return $this->serializer->decode(['body' => $payload->body])->with(...$stamps);
-                });
-            }
-
-            $this->client->publish(
-                '$JS.API.CONSUMER.MSG.NEXT.'.$this->streamName.'.'.$this->streamName,
-                ['batch' => 1, 'no_wait' => true],
-                $this->subscription
-            );
-
-            if (null === $receivedMessage = $this->client->process(120, false)) {
+            if ($payload->isEmpty()) {
                 return [];
             }
 
-            return [$receivedMessage];
+            $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
+            if (null !== $replyTo = $message->replyTo) {
+                $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
+            }
+
+            return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
             $this->unsubscribe();
             $this->log(Level::Error, null, $e);
@@ -200,6 +188,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         if (null === $this->consumer) {
             $this->consumer = $this->getStream()->getConsumer($this->streamName);
+            $this->consumer->setBatching(1);
+            $this->consumer->setExpires(.0);
             // note configuration is persisted at server level
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
@@ -229,15 +219,15 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     private function unsubscribe(): void
     {
-        if (null === $this->subscription) {
+        if (null === $this->queue) {
             return;
         }
 
         try {
-            $this->client->unsubscribe($this->subscription);
+            $this->client->unsubscribe($this->queue);
         } catch (\Throwable) {
         }
 
-        $this->subscription = null;
+        $this->queue = null;
     }
 }
