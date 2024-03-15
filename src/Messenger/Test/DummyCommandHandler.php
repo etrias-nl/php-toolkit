@@ -19,16 +19,15 @@ class DummyCommandHandler
 
     public function __invoke(DummyCommandMessage $message): void
     {
-        $this->logger->notice('HANDLING MESSAGE');
-        $this->logger->notice(json_encode($message->payload));
+        $this->logger->info('HANDLING MESSAGE: '.json_encode($message->payload));
 
         if ($message->sleep > 0) {
-            $this->logger->notice('Sleeping for '.$message->sleep.'s');
+            $this->logger->info('Sleeping for '.$message->sleep.'s');
             usleep((int) ($message->sleep * 1_000_000));
         }
 
         if ($message->nest) {
-            $this->logger->notice('Dispatching nested message');
+            $this->logger->info('Dispatching nested message');
             $this->messageBus->dispatch(
                 new DummyCommandMessage(['NESTED' => $message->payload], $message->sleep, $message->nestFailure),
                 $message->nestSync ? [new TransportNamesStamp('sync')] : []
@@ -39,6 +38,6 @@ class DummyCommandHandler
             throw new \RuntimeException(json_encode($message->payload));
         }
 
-        $this->logger->notice('DONE');
+        $this->logger->info('DONE');
     }
 }
