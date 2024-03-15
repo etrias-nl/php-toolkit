@@ -35,10 +35,12 @@ final class Benchmark
             return $callback();
         } finally {
             $event->stop();
-            $this->logger->info(sprintf('%s (%.2F MiB - %d ms)', $name, $event->getMemory() / 1024 / 1024, $event->getDuration()), [
+            $memory = $event->getMemory() / 1024 / 1024;
+            $duration = $event->getDuration() / 1000;
+            $this->logger->info(sprintf('%s (%.2F MiB - %d s)', $name, $memory, $duration), [
                 'benchmark' => $this->runId,
-                'duration' => $event->getDuration(),
-                'memory' => $event->getMemory(),
+                'memory' => $memory,
+                'duration' => $duration,
             ] + $context);
             $this->runId = $prevRunId;
         }
