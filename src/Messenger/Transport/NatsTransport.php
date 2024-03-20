@@ -108,7 +108,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
-            $this->client->publish($replyTo->id, '+ACK');
+            $result = $this->client->dispatch($replyTo->id, '+ACK');
+            self::assertPayload($result);
         } catch (\Throwable $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
@@ -121,7 +122,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
-            $this->client->publish($replyTo->id, '-NAK');
+            $result = $this->client->dispatch($replyTo->id, '-NAK');
+            self::assertPayload($result);
         } catch (\Throwable $e) {
             $this->log(Level::Error, $envelope, $e);
         }
@@ -149,7 +151,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         try {
-            $this->client->publish($this->streamName, $payload);
+            $result = $this->client->dispatch($this->streamName, $payload);
+            self::assertPayload($result);
         } catch (\Throwable $e) {
             $this->log(Level::Error, $envelope, $e, $context);
 
@@ -166,6 +169,24 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function getMessageCount(): int
     {
         return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+    }
+
+    /**
+     * @psalm-assert Payload $payload
+     */
+    private static function assertPayload(mixed $payload): void
+    {
+        if (!$payload instanceof Payload) {
+            throw new \RuntimeException('Expected payload, got '.get_debug_type($payload));
+        }
+        if (null !== $error = $payload->getValue('error')) {
+            $message = $error->description ?? $payload->body;
+            if (isset($error->err_code)) {
+                $message .= ' ['.$error->err_code.']';
+            }
+
+            throw new \RuntimeException($message);
+        }
     }
 
     private function getStream(): Stream
