@@ -59,7 +59,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         // setup stream
         $stream = $this->getStream();
         $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
-        $this->client->api($command, $stream->getConfiguration()->toArray());
+        $config = $stream->getConfiguration()->toArray();
+        $config['num_replicas'] = $config['replicas'];
+        unset($config['replicas']);
+        $this->client->api($command, $config);
         $this->log(Level::Info, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
 
         // setup consumer
