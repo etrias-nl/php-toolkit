@@ -158,11 +158,11 @@ final class NatsTest extends TestCase
         self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
         self::assertSame([], $transport->get());
 
-        usleep(200_000);
+        usleep(250_000);
 
         self::assertSame([], $transport->get());
 
-        usleep(200_000);
+        usleep(250_000);
 
         $receivedEnvelopes = $transport->get();
 
