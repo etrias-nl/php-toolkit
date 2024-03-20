@@ -32,6 +32,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         unset($options['transport_name']);
         $options = $queryParts + $options + $defaults = [
             'stream' => $name,
+            'replicas' => 3,
             'timeout' => 3.0,
             'ack_wait' => 300,
             'deduplicate_window' => 10,
@@ -54,6 +55,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->logger,
             $this->normalizer,
             $stream,
+            \is_int($options['replicas']) || (\is_string($options['replicas']) && ctype_digit($options['replicas'])) ? (int) $options['replicas'] : throw new \RuntimeException('Invalid option "replicas" for stream "'.$stream.'"'),
             is_numeric($options['ack_wait']) ? (float) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
             is_numeric($options['deduplicate_window']) ? (float) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
         );

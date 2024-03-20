@@ -42,7 +42,7 @@ final class NatsTest extends TestCase
     public function testTransport(): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
-        $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         // initially empty
@@ -90,7 +90,7 @@ final class NatsTest extends TestCase
     public function testDeduplication(): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
-        $transport = $factory->createTransport('nats://nats?stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         $envelope1 = $transport->send(Envelope::wrap((object) ['test_1' => true]));
@@ -145,7 +145,7 @@ final class NatsTest extends TestCase
     public function testRedelivery(): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
-        $transport = $factory->createTransport('nats://nats?ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
         $messageId = $transport->send(Envelope::wrap((object) ['test1' => true]))->last(TransportMessageIdStamp::class)?->getId();

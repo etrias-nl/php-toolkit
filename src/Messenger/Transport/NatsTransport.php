@@ -45,6 +45,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly LoggerInterface $logger,
         private readonly NormalizerInterface $normalizer,
         private readonly string $streamName,
+        private readonly int $replicas,
         private readonly float|int $ackWait,
         private readonly float|int $deduplicateWindow,
     ) {}
@@ -60,7 +61,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $stream = $this->getStream();
         $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
         $config = $stream->getConfiguration()->toArray();
-        $config['num_replicas'] = $config['replicas'];
+        $config['num_replicas'] = $config['replicas']; // @see https://github.com/basis-company/nats.php/pull/72
         unset($config['replicas']);
         $this->client->api($command, $config);
         $this->log(Level::Info, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
@@ -201,7 +202,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::FILE)
-                ->setReplicas(3)
+                ->setReplicas($this->replicas)
                 ->setDuplicateWindow((float) $this->deduplicateWindow)
             ;
         }
