@@ -198,6 +198,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->stream->getConfiguration()
                 ->setRetentionPolicy(RetentionPolicy::WORK_QUEUE)
                 ->setStorageBackend(StorageBackend::FILE)
+                ->setReplicas(3)
                 ->setDuplicateWindow((float) $this->deduplicateWindow)
             ;
         }
