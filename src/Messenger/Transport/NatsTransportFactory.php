@@ -19,6 +19,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
         private readonly MessageMap $messageMap,
         #[Target(name: 'messenger.logger')]
         private readonly LoggerInterface $logger,
+        #[Target(name: 'nats.logger')]
+        private readonly LoggerInterface $clientLogger,
         private readonly NormalizerInterface $normalizer,
     ) {}
 
@@ -52,7 +54,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         $config['pingInterval'] = PHP_INT_MAX; // @see https://github.com/basis-company/nats.php/pull/75
 
         return new NatsTransport(
-            new Client(new Configuration($config), $this->logger),
+            new Client(new Configuration($config), $this->clientLogger),
             $serializer,
             $this->messageMap,
             $this->logger,

@@ -25,7 +25,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -41,7 +41,7 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -89,7 +89,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -144,7 +144,7 @@ final class NatsTest extends TestCase
 
     public function testRedelivery(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
         $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
