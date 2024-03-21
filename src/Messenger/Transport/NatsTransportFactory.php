@@ -24,7 +24,10 @@ final class NatsTransportFactory implements TransportFactoryInterface
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
     {
-        $urlParts = parse_url($dsn);
+        if (!\is_array($urlParts = parse_url($dsn))) {
+            throw new \RuntimeException('Invalid DSN.');
+        }
+
         $config = array_intersect_key($urlParts, array_flip(['host', 'port', 'user', 'pass']));
         $queryParts = [];
         parse_str($urlParts['query'] ?? '', $queryParts);
