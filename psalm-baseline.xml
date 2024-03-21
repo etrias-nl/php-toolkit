@@ -13,6 +13,13 @@
       <code><![CDATA[(int) ($message->sleep * 1_000_000)]]></code>
     </ArgumentTypeCoercion>
   </file>
+  <file src="src/Messenger/Transport/NatsTransport.php">
+    <UnusedVariable>
+      <code><![CDATA[$retry]]></code>
+      <code><![CDATA[$retry]]></code>
+      <code><![CDATA[$retry]]></code>
+    </UnusedVariable>
+  </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <InvalidArgument>
       <code><![CDATA[$config]]></code>

@@ -111,10 +111,19 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             ]);
         }
 
+        $retry = false;
+        do_ack:
         try {
             $result = $this->client->dispatch($replyTo->id, '+ACK');
             self::assertPayload($result);
         } catch (\Throwable $e) {
+            if (!$retry) {
+                usleep(self::MICROSECOND / 2);
+                $retry = true;
+
+                goto do_ack;
+            }
+
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -125,10 +134,19 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
+        $retry = false;
+        do_reject:
         try {
             $result = $this->client->dispatch($replyTo->id, '-NAK');
             self::assertPayload($result);
         } catch (\Throwable $e) {
+            if (!$retry) {
+                usleep(self::MICROSECOND / 2);
+                $retry = true;
+
+                goto do_reject;
+            }
+
             $this->log(Level::Error, $envelope, $e);
         }
     }
@@ -154,10 +172,19 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_error'] = $e;
         }
 
+        $retry = false;
+        do_send:
         try {
             $result = $this->client->dispatch($this->streamName, $payload);
             self::assertPayload($result);
         } catch (\Throwable $e) {
+            if (!$retry) {
+                usleep(self::MICROSECOND / 2);
+                $retry = true;
+
+                goto do_send;
+            }
+
             $this->log(Level::Error, $envelope, $e, $context);
 
             throw new TransportException($e->getMessage(), 0, $e);
