@@ -14,6 +14,9 @@
     </ArgumentTypeCoercion>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
+    <InvalidArgument>
+      <code><![CDATA[$config]]></code>
+    </InvalidArgument>
     <MissingTemplateParam>
       <code><![CDATA[TransportFactoryInterface]]></code>
     </MissingTemplateParam>
