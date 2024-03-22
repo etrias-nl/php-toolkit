@@ -60,17 +60,16 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         // setup stream
         $stream = $this->getStream();
         $command = ($stream->exists() ? 'STREAM.UPDATE.' : 'STREAM.CREATE.').$stream->getName();
-        $config = $stream->getConfiguration()->toArray();
-        $config['num_replicas'] = $config['replicas']; // @see https://github.com/basis-company/nats.php/pull/72
-        unset($config['replicas']);
-        $this->client->api($command, $config);
+        $result = $this->client->api($command, $stream->getConfiguration()->toArray());
+        self::assertPayload($result);
         $this->log(Level::Info, $stream, 'Stream setup: {command}', ['command' => $command, 'config' => json_encode($stream->info()?->config)]);
 
         // setup consumer
         $consumer = $this->getConsumer();
         // create also updates
         $command = 'CONSUMER.DURABLE.CREATE.'.$stream->getName().'.'.$consumer->getName();
-        $this->client->api($command, $consumer->getConfiguration()->toArray());
+        $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
+        self::assertPayload($result);
         $this->log(Level::Info, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
     }
 

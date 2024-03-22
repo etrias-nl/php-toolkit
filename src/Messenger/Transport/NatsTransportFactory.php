@@ -51,7 +51,6 @@ final class NatsTransportFactory implements TransportFactoryInterface
         }
 
         $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid option "timeout" for stream "'.$stream.'".');
-        $config['pingInterval'] = PHP_INT_MAX; // @see https://github.com/basis-company/nats.php/pull/75
 
         return new NatsTransport(
             new Client(new Configuration($config), $this->clientLogger),

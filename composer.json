@@ -6,7 +6,7 @@
         "php": "^8.1"
     },
     "require-dev": {
-        "basis-company/nats": "^0.20.0",
+        "basis-company/nats": "^0.20.1",
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
         "symfony/cache": "^6",
@@ -24,7 +24,7 @@
         "symfony/var-dumper": "^6"
     },
     "conflict": {
-        "basis-company/nats": "<0.20.0"
+        "basis-company/nats": "<0.20.1"
     },
     "autoload": {
         "psr-4": {
