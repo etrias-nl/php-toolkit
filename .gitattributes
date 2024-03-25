@@ -11,3 +11,4 @@
 /psalm.xml export-ignore
 /rector.php export-ignore
 /tests export-ignore
+/.yamllint.yaml export-ignore
