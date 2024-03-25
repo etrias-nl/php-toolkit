@@ -38,13 +38,14 @@ final class SecurityMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         $prevToken = $this->tokenStorage->getToken();
+        $prevUserProviderId = $this->currentUserProviderId;
 
         if (null === $stamp = $envelope->last(SecurityStamp::class)) {
             $stamped = false;
             $newToken = $prevToken;
 
             if (null !== $prevToken) {
-                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->currentUserProviderId ?? $this->getUserProviderIdFromContext($prevToken)));
+                $envelope = $envelope->with(new SecurityStamp($prevToken, $this->getUserProviderIdFromContext($prevToken)));
             }
         } else {
             $stamped = true;
@@ -77,7 +78,7 @@ final class SecurityMiddleware implements MiddlewareInterface
             return $stamped ? $envelope : $envelope->withoutAll(SecurityStamp::class);
         } finally {
             $this->authenticate($newToken, $prevToken);
-            $this->currentUserProviderId = null;
+            $this->currentUserProviderId = $prevUserProviderId;
         }
     }
 
@@ -99,6 +100,10 @@ final class SecurityMiddleware implements MiddlewareInterface
     private function getUserProviderIdFromContext(?TokenInterface $token): string
     {
         $getDefaultUserProviderId = function () use ($token): ?string {
+            if (null !== $this->currentUserProviderId) {
+                return $this->currentUserProviderId;
+            }
+
             if (null === $user = $token?->getUser()) {
                 $this->logger->info('Cannot determine default user provider without a token user.');
 
