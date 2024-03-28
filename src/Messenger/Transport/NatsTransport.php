@@ -91,12 +91,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
-            // $this->unsubscribe();
+            $this->unsubscribe();
             $this->log(Level::Error, null, $e);
 
             return [];
-        } finally {
-            $this->unsubscribe();
         }
     }
 
