@@ -40,7 +40,7 @@ jobs:
                         ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-
                         ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}-${{ github.event.pull_request.base.sha || github.sha }}
             -
-                uses: ScribeMD/docker-cache@0.4.0
+                uses: ScribeMD/docker-cache@0.5.0
                 with:
                     key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yaml') }}
             -
