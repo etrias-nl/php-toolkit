@@ -7,7 +7,7 @@
     },
     "require-dev": {
         "basis-company/nats": "^0.22.0",
-        "doctrine/orm": "^2",
+        "doctrine/orm": "^3",
         "monolog/monolog": "^3",
         "symfony/cache": "^6",
         "symfony/console": "^6",
