@@ -33,9 +33,9 @@ final class BenchmarkTest extends TestCase
         self::assertStringMatchesFormat(
             <<<'TXT'
                 [%s] test.INFO: run start [] []
-                [%s] test.INFO: inner_bench (%f MiB - %f s) {"benchmark":"%s","memory":%f,"duration":%f,"nested":true} []
+                [%s] test.INFO: inner_bench (%f MiB - %f s) {"benchmark":"%s","memory":%f,"memory_peak":%f,"duration":%f,"nested":true} []
                 [%s] test.INFO: run end [] []
-                [%s] test.INFO: outer_bench (%f MiB - %f s) {"benchmark":"%s","memory":%f,"duration":%f} []
+                [%s] test.INFO: outer_bench (%f MiB - %f s) {"benchmark":"%s","memory":%f,"memory_peak":%f,"duration":%f} []
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
         );

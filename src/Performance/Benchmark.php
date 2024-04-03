@@ -40,6 +40,7 @@ final class Benchmark
             $this->logger->info(sprintf('%s (%.2F MiB - %d s)', $name, $memory, $duration), [
                 'benchmark' => $this->runId,
                 'memory' => $memory,
+                'memory_peak' => memory_get_peak_usage() / 1024 / 1024,
                 'duration' => $duration,
             ] + $context);
             $this->runId = $prevRunId;
