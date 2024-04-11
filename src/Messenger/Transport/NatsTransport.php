@@ -13,6 +13,7 @@ use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
+use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Monolog\Level;
 use Psr\Log\LoggerInterface;
@@ -133,10 +134,15 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
+        $payload = [];
+        if (null !== $delayMs = $envelope->last(RejectDelayStamp::class)?->milliseconds) {
+            $payload['delay'] = $delayMs * self::MICROSECOND;
+        }
+
         $retry = false;
         do_reject:
         try {
-            $result = $this->client->dispatch($replyTo->id, '-NAK');
+            $result = $this->client->dispatch($replyTo->id, '-NAK'.($payload ? ' '.json_encode($payload) : ''));
             self::assertPayload($result);
         } catch (\Throwable $e) {
             if (!$retry) {

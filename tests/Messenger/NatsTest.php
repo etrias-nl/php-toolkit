@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Tests\Messenger;
 
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
+use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
@@ -171,6 +172,19 @@ final class NatsTest extends TestCase
         self::assertSame([], $transport->get());
 
         $transport->reject($receivedEnvelopes[0]);
+
+        usleep(50_000);
+
+        $receivedEnvelopes = $transport->get();
+
+        self::assertCount(1, $receivedEnvelopes);
+        self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+
+        $transport->reject($receivedEnvelopes[0]->with(new RejectDelayStamp(90)));
+
+        usleep(50_000);
+
+        self::assertSame([], $transport->get());
 
         usleep(50_000);
 
