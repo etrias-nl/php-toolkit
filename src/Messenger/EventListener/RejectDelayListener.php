@@ -44,7 +44,7 @@ final class RejectDelayListener implements EventSubscriberInterface
             $response = $exception->getResponse();
 
             if ($response instanceof ResponseInterface && Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode()) {
-                $retryAfter = (int) ($response->getHeader('retry-after')[0] ?? 0);
+                $retryAfter = (int) ($response->getHeader('retry-after')[0] ?? 60);
 
                 if ($retryAfter > 0) {
                     return $retryAfter * 1000;
