@@ -21,7 +21,7 @@ jobs:
                 uses: hmarr/debug-action@v3.0.0
                 if: runner.debug == '1'
             -
-                uses: actions/checkout@v4.1.1
+                uses: actions/checkout@v4.1.3
             -
                 uses: actions/cache/restore@v4.0.2
                 with:
