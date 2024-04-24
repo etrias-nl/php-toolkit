@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\TransactionalStamp;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -19,11 +20,12 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  * @internal
  *
  * @see https://github.com/symfony/symfony/issues/51993
- * @see https://github.com/symfony/symfony/pull/53809
+ * @see https://github.com/symfony/symfony/pull/54355
  */
 final class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
     public function __construct(
+        private readonly LoggerInterface $logger,
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
         private readonly ?string $entityManagerName = null,
@@ -54,8 +56,12 @@ final class DoctrineTransactionMiddleware implements MiddlewareInterface
 
             return $envelope;
         } catch (\Throwable $exception) {
-            if ($connection->isTransactionActive()) {
+            try {
                 $connection->rollBack();
+            } catch (\Throwable $rollbackException) {
+                $this->logger->error('An error occurred while rolling back the transaction', [
+                    'exception' => $rollbackException,
+                ]);
             }
 
             if ($exception instanceof HandlerFailedException) {

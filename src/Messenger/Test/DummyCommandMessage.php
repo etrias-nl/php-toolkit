@@ -10,7 +10,7 @@ use Etrias\PhpToolkit\Messenger\Stamp\TransactionalStamp;
 
 #[WithTransport('test')]
 #[DeduplicateStamp(false)]
-#[TransactionalStamp(false)]
+#[TransactionalStamp(true)]
 class DummyCommandMessage
 {
     public function __construct(
