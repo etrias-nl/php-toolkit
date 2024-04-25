@@ -252,6 +252,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             // https://docs.nats.io/nats-concepts/jetstream/consumers#configuration
             $this->consumer->getConfiguration()
                 ->setAckWait((int) (self::NANOSECOND * $this->ackWait))
+                ->setMaxAckPending(-1)
+                ->setMaxDeliver(-1)
+                ->setMaxWaiting(10_000)
             ;
         }
 
