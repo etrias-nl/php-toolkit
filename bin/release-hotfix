@@ -27,7 +27,7 @@ gh api "/repos/${repo}/commits/$(git rev-parse HEAD)/check-runs" | jq -e '.check
 
 # set versions
 curr_version="$(git describe --abbrev=0 --tags || echo "")"
-next_version="$(docker run --rm alpine/semver semver -i patch "${curr_version}")"
+next_version="$(docker run --pull=always --quiet --rm alpine/semver semver -i patch "${curr_version}")"
 
 # confirm release
 echo "Releasing ${curr_version} -> ${next_version}"
