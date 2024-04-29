@@ -35,10 +35,9 @@ jobs:
                     path: |
                         var
                         !var/composer
-                    key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+                    key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
                     restore-keys: |
-                        ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}-
-                        ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}-${{ github.event.pull_request.base.sha || github.sha }}
+                        ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
             -
                 uses: ScribeMD/docker-cache@0.5.0
                 with:
