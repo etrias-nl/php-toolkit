@@ -14,6 +14,7 @@
     failOnWarning="true"
     cacheDirectory="var/phpunit-cache"
     colors="true"
+    testdox="true"
 >
     <php>
         <ini name="display_errors" value="1"/>
