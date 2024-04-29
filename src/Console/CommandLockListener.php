@@ -7,7 +7,6 @@ namespace Etrias\PhpToolkit\Console;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
-use Symfony\Component\Console\Event\ConsoleSignalEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Lock\LockFactory;
@@ -21,11 +20,6 @@ final class CommandLockListener implements EventSubscriberInterface
         private readonly LockFactory $lockFactory,
         private readonly LoggerInterface $logger,
     ) {}
-
-    public function logSignal(ConsoleSignalEvent $event): void
-    {
-        $this->logger->warning('Received signal '.$event->getHandlingSignal().' during command "'.$event->getCommand()?->getName().'".');
-    }
 
     public function acquireLock(ConsoleCommandEvent $event): void
     {
@@ -51,7 +45,6 @@ final class CommandLockListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConsoleSignalEvent::class => 'logSignal',
             ConsoleCommandEvent::class => 'acquireLock',
             ConsoleErrorEvent::class => 'releaseLock',
             ConsoleTerminateEvent::class => 'releaseLock',
