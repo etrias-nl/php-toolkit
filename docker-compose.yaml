@@ -9,8 +9,9 @@ services:
             - nats
         volumes:
             - '.:/app'
+        tty: true
         environment:
             - CI
             - GITHUB_ACTIONS
             - RUNNER_DEBUG
-            - TERM=xterm
+            - TERM=xterm-256color
