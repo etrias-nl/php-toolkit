@@ -195,6 +195,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
+        $context['duplicate'] = $result->getValue('duplicate');
+
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
