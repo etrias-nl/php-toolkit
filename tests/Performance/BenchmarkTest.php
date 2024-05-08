@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Etrias\PhpToolkit\Tests\Monolog;
+namespace Etrias\PhpToolkit\Tests\Performance;
 
 use Etrias\PhpToolkit\Performance\Benchmark;
 use Monolog\Handler\TestHandler;
