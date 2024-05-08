@@ -288,7 +288,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
         try {
             $this->client->unsubscribe($this->queue);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->log(Level::Error, null, $e);
         }
 
         $this->queue = null;
