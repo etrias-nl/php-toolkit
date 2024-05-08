@@ -93,7 +93,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
             $this->unsubscribe();
-            $this->log(Level::Error, null, $e);
+            $this->log(Level::Error, null, new TransportException($e->getMessage(), 0, $e));
 
             return [];
         }
@@ -152,7 +152,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 goto do_reject;
             }
 
-            $this->log(Level::Error, $envelope, $e);
+            $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
         }
     }
 
@@ -289,7 +289,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $this->client->unsubscribe($this->queue);
         } catch (\Throwable $e) {
-            $this->log(Level::Error, null, $e);
+            $this->log(Level::Error, null, new TransportException($e->getMessage(), 0, $e));
         }
 
         $this->queue = null;
