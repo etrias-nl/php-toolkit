@@ -30,8 +30,8 @@ final class CommandPerformanceListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ConsoleCommandEvent::class => ['startBench', 1023],
-            ConsoleTerminateEvent::class => ['stopBench', -1023],
+            ConsoleCommandEvent::class => ['startBench', -1024],
+            ConsoleTerminateEvent::class => ['stopBench', 1024],
         ];
     }
 }
