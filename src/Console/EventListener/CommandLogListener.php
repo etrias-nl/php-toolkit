@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class CommandLogListener implements EventSubscriberInterface
 {
     private ?Command $currentCommand = null;
+    private ?string $runId = null;
 
     /**
      * @param iterable<array-key, callable(LogRecord, Command): LogRecord> $extraCliProcessors
@@ -31,7 +32,8 @@ final class CommandLogListener implements EventSubscriberInterface
             return $record;
         }
 
-        $record->extra['console']['command'] = $this->currentCommand->getName();
+        $record->extra['cli']['command'] = $this->currentCommand->getName();
+        $record->extra['cli']['run_id'] = $this->runId;
 
         foreach ($this->extraCliProcessors as $processor) {
             $record = $processor($record, $this->currentCommand);
@@ -43,18 +45,20 @@ final class CommandLogListener implements EventSubscriberInterface
     public function enterContext(ConsoleCommandEvent $event): void
     {
         $this->currentCommand = $event->getCommand();
+        $this->runId = uniqid('', true);
     }
 
     public function leaveContext(): void
     {
         $this->currentCommand = null;
+        $this->runId = null;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ConsoleCommandEvent::class => ['enterContext', 1024],
-            ConsoleTerminateEvent::class => 'leaveContext',
+            ConsoleTerminateEvent::class => ['leaveContext', -1024],
         ];
     }
 }
