@@ -23,7 +23,9 @@ final class CommandPerformanceListener implements EventSubscriberInterface
 
     public function stopBench(): void
     {
-        $this->benchmark->stop();
+        if ($this->benchmark->isStarted()) {
+            $this->benchmark->stop();
+        }
     }
 
     public static function getSubscribedEvents(): array

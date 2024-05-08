@@ -36,6 +36,11 @@ final class Benchmark
         }
     }
 
+    public function isStarted(): bool
+    {
+        return null !== $this->currentTrace;
+    }
+
     public function start(string $name, array $context = []): void
     {
         $this->currentTrace = new Trace($this->stopwatch, $name, $context, $this->currentTrace);
