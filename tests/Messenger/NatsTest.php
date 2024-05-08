@@ -10,6 +10,9 @@ use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransport;
 use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
+use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Messenger\Envelope;
@@ -42,7 +45,10 @@ final class NatsTest extends TestCase
 
     public function testTransport(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $logger = new Logger('test', [$logHandler = new TestHandler()]);
+        $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->expects(self::once())->method('normalize')->willReturnCallback(static fn (mixed $data): string => serialize($data));
+        $factory = new NatsTransportFactory(new MessageMap([]), $logger, new NullLogger(), $normalizer);
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -86,6 +92,16 @@ final class NatsTest extends TestCase
         // message acked
         self::assertMessageCount(0, $transport);
         self::assertSame([], $transport->get());
+
+        // logs
+        self::assertStringMatchesFormat(
+            <<<'TXT'
+                %A
+                [%s] test.INFO: Message "{message}" sent to transport {"payload":"O:8:\"stdClass\":1:{s:5:\"test1\";b:1;}","duplicate":null,"stream":"testTransport%s","message":"stdClass","message_id":"%s"} []
+                %A
+                TXT,
+            implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
+        );
     }
 
     public function testDeduplication(): void
