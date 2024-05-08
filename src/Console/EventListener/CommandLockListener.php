@@ -6,7 +6,6 @@ namespace Etrias\PhpToolkit\Console\EventListener;
 
 use Etrias\PhpToolkit\Console\LockableCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Lock\LockFactory;
@@ -45,7 +44,6 @@ final class CommandLockListener implements EventSubscriberInterface
     {
         return [
             ConsoleCommandEvent::class => 'acquireLock',
-            ConsoleErrorEvent::class => 'releaseLock',
             ConsoleTerminateEvent::class => 'releaseLock',
         ];
     }

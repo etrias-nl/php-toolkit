@@ -6,7 +6,6 @@ namespace Etrias\PhpToolkit\Console\EventListener;
 
 use Etrias\PhpToolkit\Performance\Benchmark;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -32,7 +31,6 @@ final class CommandPerformanceListener implements EventSubscriberInterface
     {
         return [
             ConsoleCommandEvent::class => ['startBench', 1023],
-            ConsoleErrorEvent::class => 'stopBench',
             ConsoleTerminateEvent::class => 'stopBench',
         ];
     }

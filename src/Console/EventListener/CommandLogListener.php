@@ -8,7 +8,6 @@ use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,7 +54,6 @@ final class CommandLogListener implements EventSubscriberInterface
     {
         return [
             ConsoleCommandEvent::class => ['enterContext', 1024],
-            ConsoleErrorEvent::class => 'leaveContext',
             ConsoleTerminateEvent::class => 'leaveContext',
         ];
     }

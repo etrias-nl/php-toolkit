@@ -6,7 +6,6 @@ namespace Etrias\PhpToolkit\Monolog\Processor;
 
 use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
-use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -25,21 +24,21 @@ final class CliRunIdProcessor implements EventSubscriberInterface
         return $record;
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConsoleEvents::COMMAND => 'onCommand',
-            ConsoleEvents::TERMINATE => 'onTerminate',
-        ];
-    }
-
-    public function onCommand(ConsoleCommandEvent $event): void
+    public function onCommand(): void
     {
         $this->runId = uniqid('', true);
     }
 
-    public function onTerminate(ConsoleTerminateEvent $event): void
+    public function onTerminate(): void
     {
         $this->runId = null;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ConsoleCommandEvent::class => 'onCommand',
+            ConsoleTerminateEvent::class => 'onTerminate',
+        ];
     }
 }
