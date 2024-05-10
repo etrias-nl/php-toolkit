@@ -1,6 +1,6 @@
 services:
     nats:
-        image: 'nats:2.10.14'
+        image: 'nats:2.10.14-alpine'
         command:
             - '--jetstream'
     php:
