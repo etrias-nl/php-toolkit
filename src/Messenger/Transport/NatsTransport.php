@@ -190,9 +190,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 goto do_send;
             }
 
-            $this->log(Level::Error, $envelope, $e, $context);
+            $exception = new TransportException($e->getMessage(), 0, $e);
 
-            throw new TransportException($e->getMessage(), 0, $e);
+            $this->log(Level::Error, $envelope, $exception, $context);
+
+            throw $exception;
         }
 
         $context['duplicate'] = $result->getValue('duplicate');
