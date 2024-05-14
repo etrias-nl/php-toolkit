@@ -23,9 +23,11 @@ final class BenchmarkTest extends TestCase
         $benchmark = new Benchmark($stopwatch, $logger);
 
         self::assertSame('bench_result', $benchmark->run('outer_bench', static function () use ($benchmark, $logger): mixed {
+            $benchmark->start('group_bench');
             $logger->info('run start');
             $result = $benchmark->run('inner_bench', static fn (): string => 'bench_result', ['nested' => true]);
             $logger->info('run end');
+            $benchmark->stop();
 
             return $result;
         }));
@@ -33,9 +35,10 @@ final class BenchmarkTest extends TestCase
         self::assertStringMatchesFormat(
             <<<'TXT'
                 [%s] test.INFO: run start [] []
-                [%s] test.INFO: inner_bench (%f MiB - %f s) {"benchmark":"%s","benchmark_group":"%s","memory":%f,"memory_peak":%f,"duration":%f,"nested":true} []
+                [%s] test.INFO: inner_bench (%f MiB - %f s) {"benchmark":"%s","benchmark_origin":"%s","memory":%f,"memory_peak":%f,"duration":%f,"nested":true} []
                 [%s] test.INFO: run end [] []
-                [%s] test.INFO: outer_bench (%f MiB - %f s) {"benchmark":"%s","benchmark_group":"%s","memory":%f,"memory_peak":%f,"duration":%f} []
+                [%s] test.INFO: group_bench (%f MiB - %f s) {"benchmark":"%s","benchmark_origin":"%s","memory":%f,"memory_peak":%f,"duration":%f} []
+                [%s] test.INFO: outer_bench (%f MiB - %f s) {"benchmark":"%s","benchmark_origin":null,"memory":%f,"memory_peak":%f,"duration":%f} []
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
         );

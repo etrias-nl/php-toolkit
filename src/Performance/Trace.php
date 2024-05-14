@@ -24,9 +24,4 @@ final class Trace
         $this->id = uniqid('bench_', true);
         $this->event = $stopwatch->start($this->id.uniqid($this->name, true));
     }
-
-    public function getRootId(): string
-    {
-        return $this->previousTrace?->getRootId() ?? $this->id;
-    }
 }

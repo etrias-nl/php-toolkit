@@ -59,7 +59,7 @@ final class Benchmark
 
         $this->logger->info(sprintf('%s (%.2F MiB - %d s)', $trace->name, $memory, $duration), [
             'benchmark' => $trace->id,
-            'benchmark_group' => $trace->getRootId(),
+            'benchmark_origin' => $trace->previousTrace?->id,
             'memory' => $memory,
             'memory_peak' => memory_get_peak_usage() / 1024 / 1024,
             'duration' => $duration,

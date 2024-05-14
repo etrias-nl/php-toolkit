@@ -8,6 +8,7 @@ use Etrias\PhpToolkit\Performance\Benchmark;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 
 final class CommandPerformanceListener implements EventSubscriberInterface
 {
@@ -17,7 +18,13 @@ final class CommandPerformanceListener implements EventSubscriberInterface
 
     public function startBench(ConsoleCommandEvent $event): void
     {
-        $this->benchmark->start($event->getCommand()?->getName() ?? $event::class);
+        $command = $event->getCommand();
+
+        if ($command instanceof ConsumeMessagesCommand) {
+            return;
+        }
+
+        $this->benchmark->start($command?->getName() ?? $event::class);
     }
 
     public function stopBench(): void
