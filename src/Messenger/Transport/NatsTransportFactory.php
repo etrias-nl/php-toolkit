@@ -39,6 +39,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             'stream' => $name,
             'replicas' => 3,
             'timeout' => 3.0,
+            'max_deliver' => 0,
             'ack_wait' => 300,
             'deduplicate_window' => 10,
         ];
@@ -60,6 +61,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->normalizer,
             $stream,
             \is_int($options['replicas']) || (\is_string($options['replicas']) && ctype_digit($options['replicas'])) ? (int) $options['replicas'] : throw new \RuntimeException('Invalid option "replicas" for stream "'.$stream.'"'),
+            \is_int($options['max_deliver']) || (\is_string($options['max_deliver']) && ctype_digit($options['max_deliver'])) ? (int) $options['max_deliver'] : throw new \RuntimeException('Invalid option "max_deliver" for stream "'.$stream.'"'),
             is_numeric($options['ack_wait']) ? (float) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
             is_numeric($options['deduplicate_window']) ? (float) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
         );

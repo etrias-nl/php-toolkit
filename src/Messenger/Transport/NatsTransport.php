@@ -47,6 +47,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly NormalizerInterface $normalizer,
         private readonly string $streamName,
         private readonly int $replicas,
+        private readonly int $maxDeliver,
         private readonly float|int $ackWait,
         private readonly float|int $deduplicateWindow,
     ) {}
@@ -87,7 +88,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
             $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
             if (null !== $replyTo = $message->replyTo) {
-                $stamps[] = new ReplyToStamp($replyTo, new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
+                $stamps[] = new ReplyToStamp($replyTo, 1 === $this->maxDeliver ? null : new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds'));
             }
 
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
@@ -105,7 +106,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
-        if (new \DateTimeImmutable() >= $replyTo->expiresAt) {
+        if (null !== $replyTo->expiresAt && new \DateTimeImmutable() >= $replyTo->expiresAt) {
             $this->log(Level::Warning, $envelope, 'Message "{message}" expired', [
                 'expired_at' => $replyTo->expiresAt,
             ]);
@@ -257,7 +258,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->consumer->getConfiguration()
                 ->setAckWait((int) (self::NANOSECOND * $this->ackWait))
                 ->setMaxAckPending(-1)
-                ->setMaxDeliver(-1)
+                ->setMaxDeliver($this->maxDeliver)
                 ->setMaxWaiting(10_000)
             ;
         }

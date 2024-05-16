@@ -10,6 +10,6 @@ final class ReplyToStamp implements NonSendableStampInterface
 {
     public function __construct(
         public readonly string $id,
-        public readonly \DateTimeImmutable $expiresAt,
+        public readonly ?\DateTimeImmutable $expiresAt = null,
     ) {}
 }
