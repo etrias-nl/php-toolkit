@@ -10,14 +10,14 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 #[AsMessageHandler]
-class DummyCommandHandler
+final class DummyMessageHandler
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
         private readonly LoggerInterface $logger,
     ) {}
 
-    public function __invoke(DummyCommandMessage $message): void
+    public function __invoke(DummyMessage $message): void
     {
         $this->logger->info('HANDLING MESSAGE: '.json_encode($message->payload));
 
@@ -29,7 +29,7 @@ class DummyCommandHandler
         if ($message->nest) {
             $this->logger->info('Dispatching nested message');
             $this->messageBus->dispatch(
-                new DummyCommandMessage(['NESTED' => $message->payload], $message->sleep, $message->nestFailure),
+                new DummyMessage(['NESTED' => $message->payload], $message->sleep, $message->nestFailure),
                 $message->nestSync ? [new TransportNamesStamp('sync')] : []
             );
         }

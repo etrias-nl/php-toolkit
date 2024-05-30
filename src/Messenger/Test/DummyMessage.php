@@ -11,7 +11,7 @@ use Etrias\PhpToolkit\Messenger\Stamp\TransactionalStamp;
 #[WithTransport('test')]
 #[DeduplicateStamp(false)]
 #[TransactionalStamp(true)]
-class DummyCommandMessage
+final class DummyMessage
 {
     public function __construct(
         public readonly mixed $payload,

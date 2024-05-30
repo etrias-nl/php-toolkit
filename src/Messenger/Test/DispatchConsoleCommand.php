@@ -47,7 +47,7 @@ class DispatchConsoleCommand extends Command
 
         for ($i = 1; $i <= (int) $input->getOption('batch'); ++$i) {
             $output->writeln('Dispatching message #'.$i);
-            $message = new DummyCommandMessage(
+            $message = new DummyMessage(
                 $payload ?? 'Batch message #'.$i,
                 (float) $input->getOption('sleep'),
                 $input->getOption('failure'),
