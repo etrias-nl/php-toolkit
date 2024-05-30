@@ -13,7 +13,7 @@
       <code><![CDATA[list<T>]]></code>
     </MoreSpecificReturnType>
   </file>
-  <file src="src/Messenger/Test/DummyCommandHandler.php">
+  <file src="src/Messenger/Test/DummyMessageHandler.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[(int) ($message->sleep * 1_000_000)]]></code>
     </ArgumentTypeCoercion>
