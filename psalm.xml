@@ -28,4 +28,7 @@
         <function name="empty"/>
         <function name="is_null"/>
     </forbiddenFunctions>
+    <issueHandlers>
+        <UnusedForeachValue errorLevel="suppress"/>
+    </issueHandlers>
 </psalm>
