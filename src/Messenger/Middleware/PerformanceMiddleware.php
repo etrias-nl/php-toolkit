@@ -26,6 +26,7 @@ final class PerformanceMiddleware implements MiddlewareInterface
             $hasSender = false;
             foreach ($this->sendersLocator->getSenders($envelope) as $sender) {
                 $hasSender = true;
+
                 break;
             }
 

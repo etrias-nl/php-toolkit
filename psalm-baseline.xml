@@ -13,6 +13,11 @@
       <code><![CDATA[list<T>]]></code>
     </MoreSpecificReturnType>
   </file>
+  <file src="src/Messenger/Middleware/PerformanceMiddleware.php">
+    <UnusedForeachValue>
+      <code><![CDATA[$sender]]></code>
+    </UnusedForeachValue>
+  </file>
   <file src="src/Messenger/Test/DummyMessageHandler.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[(int) ($message->sleep * 1_000_000)]]></code>
