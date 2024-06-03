@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\Persistence\ConnectionRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
@@ -16,6 +18,8 @@ use Monolog\LogRecord;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -210,6 +214,37 @@ final class NatsTest extends TestCase
 
         self::assertCount(1, $receivedEnvelopes);
         self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
+    }
+
+    public function testFallback(): void
+    {
+        $connectionRegistry = $this->createMock(ConnectionRegistry::class);
+        $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['url' => 'sqlite:///:memory:']));
+        $fallbackFactory = new DoctrineTransportFactory($connectionRegistry);
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $fallbackFactory);
+        $transport = $factory->createTransport('nats://foo?stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
+
+        try {
+            $transport->getMessageCount();
+            self::fail();
+        } catch (\Exception) {
+        }
+
+        $envelope = $transport->send(Envelope::wrap((object) ['test1' => true]));
+        $fallbackResult = $fallbackConnection->fetchAllAssociative('select * from messenger_messages');
+
+        self::assertCount(1, $fallbackResult);
+        self::assertNull($fallbackResult[0]['delivered_at']);
+
+        $envelope = $envelope->with(new ReplyToStamp('fallback'), new DoctrineReceivedStamp((string) $fallbackResult[0]['id']));
+
+        $transport->reject($envelope);
+
+        self::assertSame($fallbackResult, $fallbackConnection->fetchAllAssociative('select * from messenger_messages'));
+
+        $transport->ack($envelope);
+
+        self::assertSame([], $fallbackConnection->fetchAllAssociative('select * from messenger_messages'));
     }
 
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void

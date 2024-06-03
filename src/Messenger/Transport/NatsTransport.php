@@ -43,7 +43,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Queue $queue = null;
 
     /**
-     * @param null|(ListableReceiverInterface&TransportInterface) $fallbackTransport
+     * @param null|(ListableReceiverInterface&MessageCountAwareInterface&TransportInterface) $fallbackTransport
      */
     public function __construct(
         private readonly Client $client,
@@ -80,6 +80,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
         self::assertPayload($result);
         $this->log(Level::Info, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
+
+        if ($this->fallbackTransport instanceof SetupableTransportInterface) {
+            $this->fallbackTransport->setup();
+        }
     }
 
     public function get(): array
@@ -259,7 +263,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function getMessageCount(): int
     {
-        return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+        $count = $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+        $count += $this->fallbackTransport?->getMessageCount() ?? 0;
+
+        return $count;
     }
 
     /**
