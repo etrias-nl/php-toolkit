@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
+use Doctrine\DBAL\DriverManager;
+use Doctrine\Persistence\ConnectionRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
@@ -13,12 +15,16 @@ use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Monolog\LogRecord;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
+use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -29,7 +35,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -48,7 +54,7 @@ final class NatsTest extends TestCase
         $logger = new Logger('test', [$logHandler = new TestHandler()]);
         $normalizer = $this->createMock(NormalizerInterface::class);
         $normalizer->expects(self::once())->method('normalize')->willReturnCallback(static fn (mixed $data): string => serialize($data));
-        $factory = new NatsTransportFactory(new MessageMap([]), $logger, new NullLogger(), $normalizer);
+        $factory = new NatsTransportFactory(new MessageMap([]), $logger, new NullLogger(), $normalizer, $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -106,7 +112,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -161,7 +167,7 @@ final class NatsTest extends TestCase
 
     public function testRedelivery(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class));
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -210,6 +216,37 @@ final class NatsTest extends TestCase
         self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
     }
 
+    public function testFallback(): void
+    {
+        $connectionRegistry = $this->createMock(ConnectionRegistry::class);
+        $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['url' => 'sqlite:///:memory:']));
+        $fallbackFactory = new DoctrineTransportFactory($connectionRegistry);
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $fallbackFactory);
+        $transport = $factory->createTransport('nats://foo?stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
+
+        try {
+            $transport->getMessageCount();
+            self::fail();
+        } catch (\Exception) {
+        }
+
+        $envelope = $transport->send(Envelope::wrap((object) ['test1' => true]));
+        $fallbackResult = $fallbackConnection->fetchAllAssociative('select * from messenger_messages');
+
+        self::assertCount(1, $fallbackResult);
+        self::assertNull($fallbackResult[0]['delivered_at']);
+
+        $envelope = $envelope->with(new ReplyToStamp('fallback'), new DoctrineReceivedStamp((string) $fallbackResult[0]['id']));
+
+        $transport->reject($envelope);
+
+        self::assertSame($fallbackResult, $fallbackConnection->fetchAllAssociative('select * from messenger_messages'));
+
+        $transport->ack($envelope);
+
+        self::assertSame([], $fallbackConnection->fetchAllAssociative('select * from messenger_messages'));
+    }
+
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
     {
         if ($wait) {
@@ -218,5 +255,13 @@ final class NatsTest extends TestCase
         }
 
         self::assertSame($expectedCount, $transport->getMessageCount());
+    }
+
+    private function noFallbackTransportFactory(): MockObject&TransportFactoryInterface
+    {
+        $transportFactory = $this->createMock(TransportFactoryInterface::class);
+        $transportFactory->expects(self::never())->method('createTransport');
+
+        return $transportFactory;
     }
 }

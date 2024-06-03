@@ -13,6 +13,7 @@ use Basis\Nats\Stream\StorageBackend;
 use Basis\Nats\Stream\Stream;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\DeduplicateStamp;
+use Etrias\PhpToolkit\Messenger\Stamp\FallbackStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
 use Etrias\PhpToolkit\Messenger\Stamp\ReplyToStamp;
 use Monolog\Level;
@@ -20,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\SetupableTransportInterface;
@@ -32,6 +34,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
+    private const REPLY_TO_FALLBACK = 'fallback';
     private const NANOSECOND = 1_000_000_000;
     private const MICROSECOND = 1_000_000;
 
@@ -39,6 +42,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private ?Consumer $consumer = null;
     private ?Queue $queue = null;
 
+    /**
+     * @param null|(ListableReceiverInterface&MessageCountAwareInterface&TransportInterface) $fallbackTransport
+     */
     public function __construct(
         private readonly Client $client,
         private readonly SerializerInterface $serializer,
@@ -50,6 +56,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         private readonly bool $redeliver,
         private readonly float|int $ackWait,
         private readonly float|int $deduplicateWindow,
+        private readonly ?TransportInterface $fallbackTransport,
     ) {}
 
     public function __destruct()
@@ -73,11 +80,31 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $result = $this->client->api($command, $consumer->getConfiguration()->toArray());
         self::assertPayload($result);
         $this->log(Level::Info, $consumer, 'Consumer setup: {command}', ['command' => $command, 'config' => json_encode($consumer->info()?->config)]);
+
+        if ($this->fallbackTransport instanceof SetupableTransportInterface) {
+            $this->fallbackTransport->setup();
+        }
     }
 
     public function get(): array
     {
         try {
+            $nextFallbackTs = null;
+            foreach ($this->fallbackTransport?->all(1) ?? [] as $envelope) {
+                $nextFallbackTs = $envelope->last(FallbackStamp::class)?->sendAt ?? new \DateTimeImmutable();
+            }
+
+            if (null !== $nextFallbackTs) {
+                $state = $this->getStream()->info()?->state;
+                $nextTs = $state?->messages ? new \DateTimeImmutable($state->first_ts) : null;
+
+                if (null === $nextTs || $nextFallbackTs < $nextTs) {
+                    foreach ($this->fallbackTransport?->get() ?? [] as $envelope) {
+                        return [$envelope->with(new ReplyToStamp(self::REPLY_TO_FALLBACK))];
+                    }
+                }
+            }
+
             $this->queue ??= $this->getConsumer()->getQueue();
             $message = $this->queue->next();
             $payload = $message->payload;
@@ -103,6 +130,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function ack(Envelope $envelope): void
     {
         if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
+            return;
+        }
+
+        if (self::REPLY_TO_FALLBACK === $replyTo->id) {
+            $this->fallbackTransport?->ack($envelope);
+
             return;
         }
 
@@ -132,6 +165,14 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function reject(Envelope $envelope): void
     {
         if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
+            return;
+        }
+
+        if (self::REPLY_TO_FALLBACK === $replyTo->id) {
+            if (!$this->redeliver) {
+                $this->fallbackTransport?->reject($envelope);
+            }
+
             return;
         }
 
@@ -175,7 +216,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             ]);
         } catch (\Throwable $e) {
             $context['payload'] = @serialize($envelope->getMessage());
-            $context['payload_normalize_error'] = $e;
+            $context['payload_normalize_exception'] = $e;
         }
 
         $retry = false;
@@ -183,12 +224,26 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         try {
             $result = $this->client->dispatch($this->streamName, $payload);
             self::assertPayload($result);
+            $context['duplicate'] = $result->getValue('duplicate');
         } catch (\Throwable $e) {
             if (!$retry) {
                 usleep(self::MICROSECOND / 2);
                 $retry = true;
 
                 goto do_send;
+            }
+
+            if (null !== $this->fallbackTransport) {
+                $context['fallback'] = true;
+
+                try {
+                    $envelope = $envelope->withoutAll(FallbackStamp::class)->with(new FallbackStamp(new \DateTimeImmutable()));
+                    $messageId = $this->fallbackTransport->send($envelope)->last(TransportMessageIdStamp::class)?->getId();
+
+                    goto sent;
+                } catch (\Throwable $fallbackException) {
+                    $context['fallback_exception'] = $fallbackException;
+                }
             }
 
             $exception = new TransportException($e->getMessage(), 0, $e);
@@ -198,8 +253,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             throw $exception;
         }
 
-        $context['duplicate'] = $result->getValue('duplicate');
-
+        sent:
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
@@ -209,7 +263,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function getMessageCount(): int
     {
-        return $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+        $count = $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
+        $count += $this->fallbackTransport?->getMessageCount() ?? 0;
+
+        return $count;
     }
 
     /**

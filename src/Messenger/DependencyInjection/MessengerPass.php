@@ -81,5 +81,25 @@ final class MessengerPass implements CompilerPassInterface
             ->setArgument('$mapping', $messageMapByTransport)
             ->setArgument('$defaultStamps', $defaultStamps)
         ;
+
+        if ($container->has($globalFallbackId = 'messenger.transport.fallback')) {
+            $globalFallbackDefinition = $container->getDefinition($globalFallbackId);
+            $globalFallbackArguments = $globalFallbackDefinition->getArguments();
+
+            foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $attr) {
+                if ($id === $globalFallbackId) {
+                    continue;
+                }
+                $alias = $attr[0]['alias'] ?? $id;
+                $fallbackArguments = $globalFallbackArguments;
+                $fallbackArguments[1]['queue_name'] = 'fallback_'.$alias;
+
+                $definition = $container->getDefinition($id);
+                $options = (array) $definition->getArgument(1);
+                $options['fallback_transport'] = $fallbackArguments;
+
+                $definition->setArgument(1, $options);
+            }
+        }
     }
 }
