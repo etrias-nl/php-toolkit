@@ -39,7 +39,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             'stream' => $name,
             'replicas' => 3,
             'timeout' => 3.0,
-            'max_deliver' => 0,
+            'redeliver' => true,
             'ack_wait' => 300,
             'deduplicate_window' => 10,
         ];
@@ -60,10 +60,10 @@ final class NatsTransportFactory implements TransportFactoryInterface
             $this->logger,
             $this->normalizer,
             $stream,
-            \is_int($options['replicas']) || (\is_string($options['replicas']) && ctype_digit($options['replicas'])) ? (int) $options['replicas'] : throw new \RuntimeException('Invalid option "replicas" for stream "'.$stream.'"'),
-            \is_int($options['max_deliver']) || (\is_string($options['max_deliver']) && ctype_digit($options['max_deliver'])) ? (int) $options['max_deliver'] : throw new \RuntimeException('Invalid option "max_deliver" for stream "'.$stream.'"'),
-            is_numeric($options['ack_wait']) ? (float) $options['ack_wait'] : throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
-            is_numeric($options['deduplicate_window']) ? (float) $options['deduplicate_window'] : throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
+            filter_var($options['replicas'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "replicas" for stream "'.$stream.'"'),
+            filter_var($options['redeliver'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "redeliver" for stream "'.$stream.'"'),
+            filter_var($options['ack_wait'], FILTER_VALIDATE_INT | FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
+            filter_var($options['deduplicate_window'], FILTER_VALIDATE_INT | FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
         );
     }
 
