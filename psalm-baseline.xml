@@ -19,7 +19,17 @@
     </ArgumentTypeCoercion>
   </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
+    <PossiblyNullArgument>
+      <code><![CDATA[$state->first_ts]]></code>
+    </PossiblyNullArgument>
+    <PossiblyNullPropertyFetch>
+      <code><![CDATA[$state->first_ts]]></code>
+    </PossiblyNullPropertyFetch>
+    <RiskyTruthyFalsyComparison>
+      <code><![CDATA[$state?->messages]]></code>
+    </RiskyTruthyFalsyComparison>
     <UnusedVariable>
+      <code><![CDATA[$messageId]]></code>
       <code><![CDATA[$retry]]></code>
       <code><![CDATA[$retry]]></code>
       <code><![CDATA[$retry]]></code>
@@ -28,6 +38,7 @@
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
     <InvalidArgument>
       <code><![CDATA[$config]]></code>
+      <code><![CDATA[$fallbackTransport]]></code>
     </InvalidArgument>
     <MissingTemplateParam>
       <code><![CDATA[TransportFactoryInterface]]></code>

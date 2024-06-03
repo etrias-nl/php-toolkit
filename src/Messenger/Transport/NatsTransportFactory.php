@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -22,6 +23,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
         #[Target(name: 'nats.logger')]
         private readonly LoggerInterface $clientLogger,
         private readonly NormalizerInterface $normalizer,
+        #[Autowire(service: 'messenger.transport_factory')]
+        private readonly TransportFactoryInterface $fallbackFactory,
     ) {}
 
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): NatsTransport
@@ -34,7 +37,8 @@ final class NatsTransportFactory implements TransportFactoryInterface
         $queryParts = [];
         parse_str($urlParts['query'] ?? '', $queryParts);
         $name = $options['transport_name'] ?? null;
-        unset($options['transport_name']);
+        $fallbackTransport = $options['fallback_transport'] ?? null;
+        unset($options['transport_name'], $options['fallback_transport']);
         $options = $queryParts + $options + $defaults = [
             'stream' => $name,
             'replicas' => 3,
@@ -53,6 +57,10 @@ final class NatsTransportFactory implements TransportFactoryInterface
 
         $config['timeout'] = is_numeric($options['timeout']) ? (float) $options['timeout'] : throw new \RuntimeException('Invalid option "timeout" for stream "'.$stream.'".');
 
+        if (null !== $fallbackTransport) {
+            $fallbackTransport = $this->fallbackFactory->createTransport(...$fallbackTransport);
+        }
+
         return new NatsTransport(
             new Client(new Configuration($config), $this->clientLogger),
             $serializer,
@@ -64,6 +72,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
             filter_var($options['redeliver'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "redeliver" for stream "'.$stream.'"'),
             filter_var($options['ack_wait'], FILTER_VALIDATE_INT | FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "ack_wait" for stream "'.$stream.'"'),
             filter_var($options['deduplicate_window'], FILTER_VALIDATE_INT | FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) ?? throw new \RuntimeException('Invalid option "deduplicate_window" for stream "'.$stream.'"'),
+            $fallbackTransport,
         );
     }
 
