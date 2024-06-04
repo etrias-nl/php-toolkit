@@ -20,6 +20,7 @@ use Monolog\Level;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
@@ -133,16 +134,16 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
-        if (self::REPLY_TO_FALLBACK === $replyTo->id) {
-            $this->fallbackTransport?->ack($envelope);
-
-            return;
-        }
-
         if (null !== $replyTo->expiresAt && new \DateTimeImmutable() >= $replyTo->expiresAt) {
             $this->log(Level::Warning, $envelope, 'Message "{message}" expired', [
                 'expired_at' => $replyTo->expiresAt,
             ]);
+        }
+
+        if (self::REPLY_TO_FALLBACK === $replyTo->id) {
+            $this->fallbackTransport?->ack($envelope);
+
+            return;
         }
 
         $retry = false;
@@ -168,8 +169,15 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
+        $delayMs = $envelope->last(RejectDelayStamp::class)?->milliseconds;
+
         if (self::REPLY_TO_FALLBACK === $replyTo->id) {
-            if (!$this->redeliver) {
+            if ($this->redeliver) {
+                if (null !== $delayMs) {
+                    $this->fallbackTransport?->send($envelope->withoutAll(DelayStamp::class)->with(new DelayStamp($delayMs)));
+                    $this->fallbackTransport?->reject($envelope);
+                }
+            } else {
                 $this->fallbackTransport?->reject($envelope);
             }
 
@@ -177,7 +185,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $payload = [];
-        if (null !== $delayMs = $envelope->last(RejectDelayStamp::class)?->milliseconds) {
+        if (null !== $delayMs) {
             $payload['delay'] = $delayMs * self::MICROSECOND;
         }
 
