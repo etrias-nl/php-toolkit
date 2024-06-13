@@ -122,7 +122,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
             $this->unsubscribe();
-            $this->log(Level::Error, null, new TransportException($e->getMessage(), 0, $e));
+            $this->log(Level::Error, null, new TransportException($e->getMessage(), 0, $e), ['is_receiver_error' => true]);
 
             return [];
         }
@@ -141,7 +141,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         if (self::REPLY_TO_FALLBACK === $replyTo->id) {
-            $this->fallbackTransport?->ack($envelope);
+            try {
+                $this->fallbackTransport?->ack($envelope);
+            } catch (\Throwable $e) {
+                $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
+            }
 
             return;
         }
@@ -159,7 +163,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 goto do_ack;
             }
 
-            throw new TransportException($e->getMessage(), 0, $e);
+            $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
         }
     }
 
@@ -172,13 +176,17 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $delayMs = $envelope->last(RejectDelayStamp::class)?->milliseconds;
 
         if (self::REPLY_TO_FALLBACK === $replyTo->id) {
-            if ($this->redeliver) {
-                if (null !== $delayMs) {
-                    $this->fallbackTransport?->send($envelope->withoutAll(DelayStamp::class)->with(new DelayStamp($delayMs)));
+            try {
+                if ($this->redeliver) {
+                    if (null !== $delayMs) {
+                        $this->fallbackTransport?->send($envelope->withoutAll(DelayStamp::class)->with(new DelayStamp($delayMs)));
+                        $this->fallbackTransport?->reject($envelope);
+                    }
+                } else {
                     $this->fallbackTransport?->reject($envelope);
                 }
-            } else {
-                $this->fallbackTransport?->reject($envelope);
+            } catch (\Throwable $e) {
+                $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
             }
 
             return;
@@ -272,9 +280,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function getMessageCount(): int
     {
         $count = $this->getStream()->info()?->state?->messages ?? throw new TransportException('Unable to get message count');
-        $count += $this->fallbackTransport?->getMessageCount() ?? 0;
 
-        return $count;
+        return $count + ($this->fallbackTransport?->getMessageCount() ?? 0);
     }
 
     /**

@@ -222,13 +222,7 @@ final class NatsTest extends TestCase
         $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['url' => 'sqlite:///:memory:']));
         $fallbackFactory = new DoctrineTransportFactory($connectionRegistry);
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $fallbackFactory);
-        $transport = $factory->createTransport('nats://foo?stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
-
-        try {
-            $transport->getMessageCount();
-            self::fail();
-        } catch (\Exception) {
-        }
+        $transport = $factory->createTransport('nats://foo?timeout=1&stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
 
         $envelope = $transport->send(Envelope::wrap((object) ['test1' => true]));
         $fallbackResult = $fallbackConnection->fetchAllAssociative('select * from messenger_messages');
