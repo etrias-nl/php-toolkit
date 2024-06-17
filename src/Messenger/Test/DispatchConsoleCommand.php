@@ -66,7 +66,13 @@ class DispatchConsoleCommand extends Command
                     $input->getOption('nest-sync'),
                 );
             } else {
-                $message = \is_array($payload) ? new $class(...$payload) : new $class($payload);
+                try {
+                    $message = \is_array($payload) ? new $class(...$payload) : new $class($payload);
+                } catch (\Throwable $e) {
+                    $io->error($e->getMessage());
+
+                    return 1;
+                }
                 $io->writeln($dumper($message));
                 if (!$io->confirm('Dispatch?', false)) {
                     continue;
