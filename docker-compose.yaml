@@ -4,7 +4,7 @@ services:
         command:
             - '--jetstream'
     php:
-        image: 'etriasnl/dev-php-fpm:8.1.29-28'
+        image: 'etriasnl/dev-php-fpm:8.1.29-29'
         depends_on:
             - nats
         volumes:
