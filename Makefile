@@ -1,7 +1,7 @@
 MAKEFLAGS += --warn-undefined-variables --always-make
 .DEFAULT_GOAL := _
 
-exec_docker=docker compose run --quiet-pull --rm -u "$(shell id -u):$(shell id -g)"
+exec_docker=docker compose run --quiet-pull --rm
 exec_app=${exec_docker} --no-deps php
 exec_app_deps=${exec_docker} php
 
