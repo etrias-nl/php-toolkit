@@ -32,7 +32,7 @@ final class LogMiddleware implements MiddlewareInterface
             return $record;
         }
 
-        $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId();
+        $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId() ?? spl_object_hash($this->currentEnvelope);
         $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
         $record->extra['messenger']['message'] = $this->currentEnvelope->getMessage()::class;
 

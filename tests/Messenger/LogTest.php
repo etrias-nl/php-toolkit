@@ -43,7 +43,7 @@ final class LogTest extends TestCase
             {
                 $message = $envelope->getMessage();
 
-                $this->logger->info('handling');
+                $this->logger->info(json_encode($message));
 
                 if ($message->nest) {
                     $this->bus->dispatch((object) ['nest' => false], [new TransportMessageIdStamp('NestedID')]);
@@ -60,11 +60,11 @@ final class LogTest extends TestCase
 
         self::assertStringMatchesFormat(
             <<<'TXT'
-                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
-                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
-                [%s] test.INFO: handling [] {"messenger":{"id":null,"origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
-                [%s] test.INFO: handling [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"},"extra_processor":"stdClass"}
-                [%s] test.INFO: handling [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: {"test1":true,"nest":true} [] {"messenger":{"id":"%s","origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: {"nest":false} [] {"messenger":{"id":"NestedID","origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: {"test2":true,"nest":false} [] {"messenger":{"id":"%s","origin":null,"message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: {"test3":true,"nest":true} [] {"messenger":{"id":"ID","origin":"OriginID","message":"stdClass"},"extra_processor":"stdClass"}
+                [%s] test.INFO: {"nest":false} [] {"messenger":{"id":"NestedID","origin":"ID","message":"stdClass"},"extra_processor":"stdClass"}
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))
         );

@@ -244,7 +244,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         } catch (\Throwable $e) {
             if (!$retry) {
                 usleep(self::MICROSECOND / 2);
-                $retry = true;
+                $retry = $context['retry'] = true;
 
                 goto do_send;
             }
