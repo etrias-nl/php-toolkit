@@ -16,7 +16,7 @@ final class DockerHandler extends AbstractProcessingHandler
     /**
      * @var null|resource
      */
-    private mixed $resource;
+    private mixed $resource = null;
 
     public function __construct(
         Level $level = Level::Debug,
