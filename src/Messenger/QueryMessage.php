@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger;
 
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
@@ -29,6 +30,11 @@ final class QueryMessage
             throw $e;
         }
 
+        return self::fromEnvelope($envelope);
+    }
+
+    public static function fromEnvelope(Envelope $envelope): mixed
+    {
         $handledStamps = $envelope->all(HandledStamp::class);
 
         if (!$handledStamps) {
