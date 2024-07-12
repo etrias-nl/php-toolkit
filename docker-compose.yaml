@@ -1,12 +1,21 @@
+x-healthcheck: &x-healthcheck
+    interval: 2s
+    timeout: 5s
+    retries: 3
+
 services:
     nats:
         image: 'nats:2.10.17-alpine'
         command:
             - '--jetstream'
+        healthcheck:
+            <<: *x-healthcheck
+            test: 'echo -e PING | nc localhost 4222 | grep PONG'
     php:
         image: 'etriasnl/dev-php-fpm:8.1.29-31'
         depends_on:
-            - nats
+            nats:
+                condition: service_healthy
         volumes:
             - '.:/app'
         environment:
