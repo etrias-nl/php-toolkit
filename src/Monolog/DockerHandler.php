@@ -23,7 +23,7 @@ final class DockerHandler extends AbstractProcessingHandler
         bool $bubble = true,
         int $processId = 1,
         int $fileDescriptor = 2,
-        string $basePath = '',
+        string $basePath = '/app',
     ) {
         parent::__construct($level, $bubble);
 
