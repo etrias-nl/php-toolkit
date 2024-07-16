@@ -23,13 +23,14 @@ final class DockerHandler extends AbstractProcessingHandler
         bool $bubble = true,
         int $processId = 1,
         int $fileDescriptor = 2,
+        string $basePath = '',
     ) {
         parent::__construct($level, $bubble);
 
         $this->command = sprintf('cat - >> /proc/%d/fd/%d', $processId, $fileDescriptor);
 
         $this->pushProcessor(new PsrLogMessageProcessor());
-        $this->setFormatter(new CompactJsonFormatter());
+        $this->setFormatter(new CompactJsonFormatter($basePath));
     }
 
     public function close(): void
