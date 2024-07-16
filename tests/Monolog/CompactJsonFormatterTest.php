@@ -26,7 +26,7 @@ final class CompactJsonFormatterTest extends TestCase
 
     public function testFormatException(): void
     {
-        $formatter = new CompactJsonFormatter();
+        $formatter = new CompactJsonFormatter(__DIR__);
         $formatted = $formatter->normalizeValue(new \RuntimeException('foo', 123, new \LogicException('bar')));
 
         self::assertIsArray($formatted);
@@ -34,6 +34,7 @@ final class CompactJsonFormatterTest extends TestCase
         self::assertSame('foo', $formatted['message']);
         self::assertSame(123, $formatted['code']);
         self::assertIsString($formatted['file']);
+        self::assertStringStartsWith(basename(__FILE__).':', $formatted['file']);
         self::assertIsString($formatted['trace']);
 
         self::assertIsArray($formatted['previous']);
@@ -41,6 +42,7 @@ final class CompactJsonFormatterTest extends TestCase
         self::assertSame('bar', $formatted['previous']['message']);
         self::assertSame(0, $formatted['previous']['code']);
         self::assertIsString($formatted['previous']['file']);
+        self::assertStringStartsWith(basename(__FILE__).':', $formatted['previous']['file']);
         self::assertIsString($formatted['previous']['trace']);
     }
 }

@@ -13,9 +13,12 @@ final class CompactJsonFormatter extends JsonFormatter
 {
     private bool $inList = false;
 
-    public function __construct()
-    {
+    public function __construct(
+        string $basePath = '',
+    ) {
         parent::__construct(self::BATCH_MODE_NEWLINES, true, false, true);
+
+        $this->setBasePath($basePath);
     }
 
     protected function normalize(mixed $data, int $depth = 0): mixed
