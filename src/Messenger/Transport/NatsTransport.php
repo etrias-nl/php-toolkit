@@ -111,10 +111,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $payload = $message->payload;
 
             if ($payload->isEmpty()) {
-                if ('Request Timeout' === $payload->getHeader('Status-Message')) {
-                    $this->log(Level::Warning, null, 'Unexpected payload received', ['headers' => json_encode($payload->headers)]);
-                }
-
                 return [];
             }
 
@@ -334,7 +330,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $this->consumer->getConfiguration()
                 ->setAckWait((int) (self::NANOSECOND * $this->ackWait))
                 ->setMaxAckPending(-1)
-                ->setMaxDeliver($this->redeliver ? 0 : 1)
+                ->setMaxDeliver($this->redeliver ? 0 : -1)
                 ->setMaxWaiting(10_000)
             ;
         }
