@@ -9,6 +9,9 @@ use Monolog\Level;
 use Monolog\LogRecord;
 use Monolog\Processor\PsrLogMessageProcessor;
 
+/**
+ * @deprecated use native stream handler
+ */
 final class DockerHandler extends AbstractProcessingHandler
 {
     private readonly string $command;
