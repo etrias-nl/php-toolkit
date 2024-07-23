@@ -111,7 +111,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $payload = $message->payload;
 
             if ($payload->isEmpty()) {
-                if ('404' !== $payload->getHeader('Status-Code')) {
+                if ('Request Timeout' === $payload->getHeader('Status-Message')) {
                     $this->log(Level::Warning, null, 'Unexpected payload received', ['headers' => json_encode($payload->headers)]);
                 }
 
