@@ -9,6 +9,9 @@ use Monolog\Level;
 use Monolog\LogRecord;
 use Monolog\Processor\PsrLogMessageProcessor;
 
+/**
+ * @see https://stackoverflow.com/a/77468772
+ */
 final class DockerHandler extends AbstractProcessingHandler
 {
     private readonly string $command;
