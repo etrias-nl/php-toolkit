@@ -49,7 +49,7 @@ final class NatsTransportFactory implements TransportFactoryInterface
         ];
 
         if ($diff = array_diff_key($options, $defaults)) {
-            throw new \RuntimeException(sprintf('Unsupported transport options: %s', implode(', ', array_keys($diff))));
+            throw new \RuntimeException(\sprintf('Unsupported transport options: %s', implode(', ', array_keys($diff))));
         }
         if (!\is_string($stream = $options['stream']) || '' === trim($stream)) {
             throw new \RuntimeException('Missing stream name.');

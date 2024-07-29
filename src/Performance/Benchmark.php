@@ -57,7 +57,7 @@ final class Benchmark
         $memory = (float) ($trace->event->getMemory() / 1024 / 1024);
         $duration = (float) ($trace->event->getDuration() / 1000);
 
-        $this->logger->info(sprintf('%s (%.2F MiB - %d s)', $trace->name, $memory, $duration), [
+        $this->logger->info(\sprintf('%s (%.2F MiB - %d s)', $trace->name, $memory, $duration), [
             'benchmark' => $trace->id,
             'benchmark_origin' => $trace->previousTrace?->id,
             'memory' => $memory,

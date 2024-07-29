@@ -38,13 +38,13 @@ final class QueryMessage
         $handledStamps = $envelope->all(HandledStamp::class);
 
         if (!$handledStamps) {
-            throw new \LogicException(sprintf('Message of type "%s" was handled zero times. Exactly one handler is expected when using "%s()".', get_debug_type($envelope->getMessage()), __METHOD__));
+            throw new \LogicException(\sprintf('Message of type "%s" was handled zero times. Exactly one handler is expected when using "%s()".', get_debug_type($envelope->getMessage()), __METHOD__));
         }
 
         if (\count($handledStamps) > 1) {
-            $handlers = implode(', ', array_map(static fn (HandledStamp $stamp): string => sprintf('"%s"', $stamp->getHandlerName()), $handledStamps));
+            $handlers = implode(', ', array_map(static fn (HandledStamp $stamp): string => \sprintf('"%s"', $stamp->getHandlerName()), $handledStamps));
 
-            throw new \LogicException(sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s()", got %d: %s.', get_debug_type($envelope->getMessage()), __METHOD__, \count($handledStamps), $handlers));
+            throw new \LogicException(\sprintf('Message of type "%s" was handled multiple times. Only one handler is expected when using "%s()", got %d: %s.', get_debug_type($envelope->getMessage()), __METHOD__, \count($handledStamps), $handlers));
         }
 
         return $handledStamps[0]->getResult();

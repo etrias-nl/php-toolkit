@@ -130,7 +130,7 @@ final class SecurityMiddleware implements MiddlewareInterface
             return $getDefaultUserProviderId() ?? throw new \RuntimeException('Cannot determine user provider without a firewall config, nor a default.');
         }
 
-        return $firewallConfig->getProvider() ?? $getDefaultUserProviderId() ?? throw new \RuntimeException(sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
+        return $firewallConfig->getProvider() ?? $getDefaultUserProviderId() ?? throw new \RuntimeException(\sprintf('Firewall config "%s" does not have a user provider, nor is a default available.', $firewallConfig->getName()));
     }
 
     private function getUserProvider(string $id): UserProviderInterface
