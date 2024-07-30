@@ -218,7 +218,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     {
         $envelope = $envelope->withoutAll(TransportMessageIdStamp::class);
         $encodedMessage = $this->serializer->encode($envelope);
-        $messageId = $this->messageMap->getStamp($envelope, DeduplicateStamp::class)?->enabled ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v4()->toRfc4122();
+        $messageId = $this->messageMap->getStamp($envelope, DeduplicateStamp::class)?->enabled ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v7()->toBase58();
         $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
             self::HEADER_EXPECTED_STREAM => $this->streamName,

@@ -125,7 +125,7 @@ final class NatsTest extends TestCase
         self::assertMessageCount(3, $transport);
         self::assertTrue(\is_string($messageId1) && 32 === \strlen($messageId1));
         self::assertSame($messageId1, $messageId2);
-        self::assertTrue(\is_string($messageId3) && Uuid::isValid($messageId3));
+        self::assertTrue(\is_string($messageId3) && $messageId3 === Uuid::fromString($messageId3)->toBase58());
         self::assertNotSame($messageId3, $messageId1);
         self::assertTrue(\is_string($messageId4) && 32 === \strlen($messageId4));
         self::assertNotSame($messageId4, $messageId1);
