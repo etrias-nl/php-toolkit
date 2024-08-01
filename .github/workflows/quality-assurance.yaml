@@ -29,9 +29,8 @@ jobs:
                     key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
                     restore-keys: ${{ runner.os }}-composer-
             -
-                uses: actions/cache@v4.0.2
+                uses: actions/cache/restore@v4.0.2
                 with:
-                    save-always: true
                     path: |
                         var
                         !var/composer
@@ -73,4 +72,12 @@ jobs:
                 with:
                     path: var/composer
                     key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+                if: always()
+            -
+                uses: actions/cache/save@v4.0.2
+                with:
+                    path: |
+                        var
+                        !var/composer
+                    key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
                 if: always()
