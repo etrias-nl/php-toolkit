@@ -73,4 +73,4 @@ jobs:
                 with:
                     path: var/composer
                     key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
-                if: "always() && steps.install.outcome == 'success'"
+                if: always()
