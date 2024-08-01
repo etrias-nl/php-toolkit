@@ -74,7 +74,7 @@ jobs:
                     key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
                 if: always()
             -
-                run: gh actions-cache delete ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }} -B ${{ github.ref }} --confirm
+                run: gh cache delete ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
                 continue-on-error: true
                 if: always()
             -
