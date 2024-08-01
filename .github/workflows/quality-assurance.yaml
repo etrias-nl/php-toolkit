@@ -75,6 +75,8 @@ jobs:
                 if: always()
             -
                 run: gh cache delete ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
+                env:
+                    GH_TOKEN: ${{ github.token }}
                 continue-on-error: true
                 if: always()
             -
