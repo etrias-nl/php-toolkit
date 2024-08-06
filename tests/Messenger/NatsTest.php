@@ -104,7 +104,7 @@ final class NatsTest extends TestCase
         self::assertStringMatchesFormat(
             <<<'TXT'
                 %A
-                [%s] test.INFO: Message "{message}" sent to transport {"payload":"O:8:\"stdClass\":1:{s:5:\"test1\";b:1;}","duplicate":null,"stream":"testTransport%s","message":"stdClass","message_id":"%s"} []
+                [%s] test.INFO: Message "{message}" sent to transport {"payload":"\"O:8:\\\"stdClass\\\":1:{s:5:\\\"test1\\\";b:1;}\"","duplicate":null,"stream":"testTransport%s","message":"stdClass","message_id":"%s"} []
                 %A
                 TXT,
             implode("\n", array_map(static fn (LogRecord $record): string => trim((string) $record->formatted), $logHandler->getRecords()))

@@ -226,10 +226,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $context = [];
 
         try {
-            $context['payload'] = $this->normalizer->normalize($envelope->getMessage(), null, [
+            $context['payload'] = json_encode($this->normalizer->normalize($envelope->getMessage(), null, [
                 AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
                 AbstractObjectNormalizer::SKIP_UNINITIALIZED_VALUES => true,
-            ]);
+            ]));
         } catch (\Throwable $e) {
             $context['payload'] = @serialize($envelope->getMessage());
             $context['payload_normalize_exception'] = $e;
