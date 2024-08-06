@@ -15,6 +15,7 @@ use Etrias\PhpToolkit\Messenger\Transport\NatsTransportFactory;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Monolog\LogRecord;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -165,10 +166,12 @@ final class NatsTest extends TestCase
         self::assertSame([], $transport->get());
     }
 
-    public function testRedelivery(): void
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testRedelivery(bool $enabled): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
-        $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), ['redeliver' => $enabled], new PhpSerializer());
         $transport->setup();
 
         $messageId = $transport->send(Envelope::wrap((object) ['test1' => true]))->last(TransportMessageIdStamp::class)?->getId();
@@ -188,6 +191,12 @@ final class NatsTest extends TestCase
         usleep(250_000);
 
         $receivedEnvelopes = $transport->get();
+
+        if (!$enabled) {
+            self::assertCount(0, $receivedEnvelopes);
+
+            return;
+        }
 
         self::assertCount(1, $receivedEnvelopes);
         self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
