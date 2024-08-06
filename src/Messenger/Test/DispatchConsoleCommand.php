@@ -67,6 +67,7 @@ class DispatchConsoleCommand extends Command
                 );
             } else {
                 try {
+                    // @todo list => positional ctor args, map => hydrate property values
                     $message = \is_array($payload) ? new $class(...$payload) : new $class($payload);
                 } catch (\Throwable $e) {
                     $io->error($e->getMessage());
