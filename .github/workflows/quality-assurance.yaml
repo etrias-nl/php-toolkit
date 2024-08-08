@@ -13,6 +13,10 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
     cancel-in-progress: true
 
+defaults:
+    run:
+        shell: 'script -q -e -c "bash {0}"'
+
 jobs:
     checks:
         runs-on: ubuntu-latest
