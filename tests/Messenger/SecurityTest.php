@@ -35,7 +35,7 @@ final class SecurityTest extends TestCase
     public function testMiddleware(): void
     {
         $userProviders = new ServiceLocator([
-            'security.user.provider.concrete.user_provider' => static fn (): UserProviderInterface => new class() implements UserProviderInterface {
+            'security.user.provider.concrete.user_provider' => static fn (): UserProviderInterface => new class implements UserProviderInterface {
                 public function refreshUser(UserInterface $user): UserInterface
                 {
                     return $user;
