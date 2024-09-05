@@ -1,7 +1,7 @@
 MAKEFLAGS += --warn-undefined-variables --always-make
 .DEFAULT_GOAL := _
 
-compose=docker compose
+compose=docker compose --progress=quiet
 run=${compose} run --quiet-pull --rm
 run_app=${run} --no-deps php
 run_app_deps=${run} php
