@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
@@ -63,10 +62,6 @@ final class DoctrineTransactionMiddleware implements MiddlewareInterface
                 $this->logger->error('An error occurred while rolling back the transaction', [
                     'exception' => $rollbackException,
                 ]);
-            }
-
-            if ($exception instanceof DBALException) {
-                $connection->close();
             }
 
             if ($exception instanceof HandlerFailedException) {

@@ -121,9 +121,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
-            $level = str_contains($e->getMessage(), 'MySQL server has gone away') ? Level::Info : Level::Error;
             $this->unsubscribe();
-            $this->log($level, null, new TransportException($e->getMessage(), 0, $e));
+            $this->log(Level::Error, null, new TransportException($e->getMessage(), 0, $e));
 
             return [];
         }
