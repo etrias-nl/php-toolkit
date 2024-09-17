@@ -30,6 +30,8 @@ final class DummyMessageHandler
 
         if (null !== $this->entityManager) {
             $this->logger->info('SQL NOW(): '.$this->entityManager->getConnection()->executeQuery('select now()')->fetchOne());
+        } else {
+            $this->logger->info('SQL USAGE NOT TESTED');
         }
 
         if ($message->nest) {
