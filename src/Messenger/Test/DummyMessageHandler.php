@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\Test;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -15,6 +16,7 @@ final class DummyMessageHandler
     public function __construct(
         private readonly MessageBusInterface $messageBus,
         private readonly LoggerInterface $logger,
+        private readonly ?EntityManagerInterface $entityManager = null,
     ) {}
 
     public function __invoke(DummyMessage $message): void
@@ -24,6 +26,10 @@ final class DummyMessageHandler
         if ($message->sleep > 0) {
             $this->logger->info('Sleeping for '.$message->sleep.'s');
             usleep((int) ($message->sleep * 1_000_000));
+        }
+
+        if (null !== $this->entityManager) {
+            $this->logger->info('SQL NOW(): '.$this->entityManager->getConnection()->executeQuery('select now()')->fetchOne());
         }
 
         if ($message->nest) {
