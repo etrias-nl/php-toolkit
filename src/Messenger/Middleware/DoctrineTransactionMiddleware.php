@@ -17,10 +17,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 
 /**
- * @internal
- *
- * @see https://github.com/symfony/symfony/issues/51993
- * @see https://github.com/symfony/symfony/pull/54355
+ * @deprecated use entity manager's wrapInTransaction() in handlers instead
  */
 final class DoctrineTransactionMiddleware implements MiddlewareInterface
 {
