@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Messenger\Middleware;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ConnectionRegistry;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 final class DoctrineConnectionMiddleware implements MiddlewareInterface
 {
     public function __construct(
+        #[Autowire(service: 'doctrine')]
         private readonly ConnectionRegistry $connectionRegistry,
     ) {}
 
