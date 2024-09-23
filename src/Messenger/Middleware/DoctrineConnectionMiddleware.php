@@ -26,7 +26,6 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         private readonly LoggerInterface $logger,
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
-        private readonly ?string $entityManagerName = null,
         private readonly int $waitTimeout = 28800,
     ) {}
 
@@ -36,24 +35,25 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
-        $connection = $entityManager->getConnection();
-        $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class)?->enabled ?? true;
+        $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class);
 
-        if (!$transactional) {
-            $this->setWaitTimeout($connection);
+        if (null === $transactional || !$transactional->enabled) {
+            $this->setWaitTimeout();
 
             try {
                 return $stack->next()->handle($envelope, $stack);
             } finally {
-                $connection->close();
+                $this->closeConnections();
             }
         }
 
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->managerRegistry->getManager($transactional->entityManagerName);
+        $connection = $entityManager->getConnection();
+
         $connection->beginTransaction();
 
-        $this->setWaitTimeout($connection);
+        $this->setWaitTimeout();
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
@@ -78,13 +78,24 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
 
             throw $exception;
         } finally {
-            $connection->close();
+            $this->closeConnections();
         }
     }
 
-    private function setWaitTimeout(Connection $connection): void
+    private function setWaitTimeout(): void
     {
-        $connection->executeQuery('SET session wait_timeout = '.$this->waitTimeout);
-        $connection->executeQuery('SET session interactive_timeout = '.$this->waitTimeout);
+        /** @var Connection $connection */
+        foreach ($this->managerRegistry->getConnections() as $connection) {
+            $connection->executeQuery('SET session wait_timeout = '.$this->waitTimeout);
+            $connection->executeQuery('SET session interactive_timeout = '.$this->waitTimeout);
+        }
+    }
+
+    private function closeConnections(): void
+    {
+        /** @var Connection $connection */
+        foreach ($this->managerRegistry->getConnections() as $connection) {
+            $connection->close();
+        }
     }
 }

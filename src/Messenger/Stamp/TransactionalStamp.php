@@ -11,5 +11,6 @@ final class TransactionalStamp implements StampInterface
 {
     public function __construct(
         public readonly bool $enabled = true,
+        public readonly ?string $entityManagerName = null,
     ) {}
 }
