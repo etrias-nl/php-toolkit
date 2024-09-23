@@ -51,9 +51,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $entityManager = $this->managerRegistry->getManager($transactional->entityManagerName);
         $connection = $entityManager->getConnection();
 
-        $connection->beginTransaction();
-
-        $this->setWaitTimeout();
+        $this->setWaitTimeout($connection);
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
@@ -82,12 +80,27 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
-    private function setWaitTimeout(): void
+    private function setWaitTimeout(?Connection $transactional = null): void
     {
         /** @var Connection $connection */
         foreach ($this->managerRegistry->getConnections() as $connection) {
-            $connection->executeQuery('SET session wait_timeout = '.$this->waitTimeout);
-            $connection->executeQuery('SET session interactive_timeout = '.$this->waitTimeout);
+            foreach ([
+                'SET SESSION wait_timeout = '.$this->waitTimeout,
+                'SET SESSION interactive_timeout = '.$this->waitTimeout,
+            ] as $query) {
+                try {
+                    if ($transactional === $connection) {
+                        $connection->beginTransaction();
+                    }
+                    $connection->executeQuery($query);
+                } catch (\Exception) {
+                    $connection->close();
+                    if ($transactional === $connection) {
+                        $connection->beginTransaction();
+                    }
+                    $connection->executeQuery($query);
+                }
+            }
         }
     }
 
