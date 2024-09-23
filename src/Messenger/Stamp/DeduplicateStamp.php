@@ -10,6 +10,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 final class DeduplicateStamp implements StampInterface
 {
     public function __construct(
-        public bool $enabled = true,
+        public readonly bool $enabled = true,
     ) {}
 }
