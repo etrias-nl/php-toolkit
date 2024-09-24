@@ -38,7 +38,12 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class);
 
         if (null === $transactional || !$transactional->enabled) {
-            $this->setWaitTimeout();
+            try {
+                $this->setWaitTimeout();
+            } catch (\Exception) {
+                $this->closeConnections();
+                $this->setWaitTimeout();
+            }
 
             try {
                 return $stack->next()->handle($envelope, $stack);
@@ -51,7 +56,14 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $entityManager = $this->managerRegistry->getManager($transactional->entityManagerName);
         $connection = $entityManager->getConnection();
 
-        $this->setWaitTimeout($connection);
+        try {
+            $connection->beginTransaction();
+            $this->setWaitTimeout();
+        } catch (\Exception) {
+            $this->closeConnections();
+            $connection->beginTransaction();
+            $this->setWaitTimeout();
+        }
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
@@ -80,7 +92,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
-    private function setWaitTimeout(?Connection $transactional = null): void
+    private function setWaitTimeout(): void
     {
         /** @var Connection $connection */
         foreach ($this->managerRegistry->getConnections() as $connection) {
@@ -88,18 +100,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
                 'SET SESSION wait_timeout = '.$this->waitTimeout,
                 'SET SESSION interactive_timeout = '.$this->waitTimeout,
             ] as $query) {
-                try {
-                    if ($transactional === $connection) {
-                        $connection->beginTransaction();
-                    }
-                    $connection->executeQuery($query);
-                } catch (\Exception) {
-                    $connection->close();
-                    if ($transactional === $connection) {
-                        $connection->beginTransaction();
-                    }
-                    $connection->executeQuery($query);
-                }
+                $connection->executeQuery($query);
             }
         }
     }
