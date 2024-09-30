@@ -35,9 +35,9 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class);
+        $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class) ?? new TransactionalStamp();
 
-        if (null === $transactional || !$transactional->enabled) {
+        if (!$transactional->enabled) {
             try {
                 $this->setWaitTimeout();
             } catch (\Exception) {
