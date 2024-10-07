@@ -29,18 +29,9 @@ jobs:
             -
                 uses: actions/cache/restore@v4.1.0
                 with:
-                    path: var/composer
-                    key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
-                    restore-keys: ${{ runner.os }}-composer-
-            -
-                uses: actions/cache/restore@v4.1.0
-                with:
-                    path: |
-                        var
-                        !var/composer
+                    path: var
                     key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
-                    restore-keys: |
-                        ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
+                    restore-keys: ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
             -
                 uses: ScribeMD/docker-cache@0.5.0
                 with:
@@ -72,12 +63,6 @@ jobs:
                     commit_author: etrias <it@etrias.nl>
                 if: github.ref_name == 'main'
             -
-                uses: actions/cache/save@v4.1.0
-                with:
-                    path: var/composer
-                    key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
-                if: always()
-            -
                 run: gh cache delete ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
                 env:
                     GH_TOKEN: ${{ github.token }}
@@ -86,8 +71,6 @@ jobs:
             -
                 uses: actions/cache/save@v4.1.0
                 with:
-                    path: |
-                        var
-                        !var/composer
+                    path: var
                     key: ${{ runner.os }}-php-${{ github.head_ref || github.ref_name }}
                 if: always()
