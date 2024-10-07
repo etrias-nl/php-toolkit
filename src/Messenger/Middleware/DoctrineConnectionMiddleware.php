@@ -41,14 +41,14 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             try {
                 $this->setWaitTimeout();
             } catch (\Exception) {
-                $this->closeConnections();
+                $this->reset();
                 $this->setWaitTimeout();
             }
 
             try {
                 return $stack->next()->handle($envelope, $stack);
             } finally {
-                $this->closeConnections();
+                $this->reset();
             }
         }
 
@@ -60,7 +60,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             $connection->beginTransaction();
             $this->setWaitTimeout();
         } catch (\Exception) {
-            $this->closeConnections();
+            $this->reset();
             $connection->beginTransaction();
             $this->setWaitTimeout();
         }
@@ -88,7 +88,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
 
             throw $exception;
         } finally {
-            $this->closeConnections();
+            $this->reset();
         }
     }
 
@@ -105,11 +105,15 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
-    private function closeConnections(): void
+    private function reset(): void
     {
         /** @var Connection $connection */
         foreach ($this->managerRegistry->getConnections() as $connection) {
             $connection->close();
+        }
+
+        foreach ($this->managerRegistry->getManagers() as $name => $manager) {
+            $this->managerRegistry->resetManager($name);
         }
     }
 }
