@@ -9,6 +9,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 
 /**
  * @internal
+ * @todo make this a middleware to set default stamps on envelope
  */
 final class MessageMap
 {
