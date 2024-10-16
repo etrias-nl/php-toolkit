@@ -24,6 +24,8 @@ final class MessageMap
     ) {}
 
     /**
+     * @deprecated
+     *
      * @return class-string[]
      */
     public function getAvailableMessages(string $transport): array
@@ -32,6 +34,8 @@ final class MessageMap
     }
 
     /**
+     * @deprecated
+     *
      * @return array<string, mixed>
      */
     public function getTransportOptions(string $transport, string $message): array
