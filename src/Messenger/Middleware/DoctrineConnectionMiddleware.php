@@ -73,6 +73,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             return $envelope;
         } catch (\Throwable $exception) {
             try {
+                // @todo run in finally block; https://github.com/doctrine/orm/pull/11646/files
                 $connection->rollBack();
             } catch (\Throwable $rollbackException) {
                 $this->logger->error('An error occurred while rolling back the transaction', [
