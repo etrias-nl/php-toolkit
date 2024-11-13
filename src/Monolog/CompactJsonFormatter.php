@@ -38,7 +38,7 @@ final class CompactJsonFormatter extends JsonFormatter
 
     protected function normalizeException(\Throwable $e, int $depth = 0): array
     {
-        $data = parent::normalizeException($e, $depth);
+        $data = (array) parent::normalizeException($e, $depth);
 
         if (\is_array($trace = $data['trace'] ?? null)) {
             $data['trace'] = implode("\n", $trace);
