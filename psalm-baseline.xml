@@ -54,9 +54,6 @@
     <InvalidReturnType>
       <code><![CDATA[array]]></code>
     </InvalidReturnType>
-    <PossiblyInvalidArrayOffset>
-      <code><![CDATA[$data['trace']]]></code>
-    </PossiblyInvalidArrayOffset>
   </file>
   <file src="tests/Messenger/CacheTest.php">
     <DocblockTypeContradiction>
