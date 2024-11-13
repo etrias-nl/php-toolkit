@@ -44,6 +44,20 @@
       <code><![CDATA[TransportFactoryInterface]]></code>
     </MissingTemplateParam>
   </file>
+  <file src="src/Monolog/CompactJsonFormatter.php">
+    <InvalidArgument>
+      <code><![CDATA[$trace]]></code>
+    </InvalidArgument>
+    <InvalidReturnStatement>
+      <code><![CDATA[$data]]></code>
+    </InvalidReturnStatement>
+    <InvalidReturnType>
+      <code><![CDATA[array]]></code>
+    </InvalidReturnType>
+    <PossiblyInvalidArrayOffset>
+      <code><![CDATA[$data['trace']]]></code>
+    </PossiblyInvalidArrayOffset>
+  </file>
   <file src="tests/Messenger/CacheTest.php">
     <DocblockTypeContradiction>
       <code><![CDATA[assertSame]]></code>
