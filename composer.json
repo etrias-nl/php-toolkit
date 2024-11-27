@@ -9,7 +9,6 @@
         "basis-company/nats": "^0.26.0",
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
-        "nyholm/psr7": "^1",
         "php-http/message": "^1",
         "symfony/cache": "^6",
         "symfony/console": "^6",

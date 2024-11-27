@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Http;
 
 use Http\Message\Formatter;
-use Nyholm\Psr7\Request;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -49,15 +48,7 @@ final class HttpMessageFormatter implements Formatter
         return $message;
     }
 
-    /**
-     * @deprecated
-     */
     public function formatResponse(ResponseInterface $response): string
-    {
-        return $this->formatResponseForRequest($response, new Request('', ''));
-    }
-
-    public function formatResponseForRequest(ResponseInterface $response, RequestInterface $request): string
     {
         $message = \sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase());
         $debug = $this->debug || ($response->getStatusCode() >= 400);
@@ -75,6 +66,11 @@ final class HttpMessageFormatter implements Formatter
         }
 
         return $message;
+    }
+
+    public function formatResponseForRequest(ResponseInterface $response, RequestInterface $request): string
+    {
+        return $this->formatResponse($response);
     }
 
     private static function getMessageBody(MessageInterface $message): string
