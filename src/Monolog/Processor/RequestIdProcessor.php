@@ -6,11 +6,15 @@ namespace Etrias\PhpToolkit\Monolog\Processor;
 
 use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 #[AsMonologProcessor]
-final class RequestIdProcessor
+final class RequestIdProcessor implements EventSubscriberInterface
 {
+    private const REQUEST_ID_HEADER = 'X-Request-ID';
+
     public function __construct(
         private readonly RequestStack $requestStack,
     ) {}
@@ -18,9 +22,25 @@ final class RequestIdProcessor
     public function __invoke(LogRecord $record): LogRecord
     {
         if (null !== $request = $this->requestStack->getCurrentRequest()) {
-            $record->extra['request_id'] = $request->headers->get('X-Request-ID');
+            $record->extra['request_id'] = $request->headers->get(self::REQUEST_ID_HEADER);
         }
 
         return $record;
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            ResponseEvent::class => ['onKernelResponse', 1024],
+        ];
+    }
+
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        if (null === $requestId = $event->getRequest()->headers->get(self::REQUEST_ID_HEADER)) {
+            return;
+        }
+
+        $event->getResponse()->headers->set(self::REQUEST_ID_HEADER, $requestId);
     }
 }
