@@ -67,7 +67,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
 
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
-            $entityManager->close();
+            $entityManager->flush();
             $connection->commit();
 
             $successful = true;
