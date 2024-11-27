@@ -20,6 +20,7 @@ final class HttpMessageFormatter implements Formatter
         'x-amz-access-token',
         'x-amz-security-token',
         'x-auth-apikey',
+        'apikey',
     ];
     private const NON_SENSITIVE_RESPONSE_HEADERS = [
         'content-type',
