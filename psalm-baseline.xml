@@ -5,14 +5,6 @@
       <code><![CDATA[ClientExceptionInterface]]></code>
     </UndefinedClass>
   </file>
-  <file src="src/Messenger/MessageMap.php">
-    <LessSpecificReturnStatement>
-      <code><![CDATA[$envelope->all($stamp) ?: $this->defaultStamps[$envelope->getMessage()::class][$stamp] ?? []]]></code>
-    </LessSpecificReturnStatement>
-    <MoreSpecificReturnType>
-      <code><![CDATA[list<T>]]></code>
-    </MoreSpecificReturnType>
-  </file>
   <file src="src/Messenger/Test/DummyMessageHandler.php">
     <ArgumentTypeCoercion>
       <code><![CDATA[(int) ($message->sleep * 1_000_000)]]></code>
