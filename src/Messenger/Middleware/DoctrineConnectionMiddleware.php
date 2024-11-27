@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
 use Etrias\PhpToolkit\Messenger\Stamp\TransactionalStamp;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -23,7 +22,6 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
 final class DoctrineConnectionMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
         private readonly int $waitTimeout = 28800,
@@ -65,31 +63,28 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             $this->setWaitTimeout();
         }
 
+        $successful = false;
+
         try {
             $envelope = $stack->next()->handle($envelope, $stack);
-            $entityManager->flush();
+            $entityManager->close();
             $connection->commit();
 
+            $successful = true;
+
             return $envelope;
-        } catch (\Throwable $exception) {
-            try {
-                // @todo run in finally block; https://github.com/doctrine/orm/pull/11646/files
-                $connection->rollBack();
-            } catch (\Throwable $rollbackException) {
-                $this->logger->error('An error occurred while rolling back the transaction', [
-                    'exception' => $rollbackException,
-                ]);
-            }
-
-            if ($exception instanceof HandlerFailedException) {
-                // Remove all HandledStamp from the envelope so the retry will execute all handlers again.
-                // When a handler fails, the queries of allegedly successful previous handlers just got rolled back.
-                throw new HandlerFailedException($exception->getEnvelope()->withoutAll(HandledStamp::class), $exception->getWrappedExceptions());
-            }
-
-            throw $exception;
+        } catch (HandlerFailedException $exception) {
+            // Remove all HandledStamp from the envelope so the retry will execute all handlers again.
+            // When a handler fails, the queries of allegedly successful previous handlers just got rolled back.
+            throw new HandlerFailedException($exception->getEnvelope()->withoutAll(HandledStamp::class), $exception->getWrappedExceptions());
         } finally {
-            $this->reset();
+            try {
+                if (!$successful && $connection->isTransactionActive()) {
+                    $connection->rollBack();
+                }
+            } finally {
+                $this->reset();
+            }
         }
     }
 
