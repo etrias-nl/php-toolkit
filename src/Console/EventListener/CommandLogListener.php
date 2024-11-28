@@ -9,7 +9,7 @@ use Monolog\LogRecord;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 #[AsMonologProcessor]
@@ -22,7 +22,7 @@ final class CommandLogListener implements EventSubscriberInterface
      * @param iterable<array-key, callable(LogRecord, Command): LogRecord> $extraCliProcessors
      */
     public function __construct(
-        #[TaggedIterator('cli.log_processor')]
+        #[AutowireIterator('cli.log_processor')]
         private readonly iterable $extraCliProcessors = [],
     ) {}
 
