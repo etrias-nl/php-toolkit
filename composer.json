@@ -12,6 +12,7 @@
         "php-http/message": "^1",
         "symfony/cache": "^6",
         "symfony/console": "^6",
+        "symfony/dependency-injection": "^6",
         "symfony/doctrine-bridge": "^6",
         "symfony/doctrine-messenger": "^6",
         "symfony/event-dispatcher": "^6",
