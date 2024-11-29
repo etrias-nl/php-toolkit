@@ -26,9 +26,6 @@
         "symfony/uid": "^6",
         "symfony/var-dumper": "^6"
     },
-    "conflict": {
-        "basis-company/nats": "<0.21.0"
-    },
     "autoload": {
         "psr-4": {
             "Etrias\\PhpToolkit\\": "src/"
