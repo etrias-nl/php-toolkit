@@ -10,7 +10,6 @@
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
         "php-http/client-common": "^2",
-        "php-http/message": "^1",
         "symfony/cache": "^7",
         "symfony/console": "^7",
         "symfony/dependency-injection": "^7",
