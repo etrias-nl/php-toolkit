@@ -12,12 +12,14 @@ use Http\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Uid\Uuid;
 
 final class LoggerPlugin implements Plugin
 {
     public function __construct(
         private readonly LoggerInterface $logger,
+        #[Autowire(service: HttpMessageFormatter::class)]
         private readonly Formatter $formatter,
     ) {}
 
