@@ -23,6 +23,6 @@ services:
             - CI
             - GITHUB_ACTIONS
             - RUNNER_DEBUG
-            DEBUG_COLORS: "true"
-            TERM: xterm-256color
-            COLORTERM: truecolor
+            - DEBUG_COLORS=true
+            - TERM=xterm-256color
+            - COLORTERM=truecolor
