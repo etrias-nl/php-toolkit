@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="5.26.1@d747f6500b38ac4f7dfc5edbcae6e4b637d7add0">
-  <file src="src/Messenger/EventListener/RejectDelayListener.php">
-    <UndefinedClass>
-      <code><![CDATA[ClientExceptionInterface]]></code>
-    </UndefinedClass>
+  <file src="src/Http/LoggerPlugin.php">
+    <DeprecatedMethod>
+      <code><![CDATA[formatResponse]]></code>
+      <code><![CDATA[formatResponse]]></code>
+    </DeprecatedMethod>
   </file>
   <file src="src/Messenger/Test/DummyMessageHandler.php">
     <ArgumentTypeCoercion>
