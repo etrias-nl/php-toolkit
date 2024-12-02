@@ -8,6 +8,9 @@ use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
+use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Symfony\Set\SymfonySetList;
@@ -25,6 +28,9 @@ return static function (RectorConfig $rectorConfig): void {
         FlipTypeControlToUseExclusiveTypeRector::class,
         ExplicitBoolCompareRector::class,
         UnusedForeachValueToArrayKeysRector::class,
+        AddOverrideAttributeToOverriddenMethodsRector::class,
+        ReadOnlyClassRector::class,
+        AddTypeToConstRector::class,
     ]);
     $rectorConfig->cacheDirectory(__DIR__.'/var/rector-cache');
     $rectorConfig->importNames();
