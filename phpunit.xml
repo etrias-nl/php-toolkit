@@ -5,6 +5,7 @@
     bootstrap="vendor/autoload.php"
     beStrictAboutCoverageMetadata="true"
     beStrictAboutOutputDuringTests="true"
+    displayDetailsOnPhpunitDeprecations="true"
     displayDetailsOnTestsThatTriggerDeprecations="true"
     displayDetailsOnTestsThatTriggerErrors="true"
     displayDetailsOnTestsThatTriggerWarnings="true"
