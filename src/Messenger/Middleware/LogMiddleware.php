@@ -7,7 +7,7 @@ namespace Etrias\PhpToolkit\Messenger\Middleware;
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
 use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
@@ -22,7 +22,7 @@ final class LogMiddleware implements MiddlewareInterface
      * @param iterable<array-key, callable(LogRecord, Envelope): LogRecord> $extraEnvelopeProcessors
      */
     public function __construct(
-        #[TaggedIterator('messenger.log_processor')]
+        #[AutowireIterator('messenger.log_processor')]
         private readonly iterable $extraEnvelopeProcessors = [],
     ) {}
 
