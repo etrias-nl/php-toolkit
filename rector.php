@@ -33,7 +33,7 @@ return static function (RectorConfig $rectorConfig): void {
     // https://github.com/rectorphp/rector/blob/main/docs/rector_rules_overview.md
     // https://github.com/rectorphp/rector-symfony/blob/main/docs/rector_rules_overview.md
     $rectorConfig->sets([
-        LevelSetList::UP_TO_PHP_81,
+        LevelSetList::UP_TO_PHP_83,
         SetList::CODE_QUALITY,
         SetList::EARLY_RETURN,
         SetList::INSTANCEOF,
