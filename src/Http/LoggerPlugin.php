@@ -35,31 +35,29 @@ final class LoggerPlugin implements Plugin
             $this->logger->info($formattedResponse, [
                 'milliseconds' => $milliseconds,
                 'uid' => $uid,
-                'client_request_id' => $response->getHeader('x-request-id')[0] ?? null,
-            ]);
+            ] + $this->getResponseContext($response));
 
             return $response;
         }, function (Exception $e) use ($request, $start, $uid): void {
             $milliseconds = (int) round(hrtime(true) / 1E6 - $start);
             $error = 'HTTP Error: '.$e->getMessage()."\n\nRequest:\n".$this->formatter->formatRequest($request, $e);
+            $context = ['exception' => $e, 'milliseconds' => $milliseconds, 'uid' => $uid];
             if ($e instanceof HttpException) {
                 $response = $e->getResponse();
                 $formattedResponse = method_exists($this->formatter, 'formatResponseForRequest') ? $this->formatter->formatResponseForRequest($response, $e->getRequest()) : $this->formatter->formatResponse($response);
-                $this->logger->error($error."\n\nResponse:\n".$formattedResponse, [
-                    'exception' => $e,
-                    'milliseconds' => $milliseconds,
-                    'uid' => $uid,
-                    'external_request_id' => $response->getHeader('x-request-id')[0] ?? null,
-                ]);
+                $this->logger->error($error."\n\nResponse:\n".$formattedResponse, $context + $this->getResponseContext($response));
             } else {
-                $this->logger->error($error, [
-                    'exception' => $e,
-                    'milliseconds' => $milliseconds,
-                    'uid' => $uid,
-                ]);
+                $this->logger->error($error, $context);
             }
 
             throw $e;
         });
+    }
+
+    private function getResponseContext(ResponseInterface $response): array
+    {
+        return [
+            'external_request_id' => $response->getHeader('x-request-id')[0] ?? null,
+        ];
     }
 }
