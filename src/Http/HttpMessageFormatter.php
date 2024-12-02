@@ -48,7 +48,7 @@ final class HttpMessageFormatter implements Formatter
             $message .= "\n".$name.': '.implode(', ', $values);
         }
 
-        if ($this->debug && '' !== $body = self::getMessageBody($request)) {
+        if ('' !== $body = self::getMessageBody($request)) {
             $message .= "\n\n".$body;
         }
 
