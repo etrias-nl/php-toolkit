@@ -13,6 +13,7 @@ services:
     php:
         image: 'etriasnl/dev-php-fpm:8.1.31-43'
         user: '${HOST_UID:-0}:${HOST_GID:-0}'
+        tty: true
         depends_on:
             nats:
                 condition: service_healthy
