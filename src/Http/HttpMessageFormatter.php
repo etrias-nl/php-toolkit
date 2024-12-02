@@ -35,9 +35,14 @@ final class HttpMessageFormatter implements Formatter
         private readonly bool $debug,
     ) {}
 
-    public function formatRequest(RequestInterface $request): string
+    public function formatRequest(RequestInterface $request, ?\Throwable $error = null): string
     {
         $message = \sprintf('%s %s HTTP/%s', $request->getMethod(), $request->getRequestTarget(), $request->getProtocolVersion());
+        $full = $this->debug || null !== $error;
+
+        if (!$full) {
+            return $message;
+        }
 
         foreach (array_diff_key($request->getHeaders(), array_flip(self::SENSITIVE_REQUEST_HEADERS)) as $name => $values) {
             $message .= "\n".$name.': '.implode(', ', $values);
@@ -53,9 +58,9 @@ final class HttpMessageFormatter implements Formatter
     public function formatResponse(ResponseInterface $response): string
     {
         $message = \sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase());
-        $debug = $this->debug || ($response->getStatusCode() >= 400);
+        $full = $this->debug || ($response->getStatusCode() >= 400);
 
-        if (!$debug) {
+        if (!$full) {
             return $message;
         }
 
