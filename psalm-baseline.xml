@@ -5,6 +5,9 @@
       <code><![CDATA[formatResponse]]></code>
       <code><![CDATA[formatResponse]]></code>
     </DeprecatedMethod>
+    <TooManyArguments>
+      <code><![CDATA[formatRequest]]></code>
+    </TooManyArguments>
   </file>
   <file src="src/Messenger/Test/DummyMessageHandler.php">
     <ArgumentTypeCoercion>
