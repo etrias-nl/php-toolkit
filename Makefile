@@ -22,8 +22,9 @@ psalm-suppress:
 	${run_app} sh -c "psalm --no-progress --set-baseline=psalm-baseline.xml"
 test:
 	${run_app_deps} sh -c "phpunit"
-rector-fix: composer-update
+rector-fix:
 	${run_app} sh -c "rector process --no-progress-bar"
 tools:
-	${run_app} sh -c "rm -rf /app/var/tools && cp -R /usr/local/etc/tools/vendor /app/var/tools"
+	mkdir -p var/tools
+	${run_app} sh -c "cd /usr/local/etc/tools/vendor && cp -r --remove-destination friendsofphp phpunit rector /app/var/tools"
 qa: composer-update lint cs-fix rector-fix psalm test
