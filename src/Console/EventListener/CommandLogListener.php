@@ -11,6 +11,7 @@ use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Uid\Uuid;
 
 #[AsMonologProcessor]
 final class CommandLogListener implements EventSubscriberInterface
@@ -45,7 +46,7 @@ final class CommandLogListener implements EventSubscriberInterface
     public function enterContext(ConsoleCommandEvent $event): void
     {
         $this->currentCommand = $event->getCommand();
-        $this->runId = uniqid('', true);
+        $this->runId = Uuid::v7()->toBase58();
     }
 
     public function leaveContext(): void
