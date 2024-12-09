@@ -22,6 +22,7 @@ final class HttpMessageFormatter implements Formatter
         'x-auth-apikey',
         'apikey',
         'api-key',
+        'api_key',
     ];
     private const NON_SENSITIVE_RESPONSE_HEADERS = [
         'content-type',
