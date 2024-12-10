@@ -228,7 +228,7 @@ final class NatsTest extends TestCase
     public function testFallback(): void
     {
         $connectionRegistry = $this->createMock(ConnectionRegistry::class);
-        $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['url' => 'sqlite:///:memory:']));
+        $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]));
         $fallbackFactory = new DoctrineTransportFactory($connectionRegistry);
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $fallbackFactory);
         $transport = $factory->createTransport('nats://foo?timeout=1&stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
