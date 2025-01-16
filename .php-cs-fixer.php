@@ -38,4 +38,5 @@ return (new Config())
                 'Fixtures/Messenger/envelope_compressed.php',
                 'Fixtures/Messenger/envelope_uncompressed.php',
             ])
-    );
+    )
+;
