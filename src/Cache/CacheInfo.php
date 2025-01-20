@@ -19,10 +19,10 @@ final class CacheInfo
         $this->key = \is_string($key) ? $key : hash('xxh128', serialize($key));
     }
 
-    public static function makeTag(int|string|null $segment, int|string|null ...$segments): string
+    public static function makeTag(null|int|string $segment, null|int|string ...$segments): string
     {
         return implode('_', array_filter(
-            array_map(static fn (int|string|null $segment): string => str_replace('\\', '-', (string) $segment), [$segment, ...$segments]),
+            array_map(static fn (null|int|string $segment): string => str_replace('\\', '-', (string) $segment), [$segment, ...$segments]),
             static fn (string $segment): bool => '' !== $segment
         ));
     }
