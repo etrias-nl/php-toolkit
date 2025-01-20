@@ -67,6 +67,6 @@ final class CacheInfoTest extends TestCase
         self::assertSame('__Foo_____bar__', CacheInfo::makeTag('__Foo__', '__bar__'));
         self::assertSame('_Foo-_-bar__-foo--bar--', CacheInfo::makeTag('_Foo\\', '\bar_', '-foo\\\bar--'));
         self::assertSame('1_2_3', CacheInfo::makeTag(1, 2, 3));
-        self::assertSame('1_2', CacheInfo::makeTag('', 1, '', '2', ''));
+        self::assertSame('1_2', CacheInfo::makeTag('', 1, null, '', '2', ''));
     }
 }
