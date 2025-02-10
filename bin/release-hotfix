@@ -34,7 +34,7 @@ echo "Releasing ${curr_version} -> ${next_version}"
 read -p "Continue? (y/N) " -r && [[ ${REPLY:-N} =~ ^[Yy]$ ]] || exit
 
 # tag release
-git tag "${next_version}"
+git tag "${next_version}" -m 'Automated release'
 
 # push release
 git push --tags
