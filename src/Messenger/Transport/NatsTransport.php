@@ -199,7 +199,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $retry = false;
         do_reject:
         try {
-            $result = $this->client->dispatch($replyTo->id, '-NAK'.($payload ? ' '.json_encode($payload) : ''));
+            $result = $this->client->dispatch($replyTo->id, '-NAK'.($payload ? ' '.json_encode($payload, JSON_THROW_ON_ERROR) : ''));
             self::assertPayload($result);
         } catch (\Throwable $e) {
             if (!$retry) {

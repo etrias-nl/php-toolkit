@@ -21,7 +21,7 @@ final class DummyMessageHandler
 
     public function __invoke(DummyMessage $message): void
     {
-        $this->logger->info('HANDLING MESSAGE: '.json_encode($message->payload));
+        $this->logger->info('HANDLING MESSAGE: '.json_encode($message->payload, JSON_THROW_ON_ERROR));
 
         if ($message->sleep > 0) {
             $this->logger->info('Sleeping for '.$message->sleep.'s');
