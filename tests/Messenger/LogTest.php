@@ -43,7 +43,7 @@ final class LogTest extends TestCase
             {
                 $message = $envelope->getMessage();
 
-                $this->logger->info(json_encode($message));
+                $this->logger->info(json_encode($message, JSON_THROW_ON_ERROR));
 
                 if ($message->nest) {
                     $this->bus->dispatch((object) ['nest' => false], [new TransportMessageIdStamp('NestedID')]);
