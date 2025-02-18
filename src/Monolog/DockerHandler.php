@@ -17,7 +17,7 @@ final class DockerHandler extends AbstractProcessingHandler
     private readonly string $command;
 
     /**
-     * @var null|resource
+     * @var null|false|resource
      */
     private mixed $resource = null;
 
@@ -38,7 +38,7 @@ final class DockerHandler extends AbstractProcessingHandler
 
     public function close(): void
     {
-        if (null !== $this->resource) {
+        if ($this->resource) {
             pclose($this->resource);
         }
     }
@@ -47,6 +47,8 @@ final class DockerHandler extends AbstractProcessingHandler
     {
         $this->resource ??= popen($this->command, 'w');
 
-        @fwrite($this->resource, (string) $record->formatted);
+        if ($this->resource) {
+            @fwrite($this->resource, (string) $record->formatted);
+        }
     }
 }
