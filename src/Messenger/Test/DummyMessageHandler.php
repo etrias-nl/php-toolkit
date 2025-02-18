@@ -43,7 +43,7 @@ final class DummyMessageHandler
         }
 
         if ($message->failure) {
-            throw new \RuntimeException(json_encode($message->payload));
+            throw new \RuntimeException(json_encode($message->payload, JSON_THROW_ON_ERROR));
         }
 
         $this->logger->info('DONE');
