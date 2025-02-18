@@ -13,6 +13,8 @@
     sealAllMethods="true"
     sealAllProperties="true"
     disableSuppressAll="true"
+    ensureOverrideAttribute="false"
+    strictBinaryOperands="false"
     autoloader="/usr/local/etc/tools/vendor/autoload.php"
 >
     <projectFiles>
