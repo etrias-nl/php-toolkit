@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
 #[AsCommand(name: 'messenger-test:dispatch')]
-class DispatchConsoleCommand extends Command
+final class DispatchConsoleCommand extends Command
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
