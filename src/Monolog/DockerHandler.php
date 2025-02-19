@@ -14,6 +14,10 @@ use Monolog\Processor\PsrLogMessageProcessor;
  */
 final class DockerHandler extends AbstractProcessingHandler
 {
+    private const EXCLUDED_DEPRECATION_LOGS = [
+        '~YAML mapping driver is deprecated and will be removed in Doctrine ORM~i',
+    ];
+
     private readonly string $command;
 
     /**
@@ -45,6 +49,12 @@ final class DockerHandler extends AbstractProcessingHandler
 
     protected function write(LogRecord $record): void
     {
+        foreach (self::EXCLUDED_DEPRECATION_LOGS as $excludedDeprecationLog) {
+            if (preg_match($excludedDeprecationLog, $record->message)) {
+                return;
+            }
+        }
+
         $this->resource ??= popen($this->command, 'w');
 
         if ($this->resource) {
