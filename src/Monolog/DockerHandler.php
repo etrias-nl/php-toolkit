@@ -49,9 +49,11 @@ final class DockerHandler extends AbstractProcessingHandler
 
     protected function write(LogRecord $record): void
     {
-        foreach (self::EXCLUDED_DEPRECATION_LOGS as $excludedDeprecationLog) {
-            if (preg_match($excludedDeprecationLog, $record->message)) {
-                return;
+        if ('deprecation' === $record->channel) {
+            foreach (self::EXCLUDED_DEPRECATION_LOGS as $excludedDeprecationLog) {
+                if (preg_match($excludedDeprecationLog, $record->message)) {
+                    return;
+                }
             }
         }
 
