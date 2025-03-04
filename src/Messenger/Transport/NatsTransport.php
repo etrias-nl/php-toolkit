@@ -117,7 +117,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
             $stamps = [new TransportMessageIdStamp($payload->getHeader(self::HEADER_MESSAGE_ID))];
             if (null !== $replyTo = $message->replyTo) {
-                $stamps[] = new ReplyToStamp($replyTo, $this->redeliver ? new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds') : null);
+                $stamps[] = new ReplyToStamp($replyTo, $this->getMessageExpiresAt());
             }
 
             return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
@@ -219,6 +219,8 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
             return;
         }
+
+        $replyTo->expiresAt = $this->getMessageExpiresAt();
 
         if (self::REPLY_TO_FALLBACK === $replyTo->id) {
             try {
@@ -371,6 +373,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         return $this->consumer;
+    }
+
+    private function getMessageExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->redeliver ? new \DateTimeImmutable('+'.(int) (self::MICROSECOND * $this->ackWait).' microseconds') : null;
     }
 
     private function log(Level $level, mixed $subject, string|\Throwable $message, array $context = []): void
