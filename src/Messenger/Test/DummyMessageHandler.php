@@ -25,7 +25,10 @@ final class DummyMessageHandler
 
         if ($message->sleep > 0) {
             $this->logger->info('Sleeping for '.$message->sleep.'s');
-            usleep((int) ($message->sleep * 1_000_000));
+            $ms = (int) ($message->sleep * 1_000_000);
+            $start = microtime(true);
+
+            while ((microtime(true) - $start) * 1_000_000 < $ms);
         }
 
         if (null !== $this->entityManager) {
