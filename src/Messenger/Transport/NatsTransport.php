@@ -22,6 +22,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -31,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Uid\Uuid;
 
-final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface
+final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface, KeepaliveReceiverInterface
 {
     private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
@@ -207,6 +208,41 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $retry = true;
 
                 goto do_reject;
+            }
+
+            $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
+        }
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        if (null === $replyTo = $envelope->last(ReplyToStamp::class)) {
+            return;
+        }
+
+        if (self::REPLY_TO_FALLBACK === $replyTo->id) {
+            try {
+                if ($this->fallbackTransport instanceof KeepaliveReceiverInterface) {
+                    $this->fallbackTransport->keepalive($envelope, (int) max(1, $this->ackWait));
+                }
+            } catch (\Throwable $e) {
+                $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
+            }
+
+            return;
+        }
+
+        $retry = false;
+        do_keepalive:
+        try {
+            $result = $this->client->dispatch($replyTo->id, '+WPI');
+            self::assertPayload($result);
+        } catch (\Throwable $e) {
+            if (!$retry) {
+                usleep(self::MICROSECOND / 2);
+                $retry = true;
+
+                goto do_keepalive;
             }
 
             $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));

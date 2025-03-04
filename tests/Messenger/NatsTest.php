@@ -225,6 +225,31 @@ final class NatsTest extends TestCase
         self::assertSame($messageId, $receivedEnvelopes[0]->last(TransportMessageIdStamp::class)?->getId());
     }
 
+    public function testKeepalive(): void
+    {
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.2&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport->setup();
+
+        $transport->send(Envelope::wrap((object) ['test1' => true]));
+
+        usleep(50_000);
+
+        $receivedEnvelopes = $transport->get();
+
+        self::assertCount(1, $receivedEnvelopes);
+
+        usleep(125_000);
+
+        $transport->keepalive($receivedEnvelopes[0]);
+
+        usleep(125_000);
+
+        $receivedEnvelopes = $transport->get();
+
+        self::assertCount(0, $receivedEnvelopes);
+    }
+
     public function testFallback(): void
     {
         $connectionRegistry = $this->createMock(ConnectionRegistry::class);
