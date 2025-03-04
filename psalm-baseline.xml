@@ -24,6 +24,7 @@
       <code><![CDATA[$retry]]></code>
       <code><![CDATA[$retry]]></code>
       <code><![CDATA[$retry]]></code>
+      <code><![CDATA[$retry]]></code>
     </UnusedVariable>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
