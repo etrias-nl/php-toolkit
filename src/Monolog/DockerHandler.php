@@ -17,6 +17,7 @@ final class DockerHandler extends AbstractProcessingHandler
     private const EXCLUDED_DEPRECATION_LOGS = [
         '~YAML mapping driver is deprecated and will be removed in Doctrine ORM~i',
         '~The "Symfony\\\Component\\\HttpKernel\\\DependencyInjection\\\Extension" class is considered internal~i',
+        '~Function utf8_encode\(\) is deprecated~i',
     ];
 
     private readonly string $command;
