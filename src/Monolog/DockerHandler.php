@@ -52,6 +52,11 @@ final class DockerHandler extends AbstractProcessingHandler
 
     protected function write(LogRecord $record): void
     {
+        if ('messenger' === $record->channel && 'Sending keepalive request.' === $record->message) {
+            // @todo remove as of symfony/messenger@v7.2.5 (https://github.com/symfony/symfony/pull/59908)
+            return;
+        }
+
         if ('deprecation' === $record->channel) {
             foreach (self::EXCLUDED_DEPRECATION_LOGS as $excludedDeprecationLog) {
                 if (preg_match($excludedDeprecationLog, $record->message)) {
