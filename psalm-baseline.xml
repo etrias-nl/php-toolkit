@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="6.9.5@b9989c566097cd8a1cdc0378977938c8deb90545">
+<files psalm-version="6.10.0@9c0add4eb88d4b169ac04acb7c679918cbb9c252">
   <file src="src/Http/LoggerPlugin.php">
     <DeprecatedMethod>
       <code><![CDATA[formatResponse]]></code>
