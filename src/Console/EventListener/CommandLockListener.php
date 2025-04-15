@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Etrias\PhpToolkit\Console\EventListener;
 
 use Etrias\PhpToolkit\Console\LockableCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,14 +31,22 @@ final class CommandLockListener implements EventSubscriberInterface
         $this->lock = $this->lockFactory->createLock($command->getLockResource($event->getInput()), $command->getLockTtl($event->getInput()));
 
         if (!$this->lock->acquire()) {
-            throw new \RuntimeException('Cannot acquire lock for command "'.$command->getName().'".');
+            $event->disableCommand();
         }
     }
 
-    public function releaseLock(): void
+    public function releaseLock(ConsoleTerminateEvent $event): void
     {
-        $this->lock?->release();
+        if (null === $this->lock) {
+            return;
+        }
+
+        $this->lock->release();
         $this->lock = null;
+
+        if (ConsoleCommandEvent::RETURN_CODE_DISABLED === $event->getExitCode()) {
+            $event->setExitCode(Command::SUCCESS);
+        }
     }
 
     public static function getSubscribedEvents(): array
