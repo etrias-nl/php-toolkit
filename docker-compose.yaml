@@ -4,7 +4,7 @@ x-healthcheck: &x-healthcheck
 
 services:
     nats:
-        image: 'nats:2.10.26-alpine'
+        image: 'nats:2.10.28-alpine'
         command:
             - '--jetstream'
         healthcheck:
