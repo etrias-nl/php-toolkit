@@ -28,7 +28,7 @@ jobs:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
             -
-                uses: ScribeMD/docker-cache@0.5.0
+                uses: AndreKurait/docker-cache@0.6.0
                 with:
                     key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yaml') }}
             -
