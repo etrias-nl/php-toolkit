@@ -39,15 +39,11 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             try {
                 $this->setWaitTimeout();
             } catch (\Exception) {
-                $this->reset();
+                $this->close();
                 $this->setWaitTimeout();
             }
 
-            try {
-                return $stack->next()->handle($envelope, $stack);
-            } finally {
-                $this->reset();
-            }
+            return $stack->next()->handle($envelope, $stack);
         }
 
         /** @var EntityManagerInterface $entityManager */
@@ -58,7 +54,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             $connection->beginTransaction();
             $this->setWaitTimeout();
         } catch (\Exception) {
-            $this->reset();
+            $this->close();
             $connection->beginTransaction();
             $this->setWaitTimeout();
         }
@@ -78,12 +74,8 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             // When a handler fails, the queries of allegedly successful previous handlers just got rolled back.
             throw new HandlerFailedException($exception->getEnvelope()->withoutAll(HandledStamp::class), $exception->getWrappedExceptions());
         } finally {
-            try {
-                if (!$successful && $connection->isTransactionActive()) {
-                    $connection->rollBack();
-                }
-            } finally {
-                $this->reset();
+            if (!$successful && $connection->isTransactionActive()) {
+                $connection->rollBack();
             }
         }
     }
@@ -101,15 +93,11 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
-    private function reset(): void
+    private function close(): void
     {
         /** @var Connection $connection */
         foreach ($this->managerRegistry->getConnections() as $connection) {
             $connection->close();
-        }
-
-        foreach ($this->managerRegistry->getManagers() as $name => $manager) {
-            $this->managerRegistry->resetManager($name);
         }
     }
 }
