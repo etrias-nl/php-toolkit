@@ -316,7 +316,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 
     public function getMessageCount(): int
     {
-        $count = $this->getConsumer()->info()?->num_pending ?? throw new TransportException('Unable to get message count');
+        $info = $this->getConsumer()->info();
+        $count = $info?->num_pending ?? throw new TransportException('Unable to get pending message count');
+        $count += $info?->num_ack_pending ?? throw new TransportException('Unable to get running message count');
 
         return $count + ($this->fallbackTransport?->getMessageCount() ?? 0);
     }
