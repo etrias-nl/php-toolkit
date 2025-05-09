@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
+use Etrias\PhpToolkit\Console\EventListener\CommandLogListener;
 use Etrias\PhpToolkit\Messenger\Stamp\OriginTransportMessageIdStamp;
 use Monolog\Attribute\AsMonologProcessor;
 use Monolog\LogRecord;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
@@ -24,6 +26,8 @@ final class LogMiddleware implements MiddlewareInterface
     public function __construct(
         #[AutowireIterator('messenger.log_processor')]
         private readonly iterable $extraEnvelopeProcessors = [],
+        #[Autowire(env: CommandLogListener::ENV_TRACE_ID)]
+        private readonly ?string $traceId = null,
     ) {}
 
     public function __invoke(LogRecord $record): LogRecord
@@ -33,7 +37,7 @@ final class LogMiddleware implements MiddlewareInterface
         }
 
         $record->extra['messenger']['id'] = $this->currentEnvelope->last(TransportMessageIdStamp::class)?->getId() ?? spl_object_hash($this->currentEnvelope);
-        $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id;
+        $record->extra['messenger']['origin'] = $this->currentEnvelope->last(OriginTransportMessageIdStamp::class)?->id ?? $this->traceId;
         $record->extra['messenger']['message'] = $this->currentEnvelope->getMessage()::class;
 
         foreach ($this->extraEnvelopeProcessors as $processor) {
