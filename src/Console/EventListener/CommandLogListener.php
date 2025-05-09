@@ -9,6 +9,7 @@ use Monolog\LogRecord;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Uid\Uuid;
@@ -16,6 +17,8 @@ use Symfony\Component\Uid\Uuid;
 #[AsMonologProcessor]
 final class CommandLogListener implements EventSubscriberInterface
 {
+    public const ENV_TRACE_ID = 'LOG_TRACE_ID';
+
     private ?Command $currentCommand = null;
     private ?string $runId = null;
 
@@ -25,6 +28,8 @@ final class CommandLogListener implements EventSubscriberInterface
     public function __construct(
         #[AutowireIterator('cli.log_processor')]
         private readonly iterable $extraCliProcessors = [],
+        #[Autowire(env: self::ENV_TRACE_ID)]
+        private readonly ?string $traceId = null,
     ) {}
 
     public function __invoke(LogRecord $record): LogRecord
@@ -35,6 +40,10 @@ final class CommandLogListener implements EventSubscriberInterface
 
         $record->extra['cli']['command'] = $this->currentCommand->getName();
         $record->extra['cli']['run_id'] = $this->runId;
+
+        if (null !== $this->traceId) {
+            $record->extra['cli']['trace_id'] = $this->traceId;
+        }
 
         foreach ($this->extraCliProcessors as $processor) {
             $record = $processor($record, $this->currentCommand);
