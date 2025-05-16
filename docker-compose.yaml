@@ -11,7 +11,7 @@ services:
             <<: *x-healthcheck
             test: 'echo -e PING | nc localhost 4222 | grep PONG'
     php:
-        image: 'etriasnl/dev-php-fpm:8.3.21-34'
+        image: 'etriasnl/dev-php-fpm:8.3.21-35'
         user: '${HOST_UID:-0}:${HOST_GID:-0}'
         depends_on:
             nats:
