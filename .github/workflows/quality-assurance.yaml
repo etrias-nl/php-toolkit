@@ -7,8 +7,6 @@ name: Quality Assurance
     pull_request:
         branches: [ main ]
 
-permissions: write-all
-
 concurrency:
     group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
     cancel-in-progress: true
