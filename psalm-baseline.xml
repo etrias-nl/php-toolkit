@@ -12,8 +12,6 @@
   <file src="src/Messenger/EventListener/MemoryBaselineListener.php">
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[file_get_contents('/sys/fs/cgroup/memory.current')]]></code>
-      <code><![CDATA[file_get_contents('/sys/fs/cgroup/memory.swap.current')]]></code>
-      <code><![CDATA[file_get_contents('/sys/fs/cgroup/memory.zswap.current')]]></code>
     </RiskyTruthyFalsyComparison>
   </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
