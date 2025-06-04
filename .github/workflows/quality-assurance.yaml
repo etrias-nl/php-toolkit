@@ -47,6 +47,7 @@ jobs:
             -
                 run: make psalm-suppress
                 if: "!cancelled() && steps.install.outcome == 'success' && github.ref_name == 'main'"
+                continue-on-error: true
             -
                 uses: stefanzweifel/git-auto-commit-action@v5.2.0
                 with:
@@ -59,6 +60,7 @@ jobs:
                 env:
                     GH_TOKEN: ${{ github.token }}
                 if: "!cancelled() && github.event_name != 'pull_request'"
+                continue-on-error: true
             -
                 uses: actions/cache/save@v4.2.3
                 with:
