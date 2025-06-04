@@ -4,13 +4,20 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\EventListener;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 
 final class MemoryBaselineListener implements EventSubscriberInterface
 {
+    public function __construct(
+        #[Target(name: 'messenger.logger')]
+        private readonly LoggerInterface $logger,
+    ) {}
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -31,10 +38,14 @@ final class MemoryBaselineListener implements EventSubscriberInterface
         }
 
         $event->disableCommand();
-        $event->getOutput()->writeln((string) (
-            (int) trim(file_get_contents('/sys/fs/cgroup/memory.current') ?: '0')
-            + (int) trim(file_get_contents('/sys/fs/cgroup/memory.swap.current') ?: '0')
-            + (int) trim(file_get_contents('/sys/fs/cgroup/memory.zswap.current') ?: '0')
-        ));
+
+        $memory = (int) trim(file_get_contents('/sys/fs/cgroup/memory.current') ?: '0');
+        $memoryMiB = $memory / 1024 / 1024;
+
+        $this->logger->info(\sprintf('Worker baseline memory (%.2F MiB)', $memoryMiB), [
+            'memory_baseline' => $memoryMiB,
+        ]);
+
+        $event->getOutput()->writeln((string) $memory);
     }
 }

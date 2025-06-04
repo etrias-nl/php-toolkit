@@ -14,6 +14,7 @@ use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Symfony\Symfony73\Rector\Class_\InvokableCommandInputAttributeRector;
 
 return RectorConfig::configure()
     ->withCache(__DIR__.'/var/rector-cache')
@@ -47,5 +48,6 @@ return RectorConfig::configure()
         NewlineAfterStatementRector::class,
         CatchExceptionNameMatchingTypeRector::class,
         SplitDoubleAssignRector::class,
+        InvokableCommandInputAttributeRector::class,
     ])
 ;
