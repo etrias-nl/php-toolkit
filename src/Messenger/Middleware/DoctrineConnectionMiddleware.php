@@ -36,12 +36,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class) ?? new TransactionalStamp();
 
         if (!$transactional->enabled) {
-            try {
-                $this->setWaitTimeout();
-            } catch (\Exception) {
-                $this->close();
-                $this->setWaitTimeout();
-            }
+            $this->setWaitTimeout();
 
             return $stack->next()->handle($envelope, $stack);
         }
@@ -50,14 +45,8 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $entityManager = $this->managerRegistry->getManager($transactional->entityManagerName);
         $connection = $entityManager->getConnection();
 
-        try {
-            $connection->beginTransaction();
-            $this->setWaitTimeout();
-        } catch (\Exception) {
-            $this->close();
-            $connection->beginTransaction();
-            $this->setWaitTimeout();
-        }
+        $connection->beginTransaction();
+        $this->setWaitTimeout();
 
         $successful = false;
 
@@ -90,14 +79,6 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             ] as $query) {
                 $connection->executeQuery($query);
             }
-        }
-    }
-
-    private function close(): void
-    {
-        /** @var Connection $connection */
-        foreach ($this->managerRegistry->getConnections() as $connection) {
-            $connection->close();
         }
     }
 }
