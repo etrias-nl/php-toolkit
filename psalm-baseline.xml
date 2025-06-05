@@ -9,11 +9,6 @@
       <code><![CDATA[formatRequest]]></code>
     </TooManyArguments>
   </file>
-  <file src="src/Messenger/EventListener/MemoryBaselineListener.php">
-    <RiskyTruthyFalsyComparison>
-      <code><![CDATA[file_get_contents('/sys/fs/cgroup/memory.current')]]></code>
-    </RiskyTruthyFalsyComparison>
-  </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
     <PossiblyNullArgument>
       <code><![CDATA[$state->first_ts]]></code>
