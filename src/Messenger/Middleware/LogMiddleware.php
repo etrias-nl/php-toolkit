@@ -51,7 +51,7 @@ final class LogMiddleware implements MiddlewareInterface
     {
         $prevEnvelope = $this->currentEnvelope;
 
-        if (null !== $prevEnvelopeId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId()) {
+        if (null !== $prevEnvelopeId = $prevEnvelope?->last(TransportMessageIdStamp::class)?->getId() ?? $this->traceId) {
             $envelope = $envelope
                 ->withoutAll(OriginTransportMessageIdStamp::class)
                 ->with(new OriginTransportMessageIdStamp($prevEnvelopeId))
