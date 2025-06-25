@@ -12,6 +12,7 @@ use Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
 use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
+use Rector\Php83\Rector\Class_\ReadOnlyAnonymousClassRector;
 use Rector\Php83\Rector\ClassConst\AddTypeToConstRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\Symfony\Symfony73\Rector\Class_\InvokableCommandInputAttributeRector;
@@ -44,6 +45,7 @@ return RectorConfig::configure()
         UnusedForeachValueToArrayKeysRector::class,
         AddOverrideAttributeToOverriddenMethodsRector::class,
         ReadOnlyClassRector::class,
+        ReadOnlyAnonymousClassRector::class,
         AddTypeToConstRector::class,
         NewlineAfterStatementRector::class,
         CatchExceptionNameMatchingTypeRector::class,
