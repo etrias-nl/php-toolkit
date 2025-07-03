@@ -34,12 +34,14 @@ final class HttpMessageFormatter implements Formatter
     public function __construct(
         #[Autowire(param: 'kernel.debug')]
         private readonly bool $debug,
+        #[Autowire(env: 'int:SHELL_VERBOSITY')]
+        private readonly int $verbosity,
     ) {}
 
     public function formatRequest(RequestInterface $request, ?\Throwable $error = null): string
     {
         $message = \sprintf('%s %s HTTP/%s', $request->getMethod(), $request->getRequestTarget(), $request->getProtocolVersion());
-        $full = $this->debug || null !== $error;
+        $full = $this->debug || null !== $error || 3 === $this->verbosity;
 
         if (!$full) {
             return $message;
@@ -59,7 +61,7 @@ final class HttpMessageFormatter implements Formatter
     public function formatResponse(ResponseInterface $response): string
     {
         $message = \sprintf('HTTP/%s %s %s', $response->getProtocolVersion(), $response->getStatusCode(), $response->getReasonPhrase());
-        $full = $this->debug || ($response->getStatusCode() >= 400);
+        $full = $this->debug || ($response->getStatusCode() >= 400) || 3 === $this->verbosity;
 
         if (!$full) {
             return $message;
