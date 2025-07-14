@@ -35,7 +35,7 @@ final class HttpMessageFormatter implements Formatter
         #[Autowire(param: 'kernel.debug')]
         private readonly bool $debug,
         #[Autowire(env: 'int:SHELL_VERBOSITY')]
-        private readonly int $verbosity,
+        private readonly ?int $verbosity = null,
     ) {}
 
     public function formatRequest(RequestInterface $request, ?\Throwable $error = null): string
