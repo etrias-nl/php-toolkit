@@ -288,6 +288,7 @@ final class NatsTest extends TestCase
         fclose($socket);
 
         self::assertCount(1, $transport->get());
+        self::assertMessageCount(1, $transport);
 
         $socket = self::getSocket($transport);
         fclose($socket);
@@ -295,6 +296,7 @@ final class NatsTest extends TestCase
         $transport->send(Envelope::wrap((object) ['test2' => true]));
 
         self::assertCount(1, $transport->get());
+        self::assertMessageCount(2, $transport);
     }
 
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
@@ -317,7 +319,11 @@ final class NatsTest extends TestCase
 
         self::assertNotNull($client->connection);
 
-        return (new \ReflectionProperty($client->connection, 'socket'))->getValue($client->connection);
+        $socket = (new \ReflectionProperty($client->connection, 'socket'))->getValue($client->connection);
+
+        self::assertIsResource($socket);
+
+        return $socket;
     }
 
     private function noFallbackTransportFactory(): MockObject&TransportFactoryInterface
