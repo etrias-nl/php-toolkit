@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Tests\Messenger;
 
+use Basis\Nats\Client;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Persistence\ConnectionRegistry;
 use Etrias\PhpToolkit\Messenger\MessageMap;
@@ -275,6 +276,27 @@ final class NatsTest extends TestCase
         self::assertSame([], $fallbackConnection->fetchAllAssociative('select * from messenger_messages'));
     }
 
+    public function testReconnect(): void
+    {
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
+        $transport->setup();
+
+        $transport->send(Envelope::wrap((object) ['test1' => true]));
+
+        $socket = self::getSocket($transport);
+        fclose($socket);
+
+        self::assertCount(1, $transport->get());
+
+        $socket = self::getSocket($transport);
+        fclose($socket);
+
+        $transport->send(Envelope::wrap((object) ['test2' => true]));
+
+        self::assertCount(1, $transport->get());
+    }
+
     private static function assertMessageCount(int $expectedCount, NatsTransport $transport, bool $wait = true): void
     {
         if ($wait) {
@@ -283,6 +305,19 @@ final class NatsTest extends TestCase
         }
 
         self::assertSame($expectedCount, $transport->getMessageCount());
+    }
+
+    /**
+     * @return resource
+     */
+    private static function getSocket(NatsTransport $transport): mixed
+    {
+        /** @var Client $client */
+        $client = (new \ReflectionProperty($transport, 'client'))->getValue($transport);
+
+        self::assertNotNull($client->connection);
+
+        return (new \ReflectionProperty($client->connection, 'socket'))->getValue($client->connection);
     }
 
     private function noFallbackTransportFactory(): MockObject&TransportFactoryInterface
