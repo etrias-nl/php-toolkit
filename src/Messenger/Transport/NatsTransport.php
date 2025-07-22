@@ -39,6 +39,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private const REPLY_TO_FALLBACK = 'fallback';
     private const NANOSECOND = 1_000_000_000;
     private const MICROSECOND = 1_000_000;
+    private const SOCKET_TIMEOUT = 7200;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -107,7 +108,11 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 }
             }
 
-            $this->queue ??= $this->getConsumer()->getQueue();
+            if (null === $this->queue) {
+                $this->queue = $this->getConsumer()->getQueue();
+                $this->client->setTimeout(self::SOCKET_TIMEOUT);
+            }
+
             $message = $this->queue->next();
             $payload = $message->payload;
 
