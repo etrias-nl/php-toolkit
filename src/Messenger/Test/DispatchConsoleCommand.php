@@ -28,6 +28,7 @@ final class DispatchConsoleCommand extends Command
     {
         $this
             ->addOption('sync', null, InputOption::VALUE_NONE)
+            ->addOption('transport', null, InputOption::VALUE_REQUIRED)
             ->addOption('sleep', null, InputOption::VALUE_REQUIRED, '', 0)
             ->addOption('failure', null, InputOption::VALUE_NONE)
             ->addOption('nest', null, InputOption::VALUE_NONE)
@@ -80,7 +81,18 @@ final class DispatchConsoleCommand extends Command
                 }
             }
 
-            $stamps = $input->getOption('sync') ? [new TransportNamesStamp('sync')] : [];
+            $stamps = [];
+            $transport = $input->getOption('transport');
+
+            if ($input->getOption('sync')) {
+                if ($transport) {
+                    throw new \LogicException('Cannot use --sync with --transport');
+                }
+
+                $stamps[] = new TransportNamesStamp('sync');
+            } elseif ($transport) {
+                $stamps[] = new TransportNamesStamp($transport);
+            }
 
             $this->messageBus->dispatch($message, $stamps);
         }
