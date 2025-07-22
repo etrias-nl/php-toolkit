@@ -39,7 +39,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private const REPLY_TO_FALLBACK = 'fallback';
     private const NANOSECOND = 1_000_000_000;
     private const MICROSECOND = 1_000_000;
-    private const SOCKET_TIMEOUT = 7200;
+    private const SOCKET_TIMEOUT = 10_800;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
