@@ -287,9 +287,13 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             if (!$retry) {
                 usleep(self::MICROSECOND / 2);
                 $retry = $context['retry'] = true;
+                $context['initial_exception'] = $e;
+                $context['initial_last_error'] = json_encode(error_get_last());
 
                 goto do_send;
             }
+
+            $context['last_error'] = json_encode(error_get_last());
 
             if (null !== $this->fallbackTransport) {
                 $context['fallback'] = true;
@@ -301,6 +305,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                     goto sent;
                 } catch (\Throwable $fallbackException) {
                     $context['fallback_exception'] = $fallbackException;
+                    $context['fallback_last_error'] = json_encode(error_get_last());
                 }
             }
 
