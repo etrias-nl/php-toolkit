@@ -89,6 +89,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
     }
 
+    /**
+     * @return list<Envelope>
+     */
     public function get(): array
     {
         try {
