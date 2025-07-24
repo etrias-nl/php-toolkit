@@ -15,7 +15,10 @@ use Monolog\Processor\PsrLogMessageProcessor;
 final class DockerHandler extends AbstractProcessingHandler
 {
     private const EXCLUDED_DEPRECATION_LOGS = [
+        // @doctrine/orm:2
         '~The "Symfony\\\Component\\\HttpKernel\\\DependencyInjection\\\Extension" class is considered internal~i',
+        // @doctrine/orm:3.5
+        '~Access to ClassMetadata::\$reflFields is deprecated~i',
     ];
 
     private readonly string $command;
