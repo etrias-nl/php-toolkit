@@ -21,7 +21,7 @@ jobs:
             -
                 uses: actions/checkout@v4.2.2
             -
-                uses: actions/cache/restore@v4.2.3
+                uses: actions/cache/restore@v4.2.4
                 with:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
@@ -62,7 +62,7 @@ jobs:
                 if: "!cancelled() && github.event_name != 'pull_request'"
                 continue-on-error: true
             -
-                uses: actions/cache/save@v4.2.3
+                uses: actions/cache/save@v4.2.4
                 with:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.ref_name }}
