@@ -25,6 +25,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
         private readonly int $waitTimeout = 28800,
+        private readonly int $maxExecutionTime = 3600,
     ) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -36,7 +37,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $transactional = $this->messageMap->getStamp($envelope, TransactionalStamp::class) ?? new TransactionalStamp();
 
         if (!$transactional->enabled) {
-            $this->setWaitTimeout();
+            $this->setLimits();
 
             return $stack->next()->handle($envelope, $stack);
         }
@@ -46,7 +47,7 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         $connection = $entityManager->getConnection();
 
         $connection->beginTransaction();
-        $this->setWaitTimeout();
+        $this->setLimits();
 
         $successful = false;
 
@@ -69,13 +70,14 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
-    private function setWaitTimeout(): void
+    private function setLimits(): void
     {
         /** @var Connection $connection */
         foreach ($this->managerRegistry->getConnections() as $connection) {
             foreach ([
                 'SET SESSION wait_timeout = '.$this->waitTimeout,
                 'SET SESSION interactive_timeout = '.$this->waitTimeout,
+                'SET SESSION max_execution_time = '.($this->maxExecutionTime * 1000),
             ] as $query) {
                 $connection->executeQuery($query);
             }
