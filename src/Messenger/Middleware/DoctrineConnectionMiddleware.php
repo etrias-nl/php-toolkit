@@ -21,6 +21,9 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  */
 final class DoctrineConnectionMiddleware implements MiddlewareInterface
 {
+    /**
+     * @see CommandLongRunningListener::__construct()
+     */
     public function __construct(
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
@@ -70,6 +73,9 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         }
     }
 
+    /**
+     * @see CommandLongRunningListener::setLimits()
+     */
     private function setLimits(): void
     {
         /** @var Connection $connection */
