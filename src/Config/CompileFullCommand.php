@@ -19,7 +19,7 @@ final class CompileFullCommand extends Command
 {
     public function __construct(
         #[Autowire(param: 'kernel.bundles')]
-        private array $bundles,
+        private readonly array $bundles,
     ) {
         parent::__construct();
     }
