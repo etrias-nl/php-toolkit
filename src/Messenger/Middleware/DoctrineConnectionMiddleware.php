@@ -28,7 +28,6 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
         private readonly MessageMap $messageMap,
         private readonly ManagerRegistry $managerRegistry,
         private readonly int $waitTimeout = 28800,
-        private readonly int $maxExecutionTime = 3600,
     ) {}
 
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
@@ -83,7 +82,6 @@ final class DoctrineConnectionMiddleware implements MiddlewareInterface
             foreach ([
                 'SET SESSION wait_timeout = '.$this->waitTimeout,
                 'SET SESSION interactive_timeout = '.$this->waitTimeout,
-                'SET SESSION max_execution_time = '.($this->maxExecutionTime * 1000),
             ] as $query) {
                 $connection->executeQuery($query);
             }

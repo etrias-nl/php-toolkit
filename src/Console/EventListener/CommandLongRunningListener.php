@@ -20,7 +20,6 @@ final class CommandLongRunningListener implements EventSubscriberInterface
     public function __construct(
         private readonly ManagerRegistry $managerRegistry,
         private readonly int $doctrineWaitTimeout = 28800,
-        private readonly int $doctrineMaxExecutionTime = 3600,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -49,7 +48,6 @@ final class CommandLongRunningListener implements EventSubscriberInterface
             foreach ([
                 'SET SESSION wait_timeout = '.$this->doctrineWaitTimeout,
                 'SET SESSION interactive_timeout = '.$this->doctrineWaitTimeout,
-                'SET SESSION max_execution_time = '.($this->doctrineMaxExecutionTime * 1000),
             ] as $query) {
                 $connection->executeQuery($query);
             }
