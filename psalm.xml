@@ -29,6 +29,9 @@
         <function name="dump"/>
         <function name="empty"/>
         <function name="is_null"/>
+        <function name="strtok"/>
+        <function name="getenv"/>
+        <function name="putenv"/>
     </forbiddenFunctions>
     <issueHandlers>
         <UnusedForeachValue errorLevel="suppress"/>
