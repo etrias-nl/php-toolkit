@@ -19,8 +19,6 @@ final class DockerHandler extends AbstractProcessingHandler
         '~The "Symfony\\\Component\\\HttpKernel\\\DependencyInjection\\\Extension" class is considered internal~i',
         // @doctrine/orm:3.5
         '~Access to ClassMetadata::\$reflFields is deprecated~i',
-        // @symfony/doctrine-messeger:7.3
-        '~Detection of modified indexes is deprecated~i',
     ];
 
     private readonly string $command;
