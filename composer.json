@@ -11,6 +11,8 @@
         "doctrine/orm": "^2",
         "monolog/monolog": "^3",
         "php-http/client-common": "^2",
+        "php-soap/ext-soap-engine": "^1",
+        "phpro/soap-client": "^4",
         "symfony/cache": "^7",
         "symfony/console": "^7",
         "symfony/dependency-injection": "^7",
@@ -35,6 +37,11 @@
     "autoload-dev": {
         "psr-4": {
             "Etrias\\PhpToolkit\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": false
         }
     }
 }
