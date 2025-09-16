@@ -9,6 +9,7 @@
         "basis-company/nats": "^1",
         "doctrine/migrations": "^3",
         "doctrine/orm": "^2",
+        "guzzlehttp/guzzle": "^7",
         "monolog/monolog": "^3",
         "php-http/client-common": "^2",
         "php-soap/ext-soap-engine": "^1",
