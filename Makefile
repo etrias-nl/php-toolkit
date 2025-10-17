@@ -17,8 +17,6 @@ lint:
 cs-fix:
 	${run_app} sh -c "php-cs-fixer fix --show-progress=none"
 psalm:
-	${run_app} sh -c "psalm --no-progress"
-psalm-suppress:
 	${run_app} sh -c "psalm --no-progress --set-baseline=psalm-baseline.xml"
 test:
 	${run_app_deps} sh -c "phpunit"
