@@ -36,7 +36,7 @@ jobs:
                 run: make lint
                 if: "!cancelled() && steps.install.outcome == 'success'"
             -
-                run: make cs-fix
+                run: make cs
                 if: "!cancelled() && steps.install.outcome == 'success' && github.ref_name == 'main'"
             -
                 run: make psalm
