@@ -13,16 +13,16 @@ final class CacheInfo
      */
     public function __construct(
         array|object|string $key,
-        public readonly null|\DateInterval|\DateTimeInterface|int $ttl = null,
+        public readonly \DateInterval|\DateTimeInterface|int|null $ttl = null,
         public readonly array $tags = [],
     ) {
         $this->key = \is_string($key) ? $key : hash('xxh128', serialize($key));
     }
 
-    public static function makeTag(null|int|string $segment, null|int|string ...$segments): string
+    public static function makeTag(int|string|null $segment, int|string|null ...$segments): string
     {
         return implode('_', array_filter(
-            array_map(static fn (null|int|string $segment): string => str_replace('\\', '-', (string) $segment), [$segment, ...$segments]),
+            array_map(static fn (int|string|null $segment): string => str_replace('\\', '-', (string) $segment), [$segment, ...$segments]),
             static fn (string $segment): bool => '' !== $segment
         ));
     }
