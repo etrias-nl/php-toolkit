@@ -6,6 +6,7 @@ namespace Etrias\PhpToolkit\Messenger\EventListener;
 
 use Etrias\PhpToolkit\Messenger\Stamp\RejectDelayStamp;
 use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,10 +41,14 @@ final class RejectDelayListener implements EventSubscriberInterface
             }
         }
 
+        if ($exception instanceof NetworkExceptionInterface) {
+            return 300_000;
+        }
+
         if ($exception instanceof ClientExceptionInterface && method_exists($exception, 'getResponse')) {
             $response = $exception->getResponse();
 
-            if ($response instanceof ResponseInterface && Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode()) {
+            if ($response instanceof ResponseInterface && (Response::HTTP_TOO_MANY_REQUESTS === $response->getStatusCode() || $response->hasHeader('retry-after'))) {
                 $retryAfter = (int) ($response->getHeader('retry-after')[0] ?? 300);
 
                 if ($retryAfter > 0) {
