@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Etrias\PhpToolkit\Messenger\Test;
+namespace Etrias\PhpToolkit\Messenger\Console;
 
+use Etrias\PhpToolkit\Messenger\Test\DummyMessage;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Dumper;
@@ -15,8 +16,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
-#[AsCommand(name: 'messenger-test:dispatch')]
-final class DispatchConsoleCommand extends Command
+#[AsCommand(name: 'test:messenger:dispatch')]
+final class TestDispatchCommand extends Command
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
