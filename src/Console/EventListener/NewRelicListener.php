@@ -20,8 +20,7 @@ final class NewRelicListener implements EventSubscriberInterface
 
         if (null === $command || $command instanceof LongRunningCommand || $command instanceof ConsumeMessagesCommand || $command instanceof DoctrineCommand) {
             if (!$this->transactionActive) {
-                // @see https://docs.newrelic.com/docs/apm/agents/php-agent/troubleshooting/performance-issues-long-running-task/
-                newrelic_end_transaction();
+                newrelic_ignore_transaction();
             }
 
             return;
