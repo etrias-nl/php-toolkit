@@ -7,6 +7,7 @@ namespace Etrias\PhpToolkit\Console\EventListener;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Etrias\PhpToolkit\Console\LongRunningCommand;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 
@@ -38,10 +39,23 @@ final class NewRelicListener implements EventSubscriberInterface
         $this->transactionActive = true;
     }
 
+    public function errorTransaction(ConsoleErrorEvent $event): void
+    {
+        if ($this->transactionActive) {
+            newrelic_notice_error($event->getError());
+
+            return;
+        }
+
+        newrelic_ignore_transaction();
+        newrelic_end_transaction();
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             ConsoleCommandEvent::class => ['startTransaction', -2048],
+            ConsoleErrorEvent::class => ['errorTransaction', 2048],
         ];
     }
 }
