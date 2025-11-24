@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Soap;
 
-use Phpro\SoapClient\Caller\Caller;
 use Phpro\SoapClient\Caller\EngineCaller;
 use Psr\Http\Client\ClientInterface;
 use Soap\ExtSoapEngine\ExtSoapEngineFactory;
@@ -18,7 +17,7 @@ final class SoapCallerFactory
         private readonly WsdlProvider $wsdlProvider,
     ) {}
 
-    public function create(string $wsdl, ClientInterface $client, array $options = []): Caller
+    public function create(string $wsdl, ClientInterface $client, array $options = []): EngineCaller
     {
         $soapOptions = ExtSoapOptions::defaults($wsdl, $options);
         $soapOptions->disableWsdlCache();
