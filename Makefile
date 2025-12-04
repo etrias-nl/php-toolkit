@@ -6,6 +6,12 @@ run=${compose} run --quiet-pull --rm
 run_app=${run} --no-deps php
 run_app_deps=${run} php
 
+ifeq ($(CI),true)
+	psalm_flags=--set-baseline=psalm-baseline.xml
+else
+	psalm_flags=
+endif
+
 composer-update:
 	${run_app} sh -c "composer update --no-progress -n && composer --working-dir=/usr/local/etc/tools normalize /app/composer.json && composer validate"
 cli:
@@ -17,7 +23,7 @@ lint:
 cs:
 	${run_app} sh -c "php-cs-fixer fix --show-progress=none"
 psalm:
-	${run_app} sh -c "psalm --no-progress --set-baseline=psalm-baseline.xml"
+	${run_app} sh -c "psalm --no-progress ${psalm_flags}"
 test:
 	${run_app_deps} sh -c "phpunit"
 rector:

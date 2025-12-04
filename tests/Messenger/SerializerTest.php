@@ -23,8 +23,6 @@ final class SerializerTest extends TestCase
         $envelope = Envelope::wrap($message, [$messageIdStamp]);
         $encodedEnvelope = $deflateSerializer->encode($envelope);
 
-        self::assertArrayHasKey('body', $encodedEnvelope);
-        self::assertIsString($encodedEnvelope['body']);
         self::assertSame($encodedEnvelope['body'], hex2bin(bin2hex($encodedEnvelope['body'])));
 
         $assertDecodedEnvelope = static function (Envelope $decodedEnvelope) use ($message, $messageIdStamp): void {

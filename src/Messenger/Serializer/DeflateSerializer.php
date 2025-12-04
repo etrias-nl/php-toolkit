@@ -17,17 +17,16 @@ final class DeflateSerializer implements SerializerInterface
 
     public function decode(array $encodedEnvelope): Envelope
     {
-        return $this->serializer->decode(array_map(
-            static fn (string $value): string => (false === $inflated = @gzinflate($value)) ? $value : $inflated,
-            $encodedEnvelope
-        ));
+        $encodedEnvelope['body'] = (false === $inflated = @gzinflate($encodedEnvelope['body'])) ? $encodedEnvelope['body'] : $inflated;
+
+        return $this->serializer->decode($encodedEnvelope);
     }
 
     public function encode(Envelope $envelope): array
     {
-        return array_map(
-            static fn (string $value): string => (false === $deflated = gzdeflate($value)) ? $value : $deflated,
-            $this->serializer->encode($envelope)
-        );
+        $encoded = $this->serializer->encode($envelope);
+        $encoded['body'] = (false === $deflated = gzdeflate($encoded['body'])) ? $encoded['body'] : $deflated;
+
+        return $encoded;
     }
 }
