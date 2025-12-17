@@ -37,7 +37,7 @@ final class NatsTest extends TestCase
 {
     public function testTransportFactory(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
 
         self::assertTrue($factory->supports('nats://foo', []));
         self::assertFalse($factory->supports('natss://foo', []));
@@ -114,7 +114,7 @@ final class NatsTest extends TestCase
 
     public function testDeduplication(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -171,7 +171,7 @@ final class NatsTest extends TestCase
     #[TestWith([false])]
     public function testRedelivery(bool $enabled): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.4&stream='.uniqid(__FUNCTION__), ['redeliver' => $enabled], new PhpSerializer());
         $transport->setup();
 
@@ -228,7 +228,7 @@ final class NatsTest extends TestCase
 
     public function testKeepalive(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&ack_wait=0.2&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 
@@ -256,7 +256,7 @@ final class NatsTest extends TestCase
         $connectionRegistry = $this->createMock(ConnectionRegistry::class);
         $connectionRegistry->expects(self::once())->method('getConnection')->willReturn($fallbackConnection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]));
         $fallbackFactory = new DoctrineTransportFactory($connectionRegistry);
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $fallbackFactory);
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $fallbackFactory);
         $transport = $factory->createTransport('nats://foo?timeout=1&stream='.uniqid(__FUNCTION__), ['fallback_transport' => ['doctrine://foo', [], new PhpSerializer()]], new PhpSerializer());
 
         $envelope = $transport->send(Envelope::wrap((object) ['test1' => true]));
@@ -278,7 +278,7 @@ final class NatsTest extends TestCase
 
     public function testReconnect(): void
     {
-        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createMock(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), $this->createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
         $transport = $factory->createTransport('nats://nats?replicas=1&stream='.uniqid(__FUNCTION__), [], new PhpSerializer());
         $transport->setup();
 

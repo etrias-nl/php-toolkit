@@ -52,7 +52,7 @@ final class SecurityTest extends TestCase
                 }
             },
         ]);
-        $requestStack = new RequestStack();
+        $requestStack = new RequestStack([new Request([], [], ['_firewall_context' => 'main'])]);
         $firewallMap = new FirewallMap(new ServiceLocator([
             'main' => static fn (): FirewallContext => new FirewallContext([], null, null, new FirewallConfig('main', 'user_checker', null, true, false, 'user_provider')),
         ]), [
@@ -93,7 +93,6 @@ final class SecurityTest extends TestCase
 
         $token = new PreAuthenticatedToken(new InMemoryUser('CurrentTestUser', null), 'main');
         $tokenStorage->setToken($token);
-        $requestStack->push(new Request([], [], ['_firewall_context' => 'main']));
 
         $envelope = $bus->dispatch((object) ['test3' => true]);
 
