@@ -7,7 +7,6 @@
     errorBaseline="psalm-baseline.xml"
     findUnusedCode="false"
     findUnusedVariablesAndParams="true"
-    findUnusedBaselineEntry="false"
     findUnusedPsalmSuppress="true"
     ensureOverrideAttribute="false"
     strictBinaryOperands="false"

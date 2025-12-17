@@ -1,5 +1,6 @@
 MAKEFLAGS += --warn-undefined-variables --always-make
 .DEFAULT_GOAL := _
+CI ?= false
 
 compose=docker compose
 run=${compose} run --quiet-pull --rm
