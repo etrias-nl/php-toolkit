@@ -45,7 +45,7 @@ jobs:
                 run: make test
                 if: "!cancelled() && steps.install.outcome == 'success'"
             -
-                uses: stefanzweifel/git-auto-commit-action@v7.0.0
+                uses: stefanzweifel/git-auto-commit-action@v7.1.0
                 with:
                     commit_user_name: etrias
                     commit_user_email: etrias@users.noreply.github.com
