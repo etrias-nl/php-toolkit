@@ -8,6 +8,7 @@
     findUnusedCode="false"
     findUnusedVariablesAndParams="true"
     findUnusedPsalmSuppress="true"
+    findUnusedBaselineEntry="false"
     ensureOverrideAttribute="false"
     strictBinaryOperands="false"
     autoloader="/usr/local/etc/tools/vendor/autoload.php"
