@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Uuid;
 #[AsMonologProcessor]
 final class CommandLogListener implements EventSubscriberInterface
 {
-    public const ENV_TRACE_ID = 'LOG_TRACE_ID';
+    public const string ENV_TRACE_ID = 'LOG_TRACE_ID';
 
     private ?Command $currentCommand = null;
     private ?string $runId = null;

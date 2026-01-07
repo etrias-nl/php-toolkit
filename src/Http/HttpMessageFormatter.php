@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class HttpMessageFormatter implements Formatter
 {
-    private const SENSITIVE_REQUEST_HEADERS = [
+    private const array SENSITIVE_REQUEST_HEADERS = [
         'authorization',
         'proxy-authorization',
         'www-authenticate',
@@ -24,7 +24,7 @@ final class HttpMessageFormatter implements Formatter
         'api-key',
         'api_key',
     ];
-    private const NON_SENSITIVE_RESPONSE_HEADERS = [
+    private const array NON_SENSITIVE_RESPONSE_HEADERS = [
         'content-type',
         'retry-after',
         'x-request-id',

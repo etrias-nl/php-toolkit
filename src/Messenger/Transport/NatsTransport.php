@@ -34,12 +34,12 @@ use Symfony\Component\Uid\Uuid;
 
 final class NatsTransport implements TransportInterface, MessageCountAwareInterface, SetupableTransportInterface, KeepaliveReceiverInterface
 {
-    private const HEADER_MESSAGE_ID = 'Nats-Msg-Id';
-    private const HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
-    private const REPLY_TO_FALLBACK = 'fallback';
-    private const NANOSECOND = 1_000_000_000;
-    private const MICROSECOND = 1_000_000;
-    private const SOCKET_TIMEOUT = 10_800;
+    private const string HEADER_MESSAGE_ID = 'Nats-Msg-Id';
+    private const string HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
+    private const string REPLY_TO_FALLBACK = 'fallback';
+    private const int NANOSECOND = 1_000_000_000;
+    private const int MICROSECOND = 1_000_000;
+    private const int SOCKET_TIMEOUT = 10_800;
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;

@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 #[AsMonologProcessor]
 final class RequestIdProcessor implements EventSubscriberInterface
 {
-    private const REQUEST_ID_HEADER = 'X-Request-ID';
+    private const string REQUEST_ID_HEADER = 'X-Request-ID';
 
     public function __construct(
         private readonly RequestStack $requestStack,
