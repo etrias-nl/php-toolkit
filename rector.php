@@ -47,7 +47,6 @@ return RectorConfig::configure()
         AddOverrideAttributeToOverriddenMethodsRector::class,
         ReadOnlyClassRector::class,
         ReadOnlyAnonymousClassRector::class,
-        AddTypeToConstRector::class,
         NewlineAfterStatementRector::class,
         NewlineBetweenClassLikeStmtsRector::class,
         CatchExceptionNameMatchingTypeRector::class,
