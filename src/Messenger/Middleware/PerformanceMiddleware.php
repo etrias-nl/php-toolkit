@@ -24,7 +24,7 @@ final class PerformanceMiddleware implements MiddlewareInterface
     {
         if (null === $envelope->last(ReceivedStamp::class)) {
             $hasSender = false;
-            foreach ($this->sendersLocator->getSenders($envelope) as $sender) {
+            foreach ($this->sendersLocator->getSenders($envelope) as $_) {
                 $hasSender = true;
 
                 break;

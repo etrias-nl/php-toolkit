@@ -29,7 +29,4 @@
         <function name="getenv"/>
         <function name="putenv"/>
     </forbiddenFunctions>
-    <issueHandlers>
-        <UnusedForeachValue errorLevel="suppress"/>
-    </issueHandlers>
 </psalm>
