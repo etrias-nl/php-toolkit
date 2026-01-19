@@ -17,6 +17,7 @@ final class DockerHandler extends AbstractProcessingHandler
     private const array EXCLUDED_DEPRECATION_LOGS = [
         // @symfony:7.4
         '~XML configuration format is deprecated~i',
+        '~Request::get\(\) is deprecated~i',
         // @doctrine/orm:2
         '~The "Symfony\\\Component\\\HttpKernel\\\DependencyInjection\\\Extension" class is considered internal~i',
         // @doctrine/orm:3.5
