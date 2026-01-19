@@ -18,6 +18,7 @@ final class DockerHandler extends AbstractProcessingHandler
         // @symfony:7.4
         '~XML configuration format is deprecated~i',
         '~Request::get\(\) is deprecated~i',
+        '~Support for evaluating options in the base Constraint class is deprecated~i',
         // @doctrine/orm:2
         '~The "Symfony\\\Component\\\HttpKernel\\\DependencyInjection\\\Extension" class is considered internal~i',
         // @doctrine/orm:3.5
