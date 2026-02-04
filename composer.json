@@ -6,7 +6,7 @@
         "php": "^8.3"
     },
     "require-dev": {
-        "basis-company/nats": "1.1.2",
+        "basis-company/nats": "dev-handle-404",
         "doctrine/migrations": "^3",
         "doctrine/orm": "^2",
         "guzzlehttp/guzzle": "^7",
@@ -44,5 +44,11 @@
         "allow-plugins": {
             "php-http/discovery": false
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/chazzbg/nats.php"
+        }
+    ]
 }
