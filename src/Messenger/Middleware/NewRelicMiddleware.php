@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Etrias\PhpToolkit\Messenger\Middleware;
 
+use Etrias\PhpToolkit\Messenger\MessageMap;
+use Etrias\PhpToolkit\Messenger\Stamp\NewRelicStamp;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
@@ -14,9 +16,19 @@ final class NewRelicMiddleware implements MiddlewareInterface
 {
     private bool $transactionActive = false;
 
+    public function __construct(
+        private readonly MessageMap $messageMap,
+    ) {}
+
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         if ($this->transactionActive || null === $envelope->last(ConsumedByWorkerStamp::class)) {
+            return $stack->next()->handle($envelope, $stack);
+        }
+
+        $newRelic = $this->messageMap->getStamp($envelope, NewRelicStamp::class) ?? new NewRelicStamp();
+
+        if (!$newRelic->enabled) {
             return $stack->next()->handle($envelope, $stack);
         }
 
