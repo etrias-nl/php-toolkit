@@ -44,9 +44,6 @@
         "allow-plugins": {
             "php-http/discovery": false
         },
-        "audit": {
-            "abandoned": "report"
-        },
         "sort-packages": true
     }
 }
