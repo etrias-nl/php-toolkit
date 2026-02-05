@@ -1,0 +1,27 @@
+# THIS FILE IS AUTO GENERATED. DO NOT CHANGE!
+name: Composer Diff
+
+'on':
+    pull_request:
+        paths: [ composer.lock ]
+
+jobs:
+    composer-diff:
+        runs-on: ubuntu-latest
+        steps:
+            -
+                uses: actions/checkout@v6.0.2
+                with:
+                    fetch-depth: 0 # Required to make it possible to compare with PR base branch
+            -
+                id: composer_diff
+                uses: IonBazan/composer-diff-action@v1.2.0
+                with:
+                    with-links: true
+            -
+                uses: marocchino/sticky-pull-request-comment@v2.9.4
+                if: ${{ steps.composer_diff.outputs.composer_diff_exit_code != 0 }}
+                with:
+                    header: composer-diff
+                    message: |
+                        ${{ steps.composer_diff.outputs.composer_diff }}
