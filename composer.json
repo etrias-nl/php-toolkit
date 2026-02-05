@@ -3,32 +3,32 @@
     "description": "Common PHP Tooling",
     "license": "MIT",
     "require": {
-        "php": "^8.3"
+        "php": "~8.3.30"
     },
     "require-dev": {
-        "basis-company/nats": "^1",
-        "doctrine/migrations": "^3",
-        "doctrine/orm": "^2",
-        "guzzlehttp/guzzle": "^7",
-        "monolog/monolog": "^3",
-        "php-http/client-common": "^2",
-        "php-soap/ext-soap-engine": "^1",
-        "phpro/soap-client": "^4",
-        "symfony/cache": "^7",
-        "symfony/console": "^7",
-        "symfony/dependency-injection": "^7",
-        "symfony/doctrine-bridge": "^7",
-        "symfony/doctrine-messenger": "^7",
-        "symfony/event-dispatcher": "^7",
-        "symfony/http-foundation": "^7",
-        "symfony/lock": "^7",
-        "symfony/messenger": "^7",
-        "symfony/property-access": "^7",
-        "symfony/security-bundle": "^7",
-        "symfony/serializer": "^7",
-        "symfony/stopwatch": "^7",
-        "symfony/uid": "^7",
-        "symfony/var-dumper": "^7"
+        "basis-company/nats": "^1.1.4",
+        "doctrine/migrations": "^3.9.5",
+        "doctrine/orm": "^2.20.9",
+        "guzzlehttp/guzzle": "^7.10.0",
+        "monolog/monolog": "^3.10.0",
+        "php-http/client-common": "^2.7.3",
+        "php-soap/ext-soap-engine": "^1.9.0",
+        "phpro/soap-client": "^4.6.0",
+        "symfony/cache": "^7.4.5",
+        "symfony/console": "^7.4.4",
+        "symfony/dependency-injection": "^7.4.5",
+        "symfony/doctrine-bridge": "^7.4.4",
+        "symfony/doctrine-messenger": "^7.4.5",
+        "symfony/event-dispatcher": "^7.4.4",
+        "symfony/http-foundation": "^7.4.5",
+        "symfony/lock": "^7.4.5",
+        "symfony/messenger": "^7.4.4",
+        "symfony/property-access": "^7.4.4",
+        "symfony/security-bundle": "^7.4.4",
+        "symfony/serializer": "^7.4.5",
+        "symfony/stopwatch": "^7.4.0",
+        "symfony/uid": "^7.4.4",
+        "symfony/var-dumper": "^7.4.4"
     },
     "autoload": {
         "psr-4": {
@@ -43,6 +43,10 @@
     "config": {
         "allow-plugins": {
             "php-http/discovery": false
-        }
+        },
+        "audit": {
+            "abandoned": "report"
+        },
+        "sort-packages": true
     }
 }

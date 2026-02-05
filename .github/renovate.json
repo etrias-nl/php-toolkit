@@ -2,9 +2,5 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "github>etrias-nl/renovate"
-    ],
-    "rangeStrategy": "auto",
-    "lockFileMaintenance": {
-        "enabled": false
-    }
+    ]
 }

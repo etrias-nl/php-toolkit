@@ -31,7 +31,7 @@ jobs:
                     key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yaml') }}
             -
                 id: install
-                run: make composer-update
+                run: make composer-install
             -
                 run: make lint
                 if: "!cancelled() && steps.install.outcome == 'success'"
