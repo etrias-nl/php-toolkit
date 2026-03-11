@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d980aae4b32a47c7414441cb8d05be4",
+    "content-hash": "f036496ab14c36c38987008674d0aa8c",
     "packages": [],
     "packages-dev": [
         {
@@ -3461,16 +3461,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "1d06192e8f164e2729b0031e6807d72a6195b8bb"
+                "reference": "665522ec357540e66c294c08583b40ee576574f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/1d06192e8f164e2729b0031e6807d72a6195b8bb",
-                "reference": "1d06192e8f164e2729b0031e6807d72a6195b8bb",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/665522ec357540e66c294c08583b40ee576574f0",
+                "reference": "665522ec357540e66c294c08583b40ee576574f0",
                 "shasum": ""
             },
             "require": {
@@ -3541,7 +3541,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v7.4.6"
+                "source": "https://github.com/symfony/cache/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -3561,7 +3561,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-21T23:29:27+00:00"
+            "time": "2026-03-06T08:14:57+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -3798,16 +3798,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27"
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/6d643a93b47398599124022eb24d97c153c12f27",
-                "reference": "6d643a93b47398599124022eb24d97c153c12f27",
+                "url": "https://api.github.com/repos/symfony/console/zipball/e1e6770440fb9c9b0cf725f81d1361ad1835329d",
+                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d",
                 "shasum": ""
             },
             "require": {
@@ -3872,7 +3872,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.6"
+                "source": "https://github.com/symfony/console/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -3892,20 +3892,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T17:02:47+00:00"
+            "time": "2026-03-06T14:06:20+00:00"
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "a3f7d594ca53a34a7d39ae683fbca09408b0c598"
+                "reference": "0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/a3f7d594ca53a34a7d39ae683fbca09408b0c598",
-                "reference": "a3f7d594ca53a34a7d39ae683fbca09408b0c598",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db",
+                "reference": "0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db",
                 "shasum": ""
             },
             "require": {
@@ -3956,7 +3956,7 @@
             "description": "Allows you to standardize and centralize the way objects are constructed in your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dependency-injection/tree/v7.4.6"
+                "source": "https://github.com/symfony/dependency-injection/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -3976,7 +3976,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T16:50:00+00:00"
+            "time": "2026-03-03T07:48:48+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -4047,16 +4047,16 @@
         },
         {
             "name": "symfony/doctrine-bridge",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-bridge.git",
-                "reference": "710cb7313446aa5ce67e2da06c01f1640dfbdcc6"
+                "reference": "4fc5e2dd41be3c0b6321e0373072782edeff45ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/710cb7313446aa5ce67e2da06c01f1640dfbdcc6",
-                "reference": "710cb7313446aa5ce67e2da06c01f1640dfbdcc6",
+                "url": "https://api.github.com/repos/symfony/doctrine-bridge/zipball/4fc5e2dd41be3c0b6321e0373072782edeff45ed",
+                "reference": "4fc5e2dd41be3c0b6321e0373072782edeff45ed",
                 "shasum": ""
             },
             "require": {
@@ -4136,7 +4136,7 @@
             "description": "Provides integration for Doctrine with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/doctrine-bridge/tree/v7.4.6"
+                "source": "https://github.com/symfony/doctrine-bridge/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -4156,7 +4156,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-17T08:07:48+00:00"
+            "time": "2026-03-05T08:16:50+00:00"
         },
         {
             "name": "symfony/doctrine-messenger",
@@ -4549,16 +4549,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "fd97d5e926e988a363cef56fbbf88c5c528e9065"
+                "reference": "f94b3e7b7dafd40e666f0c9ff2084133bae41e81"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/fd97d5e926e988a363cef56fbbf88c5c528e9065",
-                "reference": "fd97d5e926e988a363cef56fbbf88c5c528e9065",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/f94b3e7b7dafd40e666f0c9ff2084133bae41e81",
+                "reference": "f94b3e7b7dafd40e666f0c9ff2084133bae41e81",
                 "shasum": ""
             },
             "require": {
@@ -4607,7 +4607,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v7.4.6"
+                "source": "https://github.com/symfony/http-foundation/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -4627,7 +4627,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-21T16:25:55+00:00"
+            "time": "2026-03-06T13:15:18+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -4833,16 +4833,16 @@
         },
         {
             "name": "symfony/messenger",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/messenger.git",
-                "reference": "9da6166eb98937d903ed3685b317b426c82d3496"
+                "reference": "13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/messenger/zipball/9da6166eb98937d903ed3685b317b426c82d3496",
-                "reference": "9da6166eb98937d903ed3685b317b426c82d3496",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0",
+                "reference": "13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0",
                 "shasum": ""
             },
             "require": {
@@ -4903,7 +4903,7 @@
             "description": "Helps applications send and receive messages to/from other applications or via message queues",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/messenger/tree/v7.4.6"
+                "source": "https://github.com/symfony/messenger/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -4923,7 +4923,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T16:50:00+00:00"
+            "time": "2026-03-04T13:54:41+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -6356,16 +6356,16 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v7.4.6",
+            "version": "v7.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "83c3cbd6dcb96c1dbe197499a0714f8dceb0f274"
+                "reference": "bd395bbc6fabd136a48e1a6f91b09f88b5050b0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/83c3cbd6dcb96c1dbe197499a0714f8dceb0f274",
-                "reference": "83c3cbd6dcb96c1dbe197499a0714f8dceb0f274",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/bd395bbc6fabd136a48e1a6f91b09f88b5050b0b",
+                "reference": "bd395bbc6fabd136a48e1a6f91b09f88b5050b0b",
                 "shasum": ""
             },
             "require": {
@@ -6436,7 +6436,7 @@
             "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/serializer/tree/v7.4.6"
+                "source": "https://github.com/symfony/serializer/tree/v7.4.7"
             },
             "funding": [
                 {
@@ -6456,7 +6456,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-02-25T16:50:00+00:00"
+            "time": "2026-03-06T13:15:18+00:00"
         },
         {
             "name": "symfony/service-contracts",
