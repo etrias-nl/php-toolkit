@@ -40,6 +40,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     private const int NANOSECOND = 1_000_000_000;
     private const int MICROSECOND = 1_000_000;
     private const int SOCKET_TIMEOUT = 10_800;
+    private const int MAX_DISPATCH_ATTEMPTS = 3;
+    /** @var list<int> Retry delays in microseconds (10ms, 100ms) */
+    private const array DISPATCH_RETRY_DELAYS_US = [10_000, 100_000];
 
     private ?Stream $stream = null;
     private ?Consumer $consumer = null;
@@ -158,19 +161,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
-        $retry = false;
-        do_ack:
         try {
-            $result = $this->client->dispatch($replyTo->id, '+ACK');
-            self::assertPayload($result);
+            $this->dispatchWithRetry($replyTo->id, '+ACK');
         } catch (\Throwable $e) {
-            if (!$retry) {
-                usleep(self::MICROSECOND / 2);
-                $retry = true;
-
-                goto do_ack;
-            }
-
             $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
         }
     }
@@ -205,19 +198,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $payload['delay'] = $delayMs * self::MICROSECOND;
         }
 
-        $retry = false;
-        do_reject:
         try {
-            $result = $this->client->dispatch($replyTo->id, '-NAK'.($payload ? ' '.json_encode($payload, JSON_THROW_ON_ERROR) : ''));
-            self::assertPayload($result);
+            $this->dispatchWithRetry($replyTo->id, '-NAK'.($payload ? ' '.json_encode($payload, JSON_THROW_ON_ERROR) : ''));
         } catch (\Throwable $e) {
-            if (!$retry) {
-                usleep(self::MICROSECOND / 2);
-                $retry = true;
-
-                goto do_reject;
-            }
-
             $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
         }
     }
@@ -242,19 +225,9 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             return;
         }
 
-        $retry = false;
-        do_keepalive:
         try {
-            $result = $this->client->dispatch($replyTo->id, '+WPI');
-            self::assertPayload($result);
+            $this->dispatchWithRetry($replyTo->id, '+WPI');
         } catch (\Throwable $e) {
-            if (!$retry) {
-                usleep(self::MICROSECOND / 2);
-                $retry = true;
-
-                goto do_keepalive;
-            }
-
             $this->log(Level::Error, $envelope, new TransportException($e->getMessage(), 0, $e));
         }
     }
@@ -280,22 +253,12 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
             $context['payload_normalize_exception'] = $e;
         }
 
-        $retry = false;
-        do_send:
+        $dispatched = false;
         try {
-            $result = $this->client->dispatch($this->streamName, $payload);
-            self::assertPayload($result);
+            $result = $this->dispatchWithRetry($this->streamName, $payload);
             $context['duplicate'] = $result->getValue('duplicate');
+            $dispatched = true;
         } catch (\Throwable $e) {
-            if (!$retry) {
-                usleep(self::MICROSECOND / 2);
-                $retry = $context['retry'] = true;
-                $context['initial_exception'] = $e;
-                $context['initial_last_error'] = json_encode(error_get_last());
-
-                goto do_send;
-            }
-
             $context['last_error'] = json_encode(error_get_last());
 
             if (null !== $this->fallbackTransport) {
@@ -304,22 +267,22 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 try {
                     $envelope = $envelope->withoutAll(FallbackStamp::class)->with(new FallbackStamp(new \DateTimeImmutable()));
                     $messageId = $this->fallbackTransport->send($envelope)->last(TransportMessageIdStamp::class)?->getId();
-
-                    goto sent;
+                    $dispatched = true;
                 } catch (\Throwable $fallbackException) {
                     $context['fallback_exception'] = $fallbackException;
                     $context['fallback_last_error'] = json_encode(error_get_last());
                 }
             }
 
-            $exception = new TransportException($e->getMessage(), 0, $e);
+            if (!$dispatched) {
+                $exception = new TransportException($e->getMessage(), 0, $e);
 
-            $this->log(Level::Error, $envelope, $exception, $context);
+                $this->log(Level::Error, $envelope, $exception, $context);
 
-            throw $exception;
+                throw $exception;
+            }
         }
 
-        sent:
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
 
         $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
@@ -410,6 +373,26 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         }
 
         $this->logger->log($level, $message, $context);
+    }
+
+    private function dispatchWithRetry(string $subject, string|Payload $payload): Payload
+    {
+        $lastException = null;
+        for ($attempt = 1; $attempt <= self::MAX_DISPATCH_ATTEMPTS; ++$attempt) {
+            try {
+                $result = $this->client->dispatch($subject, $payload);
+                self::assertPayload($result);
+
+                return $result;
+            } catch (\Throwable $e) {
+                $lastException = $e;
+                if ($attempt < self::MAX_DISPATCH_ATTEMPTS) {
+                    usleep(self::DISPATCH_RETRY_DELAYS_US[$attempt - 1] ?? 100_000);
+                }
+            }
+        }
+
+        throw $lastException;
     }
 
     private function unsubscribe(): void
