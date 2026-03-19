@@ -15,12 +15,12 @@ use Symfony\Component\Messenger\Exception\HandlerFailedException;
 
 final class RejectDelayListener implements EventSubscriberInterface
 {
-    private const int DEFAULT_WAIT = 300_000;
+    private const int DEFAULT_WAIT_MS = 300_000;
 
     public function onWorkerMessageFailed(WorkerMessageFailedEvent $event): void
     {
         if (null === $delayMs = $this->getDelayMs($event->getThrowable())) {
-            $delayMs = self::DEFAULT_WAIT;
+            $delayMs = self::DEFAULT_WAIT_MS;
         }
 
         $event->addStamps(new RejectDelayStamp($delayMs));
@@ -44,7 +44,7 @@ final class RejectDelayListener implements EventSubscriberInterface
         }
 
         if ($exception instanceof NetworkExceptionInterface) {
-            return self::DEFAULT_WAIT;
+            return self::DEFAULT_WAIT_MS;
         }
 
         if ($exception instanceof ClientExceptionInterface && method_exists($exception, 'getResponse')) {
