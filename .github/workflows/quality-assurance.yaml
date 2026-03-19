@@ -23,7 +23,7 @@ jobs:
                 with:
                     token: ${{ secrets.GH_TOKEN_WORKFLOW }}
             -
-                uses: actions/cache/restore@v5.0.3
+                uses: actions/cache/restore@v5.0.4
                 with:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.base_ref || github.ref_name }}
@@ -60,7 +60,7 @@ jobs:
                 if: "!cancelled() && github.event_name != 'pull_request'"
                 continue-on-error: true
             -
-                uses: actions/cache/save@v5.0.3
+                uses: actions/cache/save@v5.0.4
                 with:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.ref_name }}
