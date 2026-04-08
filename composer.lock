@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c825d761b6cc90d90eeb65b454e60a71",
+    "content-hash": "be04e591170e86d2450c1d2c69cf831d",
     "packages": [],
     "packages-dev": [
         {
@@ -68,8 +68,8 @@
             ],
             "description": "PHP Standard Library",
             "support": {
-                "issues": "https://github.com/azjezz/psl/issues",
-                "source": "https://github.com/azjezz/psl/tree/4.3.0"
+                "issues": "https://github.com/php-standard-library/php-standard-library/issues",
+                "source": "https://github.com/php-standard-library/php-standard-library/tree/4.3.0"
             },
             "funding": [
                 {
@@ -81,6 +81,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": "php-standard-library/php-standard-library",
             "time": "2026-02-24T01:58:53+00:00"
         },
         {
@@ -2857,20 +2858,20 @@
         },
         {
             "name": "phpro/soap-client",
-            "version": "4.6.0",
+            "version": "4.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpro/soap-client.git",
-                "reference": "1b14f814a838396dc67677da6eb5f674fbb8b506"
+                "reference": "e42dd62561103ffae7cddad3b286d06cc580faf9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpro/soap-client/zipball/1b14f814a838396dc67677da6eb5f674fbb8b506",
-                "reference": "1b14f814a838396dc67677da6eb5f674fbb8b506",
+                "url": "https://api.github.com/repos/phpro/soap-client/zipball/e42dd62561103ffae7cddad3b286d06cc580faf9",
+                "reference": "e42dd62561103ffae7cddad3b286d06cc580faf9",
                 "shasum": ""
             },
             "require": {
-                "azjezz/psl": "^3.0 || ^4.0",
+                "azjezz/psl": "^3.0 || ^4.0 || ^5.0",
                 "laminas/laminas-code": "^4.17.0",
                 "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
                 "php-soap/cached-engine": "~0.3",
@@ -2923,7 +2924,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpro/soap-client/issues",
-                "source": "https://github.com/phpro/soap-client/tree/4.6.0"
+                "source": "https://github.com/phpro/soap-client/tree/4.7.0"
             },
             "funding": [
                 {
@@ -2931,7 +2932,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-01-28T08:54:29+00:00"
+            "time": "2026-03-11T15:12:37+00:00"
         },
         {
             "name": "psr/cache",
