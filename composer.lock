@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c825d761b6cc90d90eeb65b454e60a71",
+    "content-hash": "fe6407dc7aee4bd7ed493cdfbc31cec3",
     "packages": [],
     "packages-dev": [
         {
@@ -68,8 +68,8 @@
             ],
             "description": "PHP Standard Library",
             "support": {
-                "issues": "https://github.com/azjezz/psl/issues",
-                "source": "https://github.com/azjezz/psl/tree/4.3.0"
+                "issues": "https://github.com/php-standard-library/php-standard-library/issues",
+                "source": "https://github.com/php-standard-library/php-standard-library/tree/4.3.0"
             },
             "funding": [
                 {
@@ -81,6 +81,7 @@
                     "type": "github"
                 }
             ],
+            "abandoned": "php-standard-library/php-standard-library",
             "time": "2026-02-24T01:58:53+00:00"
         },
         {
@@ -2397,20 +2398,20 @@
         },
         {
             "name": "php-soap/ext-soap-engine",
-            "version": "1.9.0",
+            "version": "1.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-soap/ext-soap-engine.git",
-                "reference": "cd76481c039ddf70d837a2835db3fef06fab0bb6"
+                "reference": "66a35ea255a3f4a9483a4c4e63a9a6af7bb5e350"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-soap/ext-soap-engine/zipball/cd76481c039ddf70d837a2835db3fef06fab0bb6",
-                "reference": "cd76481c039ddf70d837a2835db3fef06fab0bb6",
+                "url": "https://api.github.com/repos/php-soap/ext-soap-engine/zipball/66a35ea255a3f4a9483a4c4e63a9a6af7bb5e350",
+                "reference": "66a35ea255a3f4a9483a4c4e63a9a6af7bb5e350",
                 "shasum": ""
             },
             "require": {
-                "azjezz/psl": "^3.0 || ^4.0",
+                "azjezz/psl": "^3.0 || ^4.0 || ^5.0",
                 "ext-dom": "*",
                 "ext-soap": "*",
                 "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
@@ -2444,7 +2445,7 @@
             "description": "An ext-soap engine implementation",
             "support": {
                 "issues": "https://github.com/php-soap/ext-soap-engine/issues",
-                "source": "https://github.com/php-soap/ext-soap-engine/tree/1.9.0"
+                "source": "https://github.com/php-soap/ext-soap-engine/tree/1.10.0"
             },
             "funding": [
                 {
@@ -2452,7 +2453,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2025-12-01T07:15:53+00:00"
+            "time": "2026-03-11T15:08:22+00:00"
         },
         {
             "name": "php-soap/psr18-transport",
