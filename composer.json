@@ -13,7 +13,7 @@
         "monolog/monolog": "^3.10.0",
         "php-http/client-common": "^2.7.3",
         "php-soap/ext-soap-engine": "^1.9.0",
-        "phpro/soap-client": "^4.6.0",
+        "phpro/soap-client": "^4.8.0",
         "symfony/cache": "^7.4.8",
         "symfony/console": "^7.4.8",
         "symfony/dependency-injection": "^7.4.8",
