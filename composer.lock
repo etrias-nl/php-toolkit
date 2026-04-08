@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "def00e91b03f13ea87a2a634503788ab",
+    "content-hash": "dbab2fc1eab49c24aaff8321f3356972",
     "packages": [],
     "packages-dev": [
         {
             "name": "basis-company/nats",
-            "version": "1.1.4",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/basis-company/nats.php.git",
-                "reference": "4231d95b609308b6ced9596b3448e2f7abe5f9f7"
+                "reference": "7134854d40b2646ad3c84a0bd0f75b7c96a5a26c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/4231d95b609308b6ced9596b3448e2f7abe5f9f7",
-                "reference": "4231d95b609308b6ced9596b3448e2f7abe5f9f7",
+                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/7134854d40b2646ad3c84a0bd0f75b7c96a5a26c",
+                "reference": "7134854d40b2646ad3c84a0bd0f75b7c96a5a26c",
                 "shasum": ""
             },
             "require": {
@@ -43,7 +43,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "mit"
+                "MIT"
             ],
             "authors": [
                 {
@@ -69,9 +69,9 @@
             ],
             "support": {
                 "issues": "https://github.com/basis-company/nats.php/issues",
-                "source": "https://github.com/basis-company/nats.php/tree/1.1.4"
+                "source": "https://github.com/basis-company/nats.php/tree/1.2.1"
             },
-            "time": "2026-02-05T06:51:39+00:00"
+            "time": "2026-03-24T12:44:31+00:00"
         },
         {
             "name": "clue/stream-filter",
