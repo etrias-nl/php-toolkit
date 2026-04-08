@@ -4,86 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "deb49fba6b22e93c820298a8129eb73b",
+    "content-hash": "def00e91b03f13ea87a2a634503788ab",
     "packages": [],
     "packages-dev": [
-        {
-            "name": "azjezz/psl",
-            "version": "4.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-standard-library/php-standard-library.git",
-                "reference": "74c95be0214eb7ea39146ed00ac4eb71b45d787b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/php-standard-library/zipball/74c95be0214eb7ea39146ed00ac4eb71b45d787b",
-                "reference": "74c95be0214eb7ea39146ed00ac4eb71b45d787b",
-                "shasum": ""
-            },
-            "require": {
-                "ext-bcmath": "*",
-                "ext-intl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-sodium": "*",
-                "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
-                "revolt/event-loop": "^1.0.7"
-            },
-            "require-dev": {
-                "carthage-software/mago": "^1.6.0",
-                "infection/infection": "^0.31.2",
-                "php-coveralls/php-coveralls": "^2.7.0",
-                "phpbench/phpbench": "^1.4.0",
-                "phpunit/phpunit": "^9.6.22"
-            },
-            "suggest": {
-                "php-standard-library/phpstan-extension": "PHPStan integration",
-                "php-standard-library/psalm-plugin": "Psalm integration"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/hhvm/hsl",
-                    "name": "hhvm/hsl"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/bootstrap.php"
-                ],
-                "psr-4": {
-                    "Psl\\": "src/Psl"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "azjezz",
-                    "email": "azjezz@protonmail.com"
-                }
-            ],
-            "description": "PHP Standard Library",
-            "support": {
-                "issues": "https://github.com/php-standard-library/php-standard-library/issues",
-                "source": "https://github.com/php-standard-library/php-standard-library/tree/4.3.0"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/azjezz",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/veewee",
-                    "type": "github"
-                }
-            ],
-            "abandoned": "php-standard-library/php-standard-library",
-            "time": "2026-02-24T01:58:53+00:00"
-        },
         {
             "name": "basis-company/nats",
             "version": "1.1.4",
@@ -2399,25 +2322,25 @@
         },
         {
             "name": "php-soap/ext-soap-engine",
-            "version": "1.9.0",
+            "version": "1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-soap/ext-soap-engine.git",
-                "reference": "cd76481c039ddf70d837a2835db3fef06fab0bb6"
+                "reference": "0286784fc76add38465d6b8816aef578f1dc039b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-soap/ext-soap-engine/zipball/cd76481c039ddf70d837a2835db3fef06fab0bb6",
-                "reference": "cd76481c039ddf70d837a2835db3fef06fab0bb6",
+                "url": "https://api.github.com/repos/php-soap/ext-soap-engine/zipball/0286784fc76add38465d6b8816aef578f1dc039b",
+                "reference": "0286784fc76add38465d6b8816aef578f1dc039b",
                 "shasum": ""
             },
             "require": {
-                "azjezz/psl": "^3.0 || ^4.0",
                 "ext-dom": "*",
                 "ext-soap": "*",
                 "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
                 "php-soap/engine": "^2.16",
                 "php-soap/wsdl": "^1.14",
+                "php-standard-library/php-standard-library": "^3.0 || ^4.0 || ^5.0 || ^6.0",
                 "symfony/options-resolver": "^5.4 || ^6.0 || ^7.0 || ^8.0"
             },
             "require-dev": {
@@ -2446,7 +2369,7 @@
             "description": "An ext-soap engine implementation",
             "support": {
                 "issues": "https://github.com/php-soap/ext-soap-engine/issues",
-                "source": "https://github.com/php-soap/ext-soap-engine/tree/1.9.0"
+                "source": "https://github.com/php-soap/ext-soap-engine/tree/1.11.0"
             },
             "funding": [
                 {
@@ -2454,7 +2377,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2025-12-01T07:15:53+00:00"
+            "time": "2026-03-19T08:12:52+00:00"
         },
         {
             "name": "php-soap/psr18-transport",
