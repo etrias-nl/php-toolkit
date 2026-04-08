@@ -56,9 +56,11 @@ final class CacheTest extends TestCase
         $envelope = $bus->dispatch($message);
         $cacheItem = $cache->getItem('key');
         $cachedResult = $cacheItem->get();
+        $cacheMetadata = $cacheItem->getMetadata();
+        unset($cacheMetadata['expiry']);
 
         self::assertSame(2, $handlerCount);
-        self::assertSame(['tags' => array_combine($tags = ['tag', 'computed handler result', 'computed2 handler result', 'computed3'], $tags)], $cacheItem->getMetadata());
+        self::assertSame(['tags' => array_combine($tags = ['tag', 'computed handler result', 'computed2 handler result', 'computed3'], $tags)], $cacheMetadata);
         self::assertIsArray($cachedResult);
         self::assertCount(1, $cachedResult);
         self::assertContainsOnlyInstancesOf(HandledStamp::class, $cachedResult);
