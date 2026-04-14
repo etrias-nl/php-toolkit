@@ -19,7 +19,7 @@ jobs:
                 with:
                     with-links: true
             -
-                uses: marocchino/sticky-pull-request-comment@v3.0.3
+                uses: marocchino/sticky-pull-request-comment@v3.0.4
                 if: ${{ steps.composer_diff.outputs.composer_diff_exit_code != 0 }}
                 with:
                     header: composer-diff
