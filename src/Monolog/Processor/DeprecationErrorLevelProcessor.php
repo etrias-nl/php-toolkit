@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Etrias\PhpToolkit\Monolog;
+namespace Etrias\PhpToolkit\Monolog\Processor;
 
 use Monolog\Level;
 use Monolog\LogRecord;
