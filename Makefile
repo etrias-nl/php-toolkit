@@ -1,4 +1,4 @@
-MAKEFLAGS += --warn-undefined-variables --always-make
+MAKEFLAGS += --warn-undefined-variables --always-make --output-sync=target
 .DEFAULT_GOAL := _
 CI ?= false
 
