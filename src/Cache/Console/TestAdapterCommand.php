@@ -36,6 +36,8 @@ final class TestAdapterCommand extends Command
 
         $this->cache->save($item);
 
+        sleep(3);
+
         $fetched = $this->cache->getItem($key);
         if (!$fetched->isHit()) {
             throw new \RuntimeException('Cache item was not saved properly (cache miss)');
