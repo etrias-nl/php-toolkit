@@ -47,13 +47,6 @@ jobs:
                 run: make test
                 if: "!cancelled() && steps.install.outcome == 'success'"
             -
-                uses: stefanzweifel/git-auto-commit-action@v7.1.0
-                with:
-                    commit_user_name: etrias
-                    commit_user_email: etrias@users.noreply.github.com
-                    commit_author: etrias <etrias@users.noreply.github.com>
-                if: "!cancelled() && github.ref_name == 'main'"
-            -
                 run: gh cache delete ${{ runner.os }}-php-${{ github.ref_name }}
                 env:
                     GH_TOKEN: ${{ github.token }}
@@ -65,3 +58,10 @@ jobs:
                     path: var
                     key: ${{ runner.os }}-php-${{ github.ref_name }}
                 if: "!cancelled() && github.event_name != 'pull_request'"
+            -
+                uses: stefanzweifel/git-auto-commit-action@v7.1.0
+                with:
+                    commit_user_name: etrias
+                    commit_user_email: etrias@users.noreply.github.com
+                    commit_author: etrias <etrias@users.noreply.github.com>
+                if: "!cancelled() && github.ref_name == 'main'"
