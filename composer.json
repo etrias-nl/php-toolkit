@@ -24,7 +24,7 @@
         "symfony/lock": "^7.4.9",
         "symfony/messenger": "^7.4.11",
         "symfony/property-access": "^7.4.8",
-        "symfony/security-bundle": "^7.4.11",
+        "symfony/security-bundle": "^7.4.12",
         "symfony/serializer": "^7.4.10",
         "symfony/stopwatch": "^7.4.8",
         "symfony/uid": "^7.4.9",
