@@ -26,20 +26,18 @@ final class MessageMap
     ) {}
 
     /**
-     * @deprecated
-     *
      * @return class-string[]
      */
+    #[\Deprecated]
     public function getAvailableMessages(string $transport): array
     {
         return array_keys($this->mapping[$transport] ?? []);
     }
 
     /**
-     * @deprecated
-     *
      * @return array<string, mixed>
      */
+    #[\Deprecated]
     public function getTransportOptions(string $transport, string $message): array
     {
         return $this->mapping[$transport][$message] ?? [];

@@ -315,11 +315,11 @@ final class NatsTest extends TestCase
     private static function getSocket(NatsTransport $transport): mixed
     {
         /** @var Client $client */
-        $client = (new \ReflectionProperty($transport, 'client'))->getValue($transport);
+        $client = new \ReflectionProperty($transport, 'client')->getValue($transport);
 
         self::assertNotNull($client->connection);
 
-        $socket = (new \ReflectionProperty($client->connection, 'socket'))->getValue($client->connection);
+        $socket = new \ReflectionProperty($client->connection, 'socket')->getValue($client->connection);
 
         self::assertIsResource($socket);
 
