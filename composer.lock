@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86d0817c239a34d3225fed8ce5e0c2c7",
+    "content-hash": "bd15c34c68782c84e0644920b9c57de2",
     "packages": [],
     "packages-dev": [
         {
@@ -4566,16 +4566,16 @@
         },
         {
             "name": "phpro/soap-client",
-            "version": "6.0.0",
+            "version": "6.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpro/soap-client.git",
-                "reference": "d05275722e1f0153f9c02b6c90d0f1606fb91079"
+                "reference": "db2741f015ebd554a1e56f749d1ec3052d5bb246"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpro/soap-client/zipball/d05275722e1f0153f9c02b6c90d0f1606fb91079",
-                "reference": "d05275722e1f0153f9c02b6c90d0f1606fb91079",
+                "url": "https://api.github.com/repos/phpro/soap-client/zipball/db2741f015ebd554a1e56f749d1ec3052d5bb246",
+                "reference": "db2741f015ebd554a1e56f749d1ec3052d5bb246",
                 "shasum": ""
             },
             "require": {
@@ -4640,7 +4640,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpro/soap-client/issues",
-                "source": "https://github.com/phpro/soap-client/tree/6.0.0"
+                "source": "https://github.com/phpro/soap-client/tree/6.2.0"
             },
             "funding": [
                 {
@@ -4648,7 +4648,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-03-27T14:08:36+00:00"
+            "time": "2026-05-29T08:30:05+00:00"
         },
         {
             "name": "psr/cache",
