@@ -3,7 +3,7 @@ MAKEFLAGS += --warn-undefined-variables --always-make --output-sync=target
 CI ?= false
 
 compose=docker compose
-run=${compose} run --quiet-pull --rm
+run=${compose} run --rm
 run_app=${run} --no-deps php
 run_app_deps=${run} php
 
