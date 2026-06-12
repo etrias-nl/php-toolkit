@@ -1,0 +1,61 @@
+name: PR Cleanup
+
+'on':
+    pull_request:
+        # `closed` also fires when a PR is merged (with merged == true), so
+        # merging while a build is still running triggers cleanup as well.
+        types: [ closed ]
+
+jobs:
+    cancel-runs:
+        runs-on: ubuntu-latest
+        permissions:
+            actions: write
+            contents: read
+        steps:
+            -
+                name: 'Cancel running workflows for PR'
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GH_REPO: ${{ github.repository }}
+                    HEAD_REF: ${{ github.head_ref }}
+                    RUN_ID: ${{ github.run_id }}
+                run: |
+                    set -eu
+                    echo "Cancelling in-progress runs for ${HEAD_REF}"
+                    gh run list -R "${GH_REPO}" --branch "${HEAD_REF}" \
+                        --json databaseId,status \
+                        --jq '.[] | select(.status == "in_progress" or .status == "queued") | .databaseId' \
+                    | while read -r run_id; do
+                        if [ "${run_id}" = "${RUN_ID}" ]; then
+                            continue
+                        fi
+                        echo "Cancelling run ${run_id}"
+                        gh run cancel -R "${GH_REPO}" "${run_id}" || true
+                    done
+    delete-caches:
+        needs: [ cancel-runs ]
+        runs-on: ubuntu-latest
+        permissions:
+            actions: write
+            contents: read
+        steps:
+            -
+                name: 'Delete caches for PR'
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GH_REPO: ${{ github.repository }}
+                    BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
+                run: |
+                    set -eu
+                    gh extension install actions/gh-actions-cache
+                    echo "Fetching caches for ${BRANCH}"
+                    cache_keys=$(gh actions-cache list -R "${GH_REPO}" -B "${BRANCH}" -L 100 | cut -f 1)
+                    if [[ -z "${cache_keys}" ]]; then
+                        echo "No caches found for ${BRANCH}"
+                        exit 0
+                    fi
+                    for key in ${cache_keys}; do
+                        echo "Deleting cache ${key}"
+                        gh actions-cache delete "${key}" -R "${GH_REPO}" -B "${BRANCH}" --confirm
+                    done
