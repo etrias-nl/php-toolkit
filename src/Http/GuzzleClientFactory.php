@@ -24,7 +24,7 @@ final class GuzzleClientFactory
             $handler = new HandlerStack(static function (RequestInterface $request) use ($client): PromiseInterface {
                 $promise = $client->sendAsyncRequest($request);
 
-                return (new \ReflectionObject($promise)->getProperty('promise'))->getValue($promise);
+                return (new \ReflectionObject($promise))->getProperty('promise')->getValue($promise);
             });
         } else {
             $handler = new HandlerStack(static fn (RequestInterface $request): PromiseInterface => new FulfilledPromise($client->sendRequest($request)));
