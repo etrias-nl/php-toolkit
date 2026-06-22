@@ -24,7 +24,7 @@ final class DockerHandler extends AbstractProcessingHandler
         // @doctrine/orm:3.5
         '~Access to ClassMetadata::\$reflFields is deprecated~i',
         // @guzzlehttp/psr7:2.11
-        '~Since guzzlehttp/psr7 2\.11:~i'
+        '~Since guzzlehttp/psr7 2\.11:~i',
     ];
 
     private readonly string $command;
