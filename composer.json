@@ -3,13 +3,13 @@
     "description": "Common PHP Tooling",
     "license": "MIT",
     "require": {
-        "php": "~8.4.21"
+        "php": "~8.4.22"
     },
     "require-dev": {
         "basis-company/nats": "^1.2.1",
         "doctrine/migrations": "^3.9.7",
         "doctrine/orm": "^3.6.7",
-        "guzzlehttp/guzzle": "^7.11.0",
+        "guzzlehttp/guzzle": "^7.12.1",
         "monolog/monolog": "^3.10.0",
         "php-http/client-common": "^2.7.3",
         "php-soap/ext-soap-engine": "^1.12.0",

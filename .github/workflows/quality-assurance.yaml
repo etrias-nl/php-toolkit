@@ -19,7 +19,7 @@ jobs:
                 uses: hmarr/debug-action@v3.0.0
                 if: runner.debug == '1'
             -
-                uses: actions/checkout@v6.0.3
+                uses: actions/checkout@v7.0.0
                 with:
                     token: ${{ secrets.GH_TOKEN_WORKFLOW }}
             -
@@ -61,6 +61,7 @@ jobs:
             -
                 uses: stefanzweifel/git-auto-commit-action@v7.1.0
                 with:
+                    commit_message: '[no ci] Apply automatic changes'
                     commit_user_name: etrias
                     commit_user_email: etrias@users.noreply.github.com
                     commit_author: etrias <etrias@users.noreply.github.com>
