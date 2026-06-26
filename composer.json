@@ -9,7 +9,7 @@
         "basis-company/nats": "^1.2.1",
         "doctrine/migrations": "^3.9.7",
         "doctrine/orm": "^3.6.7",
-        "guzzlehttp/guzzle": "^7.12.1",
+        "guzzlehttp/guzzle": "^7.12.3",
         "monolog/monolog": "^3.10.0",
         "php-http/client-common": "^2.7.3",
         "php-soap/ext-soap-engine": "^1.12.0",
