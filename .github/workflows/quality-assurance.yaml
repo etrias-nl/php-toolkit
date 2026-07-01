@@ -38,9 +38,6 @@ jobs:
                 run: make -j lint
                 if: "!cancelled() && steps.install.outcome == 'success'"
             -
-                run: make cs
-                if: "!cancelled() && steps.install.outcome == 'success' && github.ref_name == 'main'"
-            -
                 run: make psalm
                 if: "!cancelled() && steps.install.outcome == 'success'"
             -

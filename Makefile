@@ -23,15 +23,11 @@ lint:
 	${run_app} sh -c "shellcheck --severity=error --format=gcc $(shell find bin/ -type f -executable)"
 	${run_app} sh -c "yamllint ."
 	${run_app} sh -c "phplint --no-progress --cache=var/phplint-cache --warning bin/console src tests"
-cs:
-	${run_app} sh -c "php-cs-fixer fix --show-progress=none"
 psalm:
 	${run_app} sh -c "psalm --no-progress ${psalm_flags}"
 test:
 	${run_app_deps} sh -c "phpunit"
-rector:
-	${run_app} sh -c "rector process --no-progress-bar"
 tools:
 	mkdir -p var/tools
-	${run_app} sh -c "cd /usr/local/etc/tools/vendor && cp -r --remove-destination friendsofphp phpunit rector /app/var/tools"
-qa: composer-install lint cs rector psalm test
+	${run_app} sh -c "cd /usr/local/etc/tools/vendor && cp -r --remove-destination phpunit /app/var/tools"
+qa: composer-install lint psalm test
