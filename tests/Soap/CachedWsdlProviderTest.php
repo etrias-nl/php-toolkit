@@ -22,18 +22,18 @@ final class CachedWsdlProviderTest extends TestCase
         </wsdl:definitions>
         XML;
 
-    private Filesystem $filesystem;
-    private string $cacheDir;
+    private const string LOCATION = 'https://example.test/service.wsdl';
+
+    private string $cacheDir = '';
 
     protected function setUp(): void
     {
-        $this->filesystem = new Filesystem();
         $this->cacheDir = sys_get_temp_dir().'/php-toolkit-wsdl-test-'.bin2hex(random_bytes(6));
     }
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove($this->cacheDir);
+        (new Filesystem())->remove($this->cacheDir);
     }
 
     public function testCachesValidWsdlOnce(): void
@@ -51,43 +51,41 @@ final class CachedWsdlProviderTest extends TestCase
             }
         };
 
-        $provider = new CachedWsdlProvider($loader, $this->filesystem, $this->cacheDir, false);
-        $location = 'https://example.test/service.wsdl';
+        $provider = new CachedWsdlProvider($loader, new Filesystem(), $this->cacheDir, false);
 
-        $file = $provider($location);
+        $file = $provider(self::LOCATION);
 
         self::assertFileExists($file);
         self::assertStringContainsString('definitions', (string) file_get_contents($file));
-        self::assertSame(1, $loader->calls);
 
-        self::assertSame($file, $provider($location));
-        self::assertSame(1, $loader->calls, 'A cached WSDL must not be reloaded.');
+        self::assertSame($file, $provider(self::LOCATION));
+        self::assertSame(1, $loader->calls, 'A cached WSDL must be loaded only once.');
     }
 
     public function testDoesNotCacheEmptyWsdl(): void
     {
-        $provider = new CachedWsdlProvider($this->loader(''), $this->filesystem, $this->cacheDir, false);
+        $provider = new CachedWsdlProvider($this->loader(''), new Filesystem(), $this->cacheDir, false);
 
         try {
-            $provider('https://example.test/service.wsdl');
+            $provider(self::LOCATION);
             self::fail('Expected an UnloadableWsdlException.');
         } catch (UnloadableWsdlException) {
         }
 
-        self::assertSame([], glob($this->cacheDir.'/*.wsdl') ?: []);
+        self::assertFileDoesNotExist($this->cacheDir.'/'.md5(self::LOCATION).'.wsdl');
     }
 
     public function testDoesNotCacheMalformedWsdl(): void
     {
-        $provider = new CachedWsdlProvider($this->loader('<html><body>404 Not Found</body></html>'), $this->filesystem, $this->cacheDir, false);
+        $provider = new CachedWsdlProvider($this->loader('<html><body>404 Not Found</body></html>'), new Filesystem(), $this->cacheDir, false);
 
         try {
-            $provider('https://example.test/service.wsdl');
+            $provider(self::LOCATION);
             self::fail('Expected an UnloadableWsdlException.');
         } catch (UnloadableWsdlException) {
         }
 
-        self::assertSame([], glob($this->cacheDir.'/*.wsdl') ?: []);
+        self::assertFileDoesNotExist($this->cacheDir.'/'.md5(self::LOCATION).'.wsdl');
     }
 
     private function loader(string $wsdl): WsdlLoader

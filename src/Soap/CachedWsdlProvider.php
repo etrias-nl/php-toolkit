@@ -48,6 +48,10 @@ final class CachedWsdlProvider implements WsdlProvider
 
     private function isWellFormedWsdl(string $wsdl): bool
     {
+        if ('' === $wsdl) {
+            return false;
+        }
+
         $useInternalErrors = libxml_use_internal_errors(true);
 
         try {
