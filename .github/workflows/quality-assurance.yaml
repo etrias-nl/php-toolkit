@@ -62,4 +62,4 @@ jobs:
                     commit_user_name: etrias
                     commit_user_email: etrias@users.noreply.github.com
                     commit_author: etrias <etrias@users.noreply.github.com>
-                if: "!cancelled() && github.ref_name == 'main'"
+                if: "!cancelled()"
