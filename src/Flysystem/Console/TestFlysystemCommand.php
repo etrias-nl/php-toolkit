@@ -18,7 +18,7 @@ final class TestFlysystemCommand extends Command
 {
     public function __construct(
         #[Autowire(service: 'test.storage')]
-        private readonly ?FilesystemOperator $storage = null,
+        private readonly FilesystemOperator $storage,
     ) {
         parent::__construct();
     }
@@ -27,44 +27,37 @@ final class TestFlysystemCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $storage = $this->storage;
-        if (null === $storage) {
-            $io->error('Storage "test.storage" is not configured.');
-
-            return 1;
-        }
-
         $file = uniqid('test_file_').'.txt';
         $renamedFile = $file.'.renamed';
         $contents = 'test '.time();
 
         $io->info('Testing filesystem with file: '.$file);
 
-        $storage->write($file, $contents);
+        $this->storage->write($file, $contents);
         $io->info('Write test passed');
 
-        if ($contents !== $storage->read($file)) {
+        if ($contents !== $this->storage->read($file)) {
             throw new \RuntimeException('read() returned other contents than written');
         }
         $io->info('Read test passed');
 
-        $files = $this->listFiles($storage);
+        $files = $this->listFiles();
         $io->listing($files);
         if (!\in_array($file, $files, true)) {
             throw new \RuntimeException('listContents() is missing the written file');
         }
         $io->info('List test passed');
 
-        $storage->move($file, $renamedFile);
-        $files = $this->listFiles($storage);
+        $this->storage->move($file, $renamedFile);
+        $files = $this->listFiles();
         $io->listing($files);
         if (!\in_array($renamedFile, $files, true) || \in_array($file, $files, true)) {
             throw new \RuntimeException('move() failed; listing does not reflect the renamed file');
         }
         $io->info('Rename test passed');
 
-        $storage->delete($renamedFile);
-        if ($storage->fileExists($renamedFile)) {
+        $this->storage->delete($renamedFile);
+        if ($this->storage->fileExists($renamedFile)) {
             throw new \RuntimeException('delete() failed; file still exists');
         }
         $io->info('Delete test passed');
@@ -77,9 +70,9 @@ final class TestFlysystemCommand extends Command
     /**
      * @return string[]
      */
-    private function listFiles(FilesystemOperator $storage): array
+    private function listFiles(): array
     {
-        return $storage->listContents('')
+        return $this->storage->listContents('')
             ->filter(static fn (StorageAttributes $attributes): bool => $attributes->isFile())
             ->map(static fn (StorageAttributes $attributes): string => $attributes->path())
             ->toArray()
