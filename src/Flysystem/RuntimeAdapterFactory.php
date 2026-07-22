@@ -19,22 +19,27 @@ final class RuntimeAdapterFactory
         }
 
         $urlParts = parse_url($dsn);
+        if (false === $urlParts) {
+            throw new \RuntimeException('Unable to parse filesystem DSN');
+        }
+
         $queryParts = [];
         parse_str($urlParts['query'] ?? '', $queryParts);
-        $protocol = $urlParts['scheme'];
-        $urlParts['scheme'] = filter_var($queryParts['ssl'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 'https' : 'http';
-        $urlParts['user'] = urldecode($urlParts['user']);
-        $urlParts['pass'] = urldecode($urlParts['pass']);
-        $directory = urldecode(ltrim($urlParts['path'], '/'));
+        $protocol = $urlParts['scheme'] ?? '';
+        $scheme = filter_var($queryParts['ssl'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 'https' : 'http';
+        $user = urldecode($urlParts['user'] ?? '');
+        $pass = urldecode($urlParts['pass'] ?? '');
+        $host = $urlParts['host'] ?? '';
+        $directory = urldecode(ltrim($urlParts['path'] ?? '', '/'));
 
         switch ($protocol) {
             case self::TYPE_AZURE_BLOB:
-                $connectionString = \sprintf('DefaultEndpointsProtocol=%s;AccountName=%s;AccountKey=%s;EndpointSuffix=%s', $urlParts['scheme'], $urlParts['user'], $urlParts['pass'], $urlParts['host']);
+                $connectionString = \sprintf('DefaultEndpointsProtocol=%s;AccountName=%s;AccountKey=%s;EndpointSuffix=%s', $scheme, $user, $pass, $host);
                 $blobServiceClient = BlobServiceClient::fromConnectionString($connectionString);
 
                 return new AzureBlobStorageAdapter($blobServiceClient->getContainerClient($directory), $prefix);
         }
 
-        throw new \RuntimeException('Unsupported filesystem DSN protocol: '.$urlParts['scheme']);
+        throw new \RuntimeException('Unsupported filesystem DSN protocol: '.$protocol);
     }
 }
