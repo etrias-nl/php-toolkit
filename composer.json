@@ -6,10 +6,11 @@
         "php": "~8.4.23"
     },
     "require-dev": {
+        "azure-oss/storage-blob-flysystem": "^2.2.0",
         "basis-company/nats": "^1.2.1",
         "doctrine/migrations": "^3.9.7",
         "doctrine/orm": "^3.6.7",
-        "guzzlehttp/guzzle": "^8.0.0",
+        "guzzlehttp/guzzle": "^7.15.1 || ^8.0.0",
         "league/flysystem": "^3.35.2",
         "monolog/monolog": "^3.10.0",
         "php-http/client-common": "^2.7.3",
