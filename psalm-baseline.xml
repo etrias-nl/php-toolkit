@@ -5,6 +5,33 @@
       <code><![CDATA[$event->getError()]]></code>
     </InvalidArgument>
   </file>
+  <file src="src/Flysystem/RuntimeAdapterFactory.php">
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$urlParts['host']]]></code>
+      <code><![CDATA[$urlParts['pass']]]></code>
+      <code><![CDATA[$urlParts['path']]]></code>
+      <code><![CDATA[$urlParts['scheme']]]></code>
+      <code><![CDATA[$urlParts['user']]]></code>
+    </PossiblyInvalidArrayAccess>
+    <PossiblyInvalidArrayAssignment>
+      <code><![CDATA[$urlParts['pass']]]></code>
+      <code><![CDATA[$urlParts['scheme']]]></code>
+      <code><![CDATA[$urlParts['user']]]></code>
+    </PossiblyInvalidArrayAssignment>
+    <PossiblyNullArgument>
+      <code><![CDATA[$urlParts['host']]]></code>
+      <code><![CDATA[$urlParts['pass']]]></code>
+      <code><![CDATA[$urlParts['path']]]></code>
+      <code><![CDATA[$urlParts['user']]]></code>
+    </PossiblyNullArgument>
+    <PossiblyUndefinedArrayOffset>
+      <code><![CDATA[$urlParts['host']]]></code>
+      <code><![CDATA[$urlParts['pass']]]></code>
+      <code><![CDATA[$urlParts['path']]]></code>
+      <code><![CDATA[$urlParts['scheme']]]></code>
+      <code><![CDATA[$urlParts['user']]]></code>
+    </PossiblyUndefinedArrayOffset>
+  </file>
   <file src="src/Http/LoggerPlugin.php">
     <DeprecatedMethod>
       <code><![CDATA[formatResponse]]></code>
