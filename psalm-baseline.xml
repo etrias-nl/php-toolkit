@@ -31,6 +31,13 @@
       <code><![CDATA[$urlParts['scheme']]]></code>
       <code><![CDATA[$urlParts['user']]]></code>
     </PossiblyUndefinedArrayOffset>
+    <UndefinedClass>
+      <code><![CDATA[BlobServiceClient]]></code>
+    </UndefinedClass>
+    <UnusedVariable>
+      <code><![CDATA[$connectionString]]></code>
+      <code><![CDATA[$directory]]></code>
+    </UnusedVariable>
   </file>
   <file src="src/Http/LoggerPlugin.php">
     <DeprecatedMethod>
