@@ -25,6 +25,8 @@ final class DockerHandler extends AbstractProcessingHandler
         '~Access to ClassMetadata::\$reflFields is deprecated~i',
         // @guzzlehttp/psr7:2.11
         '~Since guzzlehttp/psr7 2\.11:~i',
+        // @php:8.4
+        '~Implicitly marking parameter \$\w+ as nullable is deprecated~i',
     ];
 
     private readonly string $command;
