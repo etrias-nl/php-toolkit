@@ -12,28 +12,37 @@ use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
- * RejectDelayListener already delays the failed message itself, but the worker picks up the next
- * one immediately. While a service is unreachable that turns into hundreds of connection attempts
- * per second, all of them doomed. This pauses the worker instead, longer with every failure in a row.
+ * Losing a service inside the cluster usually means a stale connection or stale DNS, and the worker
+ * cannot fix either by trying harder — it keeps taking messages that all fail the same way. A short
+ * backoff rides out a blip; anything longer exits the worker, so Kubernetes restarts the pod on a
+ * fresh connection and paces further attempts through its own restart backoff.
+ *
+ * Services outside the cluster are left alone: restarting does not bring them back, and taking every
+ * worker down because one carrier is unreachable costs more than it saves. RejectDelayListener
+ * delays those messages instead.
  */
 final class WorkerBackoffListener implements EventSubscriberInterface
 {
     private const int START_MS = 250;
-    private const int MAX_MS = 30_000;
-    private const int MAX_SHIFT = 20;
+    private const int MAX_FAILURES = 5;
 
     private int $failures = 0;
 
+    /**
+     * @param list<string> $internalHostMarkers substrings that mark a request host as cluster-internal;
+     *                                          the default is the Kubernetes service DNS shape
+     *                                          `<service>.<namespace>.svc.<cluster-domain>`
+     */
     public function __construct(
         private readonly LoggerInterface $logger,
+        private readonly array $internalHostMarkers = ['.svc.'],
     ) {}
 
     public function onMessageFailed(WorkerMessageFailedEvent $event): void
     {
-        if (!$this->isConnectivityFailure($event->getThrowable())) {
+        if (!$this->isInternalConnectivityFailure($event->getThrowable())) {
             return;
         }
 
@@ -42,13 +51,6 @@ final class WorkerBackoffListener implements EventSubscriberInterface
 
     public function onMessageHandled(WorkerMessageHandledEvent $event): void
     {
-        if ($this->failures > 0) {
-            $this->logger->notice('Worker resumed after {failures} connectivity failures', [
-                'failures' => $this->failures,
-                'receiver' => $event->getReceiverName(),
-            ]);
-        }
-
         $this->failures = 0;
     }
 
@@ -58,16 +60,18 @@ final class WorkerBackoffListener implements EventSubscriberInterface
             return;
         }
 
-        $delayMs = min(self::MAX_MS, self::START_MS << min($this->failures - 1, self::MAX_SHIFT));
-        // Without jitter every worker backs off in lockstep and they all hit the failing service again
-        // at the same moment, which is the spike we are trying to get rid of.
-        $delayMs = random_int(intdiv($delayMs, 2), $delayMs);
+        if ($this->failures >= self::MAX_FAILURES) {
+            $this->logger->critical('Stopping the worker after {failures} failures to reach a service inside the cluster', [
+                'failures' => $this->failures,
+            ]);
 
-        if (1 === $this->failures) {
-            $this->logger->notice('Worker backing off after a connectivity failure', ['delay_ms' => $delayMs]);
+            throw new \RuntimeException(sprintf('Unable to reach a service inside the cluster, giving up after %d consecutive failures.', $this->failures));
         }
 
-        usleep($delayMs * 1000);
+        $delayMs = self::START_MS << ($this->failures - 1);
+        // Without jitter every worker backs off in lockstep and they all hit the failing service again
+        // at the same moment, which is the spike we are trying to get rid of.
+        usleep(random_int(intdiv($delayMs, 2), $delayMs) * 1000);
     }
 
     public static function getSubscribedEvents(): array
@@ -79,25 +83,37 @@ final class WorkerBackoffListener implements EventSubscriberInterface
         ];
     }
 
-    private function isConnectivityFailure(\Throwable $exception): bool
+    private function isInternalConnectivityFailure(\Throwable $exception): bool
     {
         if ($exception instanceof HandlerFailedException) {
             foreach ($exception->getWrappedExceptions(null, true) as $wrappedException) {
-                if ($this->isConnectivityFailure($wrappedException)) {
+                if ($this->isInternalConnectivityFailure($wrappedException)) {
                     return true;
                 }
             }
         }
 
-        if ($exception instanceof NetworkExceptionInterface
-            || $exception instanceof TransportExceptionInterface
-            || $exception instanceof ConnectionException
-        ) {
+        if ($exception instanceof ConnectionException) {
+            return true;
+        }
+
+        if ($exception instanceof NetworkExceptionInterface && $this->isInternalHost($exception->getRequest()->getUri()->getHost())) {
             return true;
         }
 
         $previousException = $exception->getPrevious();
 
-        return null !== $previousException && $this->isConnectivityFailure($previousException);
+        return null !== $previousException && $this->isInternalConnectivityFailure($previousException);
+    }
+
+    private function isInternalHost(string $host): bool
+    {
+        foreach ($this->internalHostMarkers as $internalHostMarker) {
+            if (str_contains($host, $internalHostMarker)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -12,6 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class RejectDelayListener implements EventSubscriberInterface
 {
@@ -43,7 +44,7 @@ final class RejectDelayListener implements EventSubscriberInterface
             }
         }
 
-        if ($exception instanceof NetworkExceptionInterface) {
+        if ($exception instanceof NetworkExceptionInterface || $exception instanceof TransportExceptionInterface) {
             return self::DEFAULT_WAIT_MS;
         }
 
