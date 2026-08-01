@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "86d8874b0fd4c09ea632614f252f0626",
+    "content-hash": "46d59e4b9102a7e31dfc9a826e8c3a80",
     "packages": [],
     "packages-dev": [
         {
@@ -198,16 +198,16 @@
         },
         {
             "name": "basis-company/nats",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/basis-company/nats.php.git",
-                "reference": "7134854d40b2646ad3c84a0bd0f75b7c96a5a26c"
+                "reference": "5bdcac168adc75f2e16e70445dd42efdcb4dbf59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/7134854d40b2646ad3c84a0bd0f75b7c96a5a26c",
-                "reference": "7134854d40b2646ad3c84a0bd0f75b7c96a5a26c",
+                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/5bdcac168adc75f2e16e70445dd42efdcb4dbf59",
+                "reference": "5bdcac168adc75f2e16e70445dd42efdcb4dbf59",
                 "shasum": ""
             },
             "require": {
@@ -258,9 +258,9 @@
             ],
             "support": {
                 "issues": "https://github.com/basis-company/nats.php/issues",
-                "source": "https://github.com/basis-company/nats.php/tree/1.2.1"
+                "source": "https://github.com/basis-company/nats.php/tree/1.2.2"
             },
-            "time": "2026-03-24T12:44:31+00:00"
+            "time": "2026-07-29T14:28:22+00:00"
         },
         {
             "name": "caseyamcl/guzzle_retry_middleware",
