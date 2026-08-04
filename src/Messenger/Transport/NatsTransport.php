@@ -95,20 +95,34 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
     public function get(): array
     {
         try {
-            $nextFallbackTs = null;
-            foreach ($this->fallbackTransport?->all(1) ?? [] as $envelope) {
-                $nextFallbackTs = $envelope->last(FallbackStamp::class)?->sendAt ?? new \DateTimeImmutable();
-            }
+            try {
+                $nextFallbackTs = null;
+                foreach ($this->fallbackTransport?->all(1) ?? [] as $envelope) {
+                    $nextFallbackTs = $envelope->last(FallbackStamp::class)?->sendAt ?? new \DateTimeImmutable();
+                }
 
-            if (null !== $nextFallbackTs) {
-                $state = $this->getStream()->info()?->state;
-                $nextTs = $state?->messages ? new \DateTimeImmutable($state->first_ts) : null;
+                if (null !== $nextFallbackTs) {
+                    $state = $this->getStream()->info()?->state;
+                    $nextTs = $state?->messages ? new \DateTimeImmutable($state->first_ts) : null;
 
-                if (null === $nextTs || $nextFallbackTs < $nextTs) {
-                    foreach ($this->fallbackTransport?->get() ?? [] as $envelope) {
-                        return [$envelope->with(new ReplyToStamp(self::REPLY_TO_FALLBACK))];
+                    if (null === $nextTs || $nextFallbackTs < $nextTs) {
+                        foreach ($this->fallbackTransport?->get() ?? [] as $envelope) {
+                            return [$envelope->with(new ReplyToStamp(self::REPLY_TO_FALLBACK))];
+                        }
                     }
                 }
+            } catch (\Throwable $e) {
+                // An undecodable ("poison") message in the Doctrine fallback transport
+                // (stale signature, changed serialization format, corrupt body) must
+                // not take the consumer down. all()/get() here rethrow the decode
+                // failure, which would crash messenger:consume and crash-loop on
+                // restart — the fallback row is peeked, never removed, so the loop
+                // never ends. Log and fall through to the NATS queue so the consumer
+                // keeps working; the offending fallback row is cleared out of band.
+                $this->log(Level::Error, null, 'Failed reading fallback transport, skipping: {error}', [
+                    'error' => $e->getMessage(),
+                    'exception' => $e,
+                ]);
             }
 
             if (null === $this->queue) {
