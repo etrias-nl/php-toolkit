@@ -128,7 +128,32 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $stamps[] = new ReplyToStamp($replyTo, $this->getMessageExpiresAt());
             }
 
-            return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
+            try {
+                $envelope = $this->serializer->decode(['body' => $payload->body]);
+            } catch (\Throwable $e) {
+                // Undecodable ("poison") message: a stale signature, a changed
+                // serialization format or a corrupt body. It can never be decoded,
+                // so terminate it — stopping JetStream redelivering it — and skip.
+                // Without this the decode failure rethrows, crashes the consumer and
+                // the same message is re-read on restart, crash-looping forever and
+                // stalling the transport.
+                if (null !== $replyTo = $message->replyTo) {
+                    try {
+                        self::assertPayload($this->client->dispatch($replyTo, '+TERM'));
+                    } catch (\Throwable $termException) {
+                        $this->log(Level::Error, null, new TransportException($termException->getMessage(), 0, $termException));
+                    }
+                }
+
+                $this->log(Level::Error, null, 'Discarded undecodable message: {error}', [
+                    'error' => $e->getMessage(),
+                    'exception' => $e,
+                ]);
+
+                return [];
+            }
+
+            return [$envelope->with(...$stamps)];
         } catch (\Throwable $e) {
             $this->unsubscribe();
 
