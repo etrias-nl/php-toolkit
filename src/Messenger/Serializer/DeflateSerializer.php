@@ -11,7 +11,6 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 final class DeflateSerializer implements SerializerInterface
 {
     public function __construct(
-        // undecorated, so message signing is applied once, by the decorator around this serializer
         #[Autowire(service: '.messenger.transport.native_php_serializer')]
         private readonly SerializerInterface $serializer,
     ) {}
