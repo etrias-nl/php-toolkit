@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 final class DeflateSerializer implements SerializerInterface
 {
     public function __construct(
-        #[Autowire(service: '.messenger.transport.native_php_serializer')]
+        #[Autowire(service: 'messenger.transport.native_php_serializer')]
         private readonly SerializerInterface $serializer,
     ) {}
 

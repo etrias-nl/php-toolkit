@@ -36,7 +36,6 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
 {
     private const string HEADER_MESSAGE_ID = 'Nats-Msg-Id';
     private const string HEADER_EXPECTED_STREAM = 'Nats-Expected-Stream';
-    private const string HEADER_ENVELOPE = 'Messenger-Headers';
     private const string REPLY_TO_FALLBACK = 'fallback';
     private const int NANOSECOND = 1_000_000_000;
     private const int MICROSECOND = 1_000_000;
@@ -129,13 +128,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
                 $stamps[] = new ReplyToStamp($replyTo, $this->getMessageExpiresAt());
             }
 
-            $encodedMessage = ['body' => $payload->body];
-            $encodedHeaders = $payload->getHeader(self::HEADER_ENVELOPE);
-            if (\is_string($encodedHeaders)) {
-                $encodedMessage['headers'] = json_decode($encodedHeaders, true, 512, JSON_THROW_ON_ERROR);
-            }
-
-            return [$this->serializer->decode($encodedMessage)->with(...$stamps)];
+            return [$this->serializer->decode(['body' => $payload->body])->with(...$stamps)];
         } catch (\Throwable $e) {
             $this->unsubscribe();
 
@@ -271,14 +264,10 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         $envelope = $envelope->withoutAll(TransportMessageIdStamp::class);
         $encodedMessage = $this->serializer->encode($envelope);
         $messageId = $this->messageMap->getStamp($envelope, DeduplicateStamp::class)?->enabled ?? true ? hash('xxh128', $encodedMessage['body']) : Uuid::v7()->toBase58();
-        $headers = [
+        $payload = new Payload($encodedMessage['body'], [
             self::HEADER_MESSAGE_ID => $messageId,
             self::HEADER_EXPECTED_STREAM => $this->streamName,
-        ];
-        if ([] !== ($encodedHeaders = $encodedMessage['headers'] ?? [])) {
-            $headers[self::HEADER_ENVELOPE] = json_encode($encodedHeaders, JSON_THROW_ON_ERROR);
-        }
-        $payload = new Payload($encodedMessage['body'], $headers);
+        ]);
         $context = [];
 
         try {
