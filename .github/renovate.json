@@ -2,5 +2,14 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
         "github>etrias-nl/renovate"
+    ],
+    "packageRules": [
+        {
+            "description": "Support any PHP 8.4 patch release so hotfixes can be pinned/backported at the project level; do not re-pin the minimum patch",
+            "matchDepNames": [
+                "php"
+            ],
+            "enabled": false
+        }
     ]
 }
