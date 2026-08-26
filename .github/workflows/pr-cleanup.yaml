@@ -14,7 +14,7 @@ jobs:
             contents: read
         steps:
             -
-                name: 'Cancel running workflows for PR'
+                name: 'Cancel Running Workflows for PR'
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GH_REPO: ${{ github.repository }}
@@ -41,7 +41,7 @@ jobs:
             contents: read
         steps:
             -
-                name: 'Delete caches for PR'
+                name: 'Delete Caches for PR'
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GH_REPO: ${{ github.repository }}
