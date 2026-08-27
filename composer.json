@@ -7,7 +7,7 @@
     },
     "require-dev": {
         "azure-oss/storage-blob-flysystem": "^2.2.0",
-        "basis-company/nats": "^1.2.2",
+        "basis-company/nats": "^1.2.3",
         "doctrine/migrations": "^3.9.7",
         "doctrine/orm": "^3.6.8",
         "guzzlehttp/guzzle": "^7.15.3",

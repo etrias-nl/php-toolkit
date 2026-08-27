@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06b1c2327cf1c4e1e608486d385c9e19",
+    "content-hash": "eb5309ea18c17b1f51f933b173cc1836",
     "packages": [],
     "packages-dev": [
         {
@@ -198,16 +198,16 @@
         },
         {
             "name": "basis-company/nats",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/basis-company/nats.php.git",
-                "reference": "5bdcac168adc75f2e16e70445dd42efdcb4dbf59"
+                "reference": "4a617e942024728790957266362daef64d389452"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/5bdcac168adc75f2e16e70445dd42efdcb4dbf59",
-                "reference": "5bdcac168adc75f2e16e70445dd42efdcb4dbf59",
+                "url": "https://api.github.com/repos/basis-company/nats.php/zipball/4a617e942024728790957266362daef64d389452",
+                "reference": "4a617e942024728790957266362daef64d389452",
                 "shasum": ""
             },
             "require": {
@@ -215,10 +215,16 @@
             },
             "require-dev": {
                 "ext-sodium": "*",
-                "friendsofphp/php-cs-fixer": "^3.9",
+                "friendsofphp/php-cs-fixer": "*",
                 "monolog/monolog": "^2.3.5",
                 "phan/phan": "^5.3",
-                "phpunit/phpunit": "^9.5"
+                "php-coveralls/php-coveralls": "^2.5",
+                "phpstan/phpstan": "*",
+                "phpstan/phpstan-deprecation-rules": "*",
+                "phpstan/phpstan-strict-rules": "*",
+                "phpunit/phpunit": "^9.5",
+                "rector/rector": "*",
+                "sebastian/code-unit-reverse-lookup": "^2.0"
             },
             "suggest": {
                 "ext-sodium": "Provides Ed25519 for nkey authentication",
@@ -258,9 +264,9 @@
             ],
             "support": {
                 "issues": "https://github.com/basis-company/nats.php/issues",
-                "source": "https://github.com/basis-company/nats.php/tree/1.2.2"
+                "source": "https://github.com/basis-company/nats.php/tree/1.2.3"
             },
-            "time": "2026-07-29T14:28:22+00:00"
+            "time": "2026-08-20T08:48:43+00:00"
         },
         {
             "name": "caseyamcl/guzzle_retry_middleware",
