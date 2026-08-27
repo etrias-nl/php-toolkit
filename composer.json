@@ -10,7 +10,7 @@
         "basis-company/nats": "^1.2.3",
         "doctrine/migrations": "^3.9.7",
         "doctrine/orm": "^3.6.8",
-        "guzzlehttp/guzzle": "^7.15.3",
+        "guzzlehttp/guzzle": "^7.15.5",
         "league/flysystem": "^3.35.3",
         "monolog/monolog": "^3.10.0",
         "php-http/client-common": "^2.7.3",
