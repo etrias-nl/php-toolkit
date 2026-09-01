@@ -112,6 +112,71 @@ final class NatsTest extends TestCase
         );
     }
 
+    public function testSetupPersistedStream(): void
+    {
+        $logger = new Logger('test', [$logHandler = new TestHandler()]);
+        $factory = new NatsTransportFactory(new MessageMap([]), $logger, new NullLogger(), self::createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
+        $streamName = uniqid(__FUNCTION__);
+        $dsn = 'nats://nats?replicas=1&stream='.$streamName;
+
+        // creates the stream
+        $transport1 = $factory->createTransport($dsn, [], new PhpSerializer());
+        $transport1->setup();
+
+        // updates the stream, reading back the configuration persisted at server level
+        // @see https://github.com/basis-company/nats.php/issues/140
+        $transport2 = $factory->createTransport($dsn, [], new PhpSerializer());
+        $transport2->setup();
+
+        $setupRecords = array_values(array_filter(
+            $logHandler->getRecords(),
+            static fn (LogRecord $record): bool => 'Stream setup: {command}' === $record->message,
+        ));
+
+        self::assertCount(2, $setupRecords);
+        self::assertSame('STREAM.CREATE.'.$streamName, $setupRecords[0]->context['command']);
+        self::assertSame('STREAM.UPDATE.'.$streamName, $setupRecords[1]->context['command']);
+
+        // note "metadata" is excluded, it carries the NATS server version
+        $configs = array_map(static function (LogRecord $record): array {
+            /** @var array<string, mixed> $config */
+            $config = json_decode((string) $record->context['config'], true, flags: JSON_THROW_ON_ERROR);
+            unset($config['metadata']);
+            ksort($config);
+
+            return $config;
+        }, $setupRecords);
+
+        $expectedConfig = [
+            'allow_direct' => false,
+            'allow_msg_ttl' => false,
+            'allow_rollup_hdrs' => true,
+            'compression' => 'none',
+            'consumer_limits' => [],
+            'deny_delete' => true,
+            'deny_purge' => false,
+            'discard' => 'old',
+            'duplicate_window' => 10_000_000_000,
+            'max_age' => 0,
+            'max_bytes' => -1,
+            'max_consumers' => -1,
+            'max_msg_size' => -1,
+            'max_msgs' => -1,
+            'max_msgs_per_subject' => -1,
+            'mirror_direct' => false,
+            'name' => $streamName,
+            'num_replicas' => 1,
+            'retention' => 'workqueue',
+            'sealed' => false,
+            'storage' => 'file',
+            'subjects' => [$streamName],
+        ];
+
+        // configuration is unaffected by the update
+        self::assertSame($expectedConfig, $configs[0]);
+        self::assertSame($expectedConfig, $configs[1]);
+    }
+
     public function testDeduplication(): void
     {
         $factory = new NatsTransportFactory(new MessageMap([]), new NullLogger(), new NullLogger(), self::createStub(NormalizerInterface::class), $this->noFallbackTransportFactory());
