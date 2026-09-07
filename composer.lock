@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "826441abb52a0ff741804aa0761447d5",
+    "content-hash": "0dc52eaf6b4cfbf5851e983b975c6473",
     "packages": [],
     "packages-dev": [
         {
@@ -110,16 +110,16 @@
         },
         {
             "name": "azure-oss/storage-blob-flysystem",
-            "version": "2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-oss-for-azure/azure-storage-blob-flysystem-php.git",
-                "reference": "0d5fcd8c2cb7f3756e0d1576cbef6bbc29074644"
+                "reference": "85ae64006ae9b49dcec432cbfb95591a4b1c199b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-blob-flysystem-php/zipball/0d5fcd8c2cb7f3756e0d1576cbef6bbc29074644",
-                "reference": "0d5fcd8c2cb7f3756e0d1576cbef6bbc29074644",
+                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-blob-flysystem-php/zipball/85ae64006ae9b49dcec432cbfb95591a4b1c199b",
+                "reference": "85ae64006ae9b49dcec432cbfb95591a4b1c199b",
                 "shasum": ""
             },
             "require": {
@@ -149,9 +149,9 @@
             ],
             "description": "Flysystem adapter for Azure Storage PHP",
             "support": {
-                "source": "https://github.com/php-oss-for-azure/azure-storage-blob-flysystem-php/tree/2.2.1"
+                "source": "https://github.com/php-oss-for-azure/azure-storage-blob-flysystem-php/tree/2.2.2"
             },
-            "time": "2026-08-20T13:21:39+00:00"
+            "time": "2026-09-04T05:57:32+00:00"
         },
         {
             "name": "azure-oss/storage-common",
