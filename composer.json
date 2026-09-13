@@ -9,7 +9,7 @@
         "azure-oss/storage-blob-flysystem": "^2.2.2",
         "basis-company/nats": "^1.2.4",
         "doctrine/migrations": "^3.9.7",
-        "doctrine/orm": "^3.6.8",
+        "doctrine/orm": "^3.7.0",
         "guzzlehttp/guzzle": "^7.15.5",
         "league/flysystem": "^3.36.0",
         "monolog/monolog": "^3.11.0",
