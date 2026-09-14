@@ -9,16 +9,16 @@
     "packages-dev": [
         {
             "name": "azure-oss/identity",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-oss-for-azure/azure-identity-php.git",
-                "reference": "68ae156c331f11567485c639097c1c05bf17a5bc"
+                "reference": "ea794d1d766c2c03039479baa013b2ef10533a98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-oss-for-azure/azure-identity-php/zipball/68ae156c331f11567485c639097c1c05bf17a5bc",
-                "reference": "68ae156c331f11567485c639097c1c05bf17a5bc",
+                "url": "https://api.github.com/repos/php-oss-for-azure/azure-identity-php/zipball/ea794d1d766c2c03039479baa013b2ef10533a98",
+                "reference": "ea794d1d766c2c03039479baa013b2ef10533a98",
                 "shasum": ""
             },
             "require": {
@@ -50,22 +50,22 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "support": {
-                "source": "https://github.com/php-oss-for-azure/azure-identity-php/tree/1.0.3"
+                "source": "https://github.com/php-oss-for-azure/azure-identity-php/tree/1.0.4"
             },
-            "time": "2026-08-20T13:21:39+00:00"
+            "time": "2026-09-04T05:57:32+00:00"
         },
         {
             "name": "azure-oss/storage-blob",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-oss-for-azure/azure-storage-blob-php.git",
-                "reference": "e425bb7ce9715b53b5765611695d06277ed7d58d"
+                "reference": "2333cad9c507062a8ae5536b02ec1f8099f1d48e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-blob-php/zipball/e425bb7ce9715b53b5765611695d06277ed7d58d",
-                "reference": "e425bb7ce9715b53b5765611695d06277ed7d58d",
+                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-blob-php/zipball/2333cad9c507062a8ae5536b02ec1f8099f1d48e",
+                "reference": "2333cad9c507062a8ae5536b02ec1f8099f1d48e",
                 "shasum": ""
             },
             "require": {
@@ -104,9 +104,9 @@
                 "storage"
             ],
             "support": {
-                "source": "https://github.com/php-oss-for-azure/azure-storage-blob-php/tree/2.3.0"
+                "source": "https://github.com/php-oss-for-azure/azure-storage-blob-php/tree/2.3.1"
             },
-            "time": "2026-08-20T13:21:39+00:00"
+            "time": "2026-09-04T05:57:32+00:00"
         },
         {
             "name": "azure-oss/storage-blob-flysystem",
@@ -155,16 +155,16 @@
         },
         {
             "name": "azure-oss/storage-common",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-oss-for-azure/azure-storage-common-php.git",
-                "reference": "f658c5c60a4adf36b0b23381a30038553fa40df6"
+                "reference": "be9f2c36c2b16037aeab2762b40ebf807f1de5c9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-common-php/zipball/f658c5c60a4adf36b0b23381a30038553fa40df6",
-                "reference": "f658c5c60a4adf36b0b23381a30038553fa40df6",
+                "url": "https://api.github.com/repos/php-oss-for-azure/azure-storage-common-php/zipball/be9f2c36c2b16037aeab2762b40ebf807f1de5c9",
+                "reference": "be9f2c36c2b16037aeab2762b40ebf807f1de5c9",
                 "shasum": ""
             },
             "require": {
@@ -191,9 +191,9 @@
             ],
             "description": "Shared primitives for Azure Storage PHP SDK packages",
             "support": {
-                "source": "https://github.com/php-oss-for-azure/azure-storage-common-php/tree/2.2.0"
+                "source": "https://github.com/php-oss-for-azure/azure-storage-common-php/tree/2.2.1"
             },
-            "time": "2026-08-20T13:21:39+00:00"
+            "time": "2026-09-04T05:57:32+00:00"
         },
         {
             "name": "basis-company/nats",
@@ -408,29 +408,29 @@
         },
         {
             "name": "doctrine/collections",
-            "version": "2.6.0",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/collections.git",
-                "reference": "7713da39d8e237f28411d6a616a3dce5e20d5de2"
+                "reference": "7c2f25ed928553a3de389ccb99aa46c0eedb2d4d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/collections/zipball/7713da39d8e237f28411d6a616a3dce5e20d5de2",
-                "reference": "7713da39d8e237f28411d6a616a3dce5e20d5de2",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/7c2f25ed928553a3de389ccb99aa46c0eedb2d4d",
+                "reference": "7c2f25ed928553a3de389ccb99aa46c0eedb2d4d",
                 "shasum": ""
             },
             "require": {
                 "doctrine/deprecations": "^1",
-                "php": "^8.1",
-                "symfony/polyfill-php84": "^1.30"
+                "php": "^8.4",
+                "symfony/polyfill-php86": "^1.36"
             },
             "require-dev": {
                 "doctrine/coding-standard": "^14",
                 "ext-json": "*",
                 "phpstan/phpstan": "^2.1.30",
                 "phpstan/phpstan-phpunit": "^2.0.7",
-                "phpunit/phpunit": "^10.5.58 || ^11.5.42 || ^12.4"
+                "phpunit/phpunit": "^12.4"
             },
             "type": "library",
             "autoload": {
@@ -474,7 +474,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/collections/issues",
-                "source": "https://github.com/doctrine/collections/tree/2.6.0"
+                "source": "https://github.com/doctrine/collections/tree/3.1.0"
             },
             "funding": [
                 {
@@ -490,7 +490,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-15T10:01:58+00:00"
+            "time": "2026-04-29T20:41:02+00:00"
         },
         {
             "name": "doctrine/dbal",
