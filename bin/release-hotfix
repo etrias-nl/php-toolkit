@@ -22,8 +22,8 @@ git pull --ff-only --quiet
 [[ $(git describe --tags --abbrev=0 --exact-match) ]] && echo "Commit already tagged" && exit 1
 
 # check runs
-gh api "/repos/${repo}/commits/$(git rev-parse HEAD)/check-runs" | jq -e '.check_runs[] | select(.conclusion != "success") | {name,status,conclusion,details_url}' && \
-    (read -p "Continue? (y/N) " -r && [[ ${REPLY:-N} =~ ^[Yy]$ ]] || exit)
+gh api "/repos/${repo}/commits/$(git rev-parse HEAD)/check-runs" | jq -e '.check_runs[] | select(.conclusion == "failure") | {name,status,conclusion,details_url}' && \
+    (read -p $'\033[1;31mFound check failures. Continue? (Y/n)\033[0m' -r && [[ ${REPLY:-Y} =~ ^[Yy]$ ]] || exit)
 
 # set versions
 curr_version="$(git describe --abbrev=0 --tags || echo "")"
