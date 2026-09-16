@@ -27,6 +27,12 @@ final class DockerHandler extends AbstractProcessingHandler
         '~Since guzzlehttp/psr7 2\.11:~i',
         // @php:8.4
         '~Implicitly marking parameter \$\w+ as nullable is deprecated~i',
+        // @doctrine/dbal:4
+        '~The "Doctrine\\\DBAL\\\Schema\\\Schema" class is considered final~i',
+        // @symfony/var-exporter:7.3
+        '~The "Doctrine\\\Migrations\\\Provider\\\LazySchema" class uses "Symfony\\\Component\\\VarExporter\\\LazyProxyTrait" that is deprecated~i',
+        // @doctrine/migrations:3.9
+        '~User Deprecated: Context: trying to commit a transaction~i',
     ];
 
     private readonly string $command;
