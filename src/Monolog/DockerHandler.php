@@ -33,6 +33,12 @@ final class DockerHandler extends AbstractProcessingHandler
         '~The "Doctrine\\\Migrations\\\Provider\\\LazySchema" class uses "Symfony\\\Component\\\VarExporter\\\LazyProxyTrait" that is deprecated~i',
         // @doctrine/migrations:3.9
         '~User Deprecated: Context: trying to commit a transaction~i',
+        // @php-http/httplug-bundle:2.3
+        '~(Calling|Implementing) "Http\\\HttplugBundle\\\Collector\\\Collector::__wakeup\(\)" is deprecated~i',
+        // @solarium/solarium:6.3
+        '~Method "JsonSerializable::jsonSerialize\(\)" might add "mixed" as a native return type declaration in the future\. Do the same in implementation "Solarium\\\Core\\\Query\\\Result\\\Result"~i',
+        // @twig/twig:3.27
+        '~Using the "macro" tag outside the root of a template is deprecated~i',
     ];
 
     private readonly string $command;
