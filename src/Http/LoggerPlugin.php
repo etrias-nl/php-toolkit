@@ -21,17 +21,34 @@ final class LoggerPlugin implements Plugin
         private readonly LoggerInterface $logger,
         #[Autowire(service: HttpMessageFormatter::class)]
         private readonly Formatter $formatter,
+        #[Autowire(param: 'kernel.debug')]
+        private readonly bool $debug = false,
+        #[Autowire(env: 'int:SHELL_VERBOSITY')]
+        private readonly ?int $verbosity = null,
     ) {}
 
     public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
     {
         $start = hrtime(true) / 1E6;
         $uid = Uuid::v7()->toBase58();
-        $this->logger->info($this->formatter->formatRequest($request), ['uid' => $uid]);
+        $shouldLog = $this->debug || ($this->verbosity ?? 0) > 0;
 
-        return $next($request)->then(function (ResponseInterface $response) use ($start, $uid, $request): ResponseInterface {
+        if ($shouldLog) {
+            $this->logger->info($this->formatter->formatRequest($request), ['uid' => $uid]);
+        }
+
+        return $next($request)->then(function (ResponseInterface $response) use ($start, $uid, $request, $shouldLog): ResponseInterface {
+            if (!$shouldLog && $response->getStatusCode() < 400) {
+                return $response;
+            }
+
             $milliseconds = (int) round(hrtime(true) / 1E6 - $start);
             $formattedResponse = method_exists($this->formatter, 'formatResponseForRequest') ? $this->formatter->formatResponseForRequest($response, $request) : $this->formatter->formatResponse($response);
+
+            if (!$shouldLog) {
+                $formattedResponse = "Request:\n".$this->formatter->formatRequest($request)."\n\nResponse:\n".$formattedResponse;
+            }
+
             $this->logger->info($formattedResponse, [
                 'milliseconds' => $milliseconds,
                 'uid' => $uid,
