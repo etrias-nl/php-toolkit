@@ -56,6 +56,14 @@ final class MessageMap
     }
 
     /**
+     * @param class-string<StampInterface> $stamp
+     */
+    public function hasDefaultStamp(string $message, string $stamp): bool
+    {
+        return isset($this->defaultStamps[$message][$stamp]);
+    }
+
+    /**
      * @template T of StampInterface
      *
      * @param class-string<T> $stamp
