@@ -8,7 +8,7 @@ name: PR Cleanup
 
 jobs:
     cancel-runs:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         permissions:
             actions: write
             contents: read
@@ -35,7 +35,7 @@ jobs:
                     done
     delete-caches:
         needs: [ cancel-runs ]
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         permissions:
             actions: write
             contents: read
