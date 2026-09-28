@@ -322,7 +322,7 @@ final class NatsTransport implements TransportInterface, MessageCountAwareInterf
         sent:
         $envelope = $envelope->with(new TransportMessageIdStamp($messageId));
 
-        $this->log(Level::Info, $envelope, 'Message "{message}" sent to transport', $context);
+        $this->log(\array_key_exists('retry', $context) ? Level::Warning : Level::Debug, $envelope, 'Message "{message}" sent to transport', $context);
 
         return $envelope;
     }

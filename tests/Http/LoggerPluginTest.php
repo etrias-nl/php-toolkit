@@ -116,6 +116,40 @@ final class LoggerPluginTest extends TestCase
         );
     }
 
+    public function testSlowSuccessfulResponseIsLoggedAsOneLine(): void
+    {
+        $handler = new TestHandler();
+        $plugin = self::createPlugin($handler, slowRequestMilliseconds: 0);
+        $response = new Response(200, ['x-request-id' => 'abc'], 'ok');
+
+        self::assertSame($response, $this->handle($plugin, $response));
+        self::assertCount(1, $handler->getRecords());
+        [$record] = $handler->getRecords();
+        self::assertSame(Level::Info, $record->level);
+        self::assertSame(
+            <<<'TXT'
+                Request:
+                POST /foo HTTP/1.1
+
+                Response:
+                HTTP/1.1 200 OK
+                TXT,
+            $record->message,
+        );
+        self::assertIsInt($record->context['milliseconds']);
+        self::assertSame('abc', $record->context['external_request_id']);
+    }
+
+    public function testFastSuccessfulResponseIsNotLogged(): void
+    {
+        $handler = new TestHandler();
+        $plugin = self::createPlugin($handler, slowRequestMilliseconds: 60_000);
+
+        $this->handle($plugin, new Response(200, [], 'ok'));
+
+        self::assertSame([], $handler->getRecords());
+    }
+
     public function testErrorResponseIsLoggedWithRequestByDefault(): void
     {
         $handler = new TestHandler();
@@ -225,9 +259,9 @@ final class LoggerPluginTest extends TestCase
         return $plugin->handleRequest($request, $next, $next)->wait();
     }
 
-    private static function createPlugin(TestHandler $handler, bool $debug = false, ?int $verbosity = null): LoggerPlugin
+    private static function createPlugin(TestHandler $handler, bool $debug = false, ?int $verbosity = null, ?int $slowRequestMilliseconds = null): LoggerPlugin
     {
-        return new LoggerPlugin(new Logger('test', [$handler]), new HttpMessageFormatter($debug, $verbosity), $debug, $verbosity);
+        return new LoggerPlugin(new Logger('test', [$handler]), new HttpMessageFormatter($debug, $verbosity), $debug, $verbosity, $slowRequestMilliseconds);
     }
 
     private static function createRequest(): RequestInterface
