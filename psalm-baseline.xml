@@ -1,20 +1,414 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="6.18.1@79465b8dc674127f442ae31ea114c11bc4dd7ed6">
+  <file src="src/Cache/Attribute/WithCacheInfoProvider.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Cache/CacheInfo.php">
+    <DuplicateArrayKey>
+      <code><![CDATA[$segments]]></code>
+    </DuplicateArrayKey>
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <InvalidDocblockParamName>
+      <code><![CDATA[$tags]]></code>
+    </InvalidDocblockParamName>
+    <ParseError>
+      <code><![CDATA[\DateInterval]]></code>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+    <UndefinedThisPropertyAssignment>
+      <code><![CDATA[$this->key]]></code>
+    </UndefinedThisPropertyAssignment>
+  </file>
+  <file src="src/Cache/Console/TestAdapterCommand.php">
+    <InvalidDocblock>
+      <code><![CDATA[#[Autowire(service: 'cache.test')]]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[CacheItemPoolInterface]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->cache]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Console/EventListener/CommandLockListener.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[LockFactory]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->lockFactory]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Console/EventListener/CommandLogListener.php">
+    <ParseError>
+      <code><![CDATA[:]]></code>
+      <code><![CDATA[iterable]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Console/EventListener/CommandLongRunningListener.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[ManagerRegistry]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->doctrineWaitTimeout]]></code>
+      <code><![CDATA[$this->managerRegistry]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Console/EventListener/CommandPerformanceListener.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[Benchmark]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->benchmark]]></code>
+      <code><![CDATA[$this->benchmark]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
   <file src="src/Console/EventListener/NewRelicListener.php">
     <InvalidArgument>
       <code><![CDATA[$event->getError()]]></code>
     </InvalidArgument>
   </file>
-  <file src="src/Http/LoggerPlugin.php">
-    <DeprecatedMethod>
-      <code><![CDATA[formatResponse]]></code>
-      <code><![CDATA[formatResponse]]></code>
-    </DeprecatedMethod>
+  <file src="src/Controller/Console/TestControllersCommand.php">
+    <InvalidDocblock>
+      <code><![CDATA[#[AutowireIterator('controller.service_arguments')]]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[\Traversable]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->controllers]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Flysystem/Console/TestFlysystemCommand.php">
+    <InvalidDocblock>
+      <code><![CDATA[#[Autowire(service: 'test.storage')]]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[FilesystemOperator]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->storage]]></code>
+      <code><![CDATA[$this->storage]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Flysystem/RuntimeAdapterFactory.php">
     <TooManyArguments>
-      <code><![CDATA[formatRequest]]></code>
+      <code><![CDATA[new AzureBlobStorageAdapter($blobServiceClient->getContainerClient($directory), $prefix)]]></code>
     </TooManyArguments>
   </file>
+  <file src="src/Http/HttpMessageFormatter.php">
+    <ParseError>
+      <code><![CDATA[$message]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Http/LoggerPlugin.php">
+    <ParseError>
+      <code><![CDATA[?]]></code>
+      <code><![CDATA[LoggerInterface]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Attribute/WithTransport.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Console/TestDispatchCommand.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageBusInterface]]></code>
+    </ParseError>
+    <TooManyArguments>
+      <code><![CDATA[new DummyMessage(
+                    $payload ?? 'Batch message #'.$i,
+                    (float) $input->getOption('sleep'),
+                    $input->getOption('failure'),
+                    $input->getOption('nest'),
+                    $input->getOption('nest-failure'),
+                    $input->getOption('nest-sync'),
+                )]]></code>
+    </TooManyArguments>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->messageBus]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/DependencyInjection/MessengerPass.php">
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$cacheInfoProviderMetadata->name]]></code>
+      <code><![CDATA[$messageTransportMetadata->name]]></code>
+      <code><![CDATA[$messageTransportMetadata->options]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="src/Messenger/EventListener/RejectDelayListener.php">
+    <TooManyArguments>
+      <code><![CDATA[new RejectDelayStamp($delayMs)]]></code>
+    </TooManyArguments>
+  </file>
+  <file src="src/Messenger/EventListener/WorkerBackoffListener.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[LoggerInterface]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->internalHostMarkers]]></code>
+      <code><![CDATA[$this->logger]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/MessageCache.php">
+    <InvalidDocblock>
+      <code><![CDATA[#[Target(name: 'messenger.cache')]]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[TagAwareCacheInterface]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->cache]]></code>
+      <code><![CDATA[$this->cache]]></code>
+      <code><![CDATA[$this->cache]]></code>
+      <code><![CDATA[$this->cacheInfoProviders]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/MessageMap.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[array]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Middleware/CacheMiddleware.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageCache]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->messageCache]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/Middleware/DoctrineConnectionMiddleware.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageMap]]></code>
+    </ParseError>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$transactional->enabled]]></code>
+      <code><![CDATA[$transactional->entityManagerName]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->managerRegistry]]></code>
+      <code><![CDATA[$this->managerRegistry]]></code>
+      <code><![CDATA[$this->managerRegistry]]></code>
+      <code><![CDATA[$this->waitTimeout]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/Middleware/LogMiddleware.php">
+    <ParseError>
+      <code><![CDATA[iterable]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Middleware/NewRelicMiddleware.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageMap]]></code>
+    </ParseError>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$newRelic->enabled]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="src/Messenger/Middleware/PerformanceMiddleware.php">
+    <ParseError>
+      <code><![CDATA[Benchmark]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Middleware/SecurityMiddleware.php">
+    <ParseError>
+      <code><![CDATA[LoggerInterface]]></code>
+      <code><![CDATA[TokenStorageInterface]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Monolog/ReducedLogHandler.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageMap]]></code>
+    </ParseError>
+    <UndefinedClass>
+      <code><![CDATA[Level]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->level]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->messageMap]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/Serializer/DeflateSerializer.php">
+    <InvalidDocblock>
+      <code><![CDATA[#[Autowire(service: 'messenger.transport.native_php_serializer')]]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[SerializerInterface]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->serializer]]></code>
+      <code><![CDATA[$this->serializer]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Messenger/Stamp/DeduplicateStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[bool]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/FallbackStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[\DateTimeImmutable]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/NewRelicStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[bool]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/OriginTransportMessageIdStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[mixed]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/RejectDelayStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[int]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/ReplyToStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/SecurityStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[?]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Stamp/TransactionalStamp.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[bool]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Messenger/Test/DummyMessage.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[mixed]]></code>
+    </ParseError>
+    <TooManyArguments>
+      <code><![CDATA[DeduplicateStamp(false)]]></code>
+      <code><![CDATA[TransactionalStamp(true)]]></code>
+      <code><![CDATA[WithTransport('test')]]></code>
+    </TooManyArguments>
+  </file>
+  <file src="src/Messenger/Test/DummyMessageHandler.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[MessageBusInterface]]></code>
+    </ParseError>
+    <TooManyArguments>
+      <code><![CDATA[new DummyMessage(['NESTED' => $message->payload], $message->sleep, $message->nestFailure)]]></code>
+    </TooManyArguments>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$message->failure]]></code>
+      <code><![CDATA[$message->nest]]></code>
+      <code><![CDATA[$message->nestFailure]]></code>
+      <code><![CDATA[$message->nestSync]]></code>
+      <code><![CDATA[$message->payload]]></code>
+      <code><![CDATA[$message->sleep]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->entityManager]]></code>
+      <code><![CDATA[$this->logger]]></code>
+      <code><![CDATA[$this->messageBus]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
   <file src="src/Messenger/Transport/NatsTransport.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[Client]]></code>
+    </ParseError>
     <PossiblyNullArgument>
       <code><![CDATA[$state->first_ts]]></code>
     </PossiblyNullArgument>
@@ -23,7 +417,69 @@
     </PossiblyNullPropertyFetch>
     <RiskyTruthyFalsyComparison>
       <code><![CDATA[$state?->messages]]></code>
+      <code><![CDATA[$this->messageMap->getStamp($envelope, DeduplicateStamp::class)?->enabled ?? true]]></code>
     </RiskyTruthyFalsyComparison>
+    <TooManyArguments>
+      <code><![CDATA[new FallbackStamp(new \DateTimeImmutable())]]></code>
+      <code><![CDATA[new ReplyToStamp($replyTo, $this->getMessageExpiresAt())]]></code>
+      <code><![CDATA[new ReplyToStamp(self::REPLY_TO_FALLBACK)]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyAssignment>
+      <code><![CDATA[$replyTo->expiresAt]]></code>
+    </UndefinedPropertyAssignment>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$envelope->last(RejectDelayStamp::class)?->milliseconds]]></code>
+      <code><![CDATA[$replyTo->expiresAt]]></code>
+      <code><![CDATA[$replyTo->id]]></code>
+      <code><![CDATA[$replyTo->id]]></code>
+      <code><![CDATA[$replyTo->id]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->ackWait]]></code>
+      <code><![CDATA[$this->ackWait]]></code>
+      <code><![CDATA[$this->ackWait]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->client]]></code>
+      <code><![CDATA[$this->deduplicateWindow]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->fallbackTransport]]></code>
+      <code><![CDATA[$this->normalizer]]></code>
+      <code><![CDATA[$this->redeliver]]></code>
+      <code><![CDATA[$this->redeliver]]></code>
+      <code><![CDATA[$this->redeliver]]></code>
+      <code><![CDATA[$this->replicas]]></code>
+      <code><![CDATA[$this->serializer]]></code>
+      <code><![CDATA[$this->serializer]]></code>
+      <code><![CDATA[$this->streamName]]></code>
+      <code><![CDATA[$this->streamName]]></code>
+      <code><![CDATA[$this->streamName]]></code>
+    </UndefinedThisPropertyFetch>
     <UnusedVariable>
       <code><![CDATA[$messageId]]></code>
       <code><![CDATA[$retry]]></code>
@@ -33,18 +489,178 @@
     </UnusedVariable>
   </file>
   <file src="src/Messenger/Transport/NatsTransportFactory.php">
-    <InvalidArgument>
-      <code><![CDATA[$config]]></code>
-      <code><![CDATA[$fallbackTransport]]></code>
-    </InvalidArgument>
-    <MissingTemplateParam>
+    <ParseError>
+      <code><![CDATA[LoggerInterface]]></code>
+      <code><![CDATA[MessageMap]]></code>
       <code><![CDATA[TransportFactoryInterface]]></code>
-    </MissingTemplateParam>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
   </file>
   <file src="src/Monolog/CompactJsonFormatter.php">
     <InvalidArgument>
       <code><![CDATA[$trace]]></code>
     </InvalidArgument>
+  </file>
+  <file src="src/Monolog/DockerHandler.php">
+    <ParseError>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+    <UndefinedClass>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->channel]]></code>
+      <code><![CDATA[$record->formatted]]></code>
+      <code><![CDATA[$record->message]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->command]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Monolog/Processor/DeprecationErrorLevelProcessor.php">
+    <UndefinedClass>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->level]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="src/Monolog/Processor/RequestIdProcessor.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[RequestStack]]></code>
+    </ParseError>
+    <UndefinedPropertyAssignment>
+      <code><![CDATA[$record->extra]]></code>
+    </UndefinedPropertyAssignment>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->extra]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->requestStack]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Performance/Benchmark.php">
+    <ParseError>
+      <code><![CDATA[Stopwatch]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[public]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Performance/Trace.php">
+    <InvalidDocblock>
+      <code><![CDATA[public readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[string]]></code>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+    <UndefinedThisPropertyAssignment>
+      <code><![CDATA[$this->event]]></code>
+      <code><![CDATA[$this->id]]></code>
+    </UndefinedThisPropertyAssignment>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->name]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="src/Soap/CachedWsdlProvider.php">
+    <ParseError>
+      <code><![CDATA[WsdlLoader]]></code>
+      <code><![CDATA[bool]]></code>
+      <code><![CDATA[private]]></code>
+      <code><![CDATA[}]]></code>
+    </ParseError>
+  </file>
+  <file src="src/Soap/SoapCallerFactory.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[WsdlProvider]]></code>
+    </ParseError>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->wsdlProvider]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="tests/Cache/CacheInfoTest.php">
+    <TooManyArguments>
+      <code><![CDATA[new CacheInfo('key', $ttl = new \DateInterval('PT1H'))]]></code>
+      <code><![CDATA[new CacheInfo('key', $ttl = new \DateTime())]]></code>
+      <code><![CDATA[new CacheInfo('key', 123, ['tag1', 'tag2'])]]></code>
+      <code><![CDATA[new CacheInfo('key', null, ['tag1', 'tag2'])]]></code>
+    </TooManyArguments>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->key]]></code>
+      <code><![CDATA[$info->tags]]></code>
+      <code><![CDATA[$info->tags]]></code>
+      <code><![CDATA[$info->tags]]></code>
+      <code><![CDATA[$info->tags]]></code>
+      <code><![CDATA[$info->tags]]></code>
+      <code><![CDATA[$info->ttl]]></code>
+      <code><![CDATA[$info->ttl]]></code>
+      <code><![CDATA[$info->ttl]]></code>
+      <code><![CDATA[$info->ttl]]></code>
+      <code><![CDATA[$info->ttl]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="tests/Http/LoggerPluginTest.php">
+    <UndefinedClass>
+      <code><![CDATA[HttpMessageFormatter]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[Level]]></code>
+      <code><![CDATA[LoggerPlugin]]></code>
+      <code><![CDATA[LoggerPlugin]]></code>
+      <code><![CDATA[LoggerPlugin]]></code>
+      <code><![CDATA[self::fail('Expected exception')]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->context]]></code>
+      <code><![CDATA[$record->context]]></code>
+      <code><![CDATA[$record->context]]></code>
+      <code><![CDATA[$record->context]]></code>
+      <code><![CDATA[$record->level]]></code>
+      <code><![CDATA[$record->level]]></code>
+      <code><![CDATA[$record->level]]></code>
+      <code><![CDATA[$record->level]]></code>
+      <code><![CDATA[$record->message]]></code>
+      <code><![CDATA[$record->message]]></code>
+      <code><![CDATA[$record->message]]></code>
+      <code><![CDATA[$record->message]]></code>
+      <code><![CDATA[$requestRecord->context]]></code>
+      <code><![CDATA[$requestRecord->context]]></code>
+      <code><![CDATA[$requestRecord->level]]></code>
+      <code><![CDATA[$requestRecord->level]]></code>
+      <code><![CDATA[$requestRecord->message]]></code>
+      <code><![CDATA[$requestRecord->message]]></code>
+      <code><![CDATA[$requestRecord->message]]></code>
+      <code><![CDATA[$responseRecord->context]]></code>
+      <code><![CDATA[$responseRecord->context]]></code>
+      <code><![CDATA[$responseRecord->level]]></code>
+      <code><![CDATA[$responseRecord->level]]></code>
+      <code><![CDATA[$responseRecord->message]]></code>
+      <code><![CDATA[$responseRecord->message]]></code>
+      <code><![CDATA[$responseRecord->message]]></code>
+    </UndefinedPropertyFetch>
   </file>
   <file src="tests/Messenger/CacheTest.php">
     <DocblockTypeContradiction>
@@ -52,10 +668,273 @@
       <code><![CDATA[assertSame]]></code>
       <code><![CDATA[assertSame]]></code>
     </DocblockTypeContradiction>
+    <TooManyArguments>
+      <code><![CDATA[new CacheInfo('key', new \DateTime('tomorrow'), [
+                    'tag',
+                    static fn (string $result): string => 'computed '.$result,
+                    static fn (string $result): array => ['computed2 '.$result, 'computed3'],
+                ])]]></code>
+      <code><![CDATA[new CacheMiddleware(new MessageCache($cache, new ServiceLocator([\stdClass::class => static fn (): CacheInfoProvider => $cacheInfoProvider])))]]></code>
+      <code><![CDATA[new MessageCache($cache, new ServiceLocator([\stdClass::class => static fn (): CacheInfoProvider => $cacheInfoProvider]))]]></code>
+    </TooManyArguments>
+  </file>
+  <file src="tests/Messenger/LogTest.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[Logger]]></code>
+    </ParseError>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[[$logMiddleware, $envelopeMiddleware]]]></code>
+    </PossiblyInvalidArgument>
+    <TooManyArguments>
+      <code><![CDATA[new OriginTransportMessageIdStamp('OriginID')]]></code>
+      <code><![CDATA[new class(new Logger('test', [$logHandler], [$logMiddleware])) implements MiddlewareInterface {
+            /** @psalm-suppress PropertyNotSetInConstructor */
+            public MessageBus $bus;
+
+            public function __construct(
+                private readonly Logger $logger,
+            ) {}
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $message = $envelope->getMessage();
+
+                $this->logger->info(json_encode($message, JSON_THROW_ON_ERROR));
+
+                if ($message->nest) {
+                    $this->bus->dispatch((object) ['nest' => false], [new TransportMessageIdStamp('NestedID')]);
+                }
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        }]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[LogMiddleware]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyAssignment>
+      <code><![CDATA[$record->extra]]></code>
+    </UndefinedPropertyAssignment>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->extra]]></code>
+      <code><![CDATA[$record->formatted]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->logger]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="tests/Messenger/NatsTest.php">
+    <InvalidAttribute>
+      <code><![CDATA[TestWith]]></code>
+      <code><![CDATA[TestWith]]></code>
+      <code><![CDATA[TestWith]]></code>
+    </InvalidAttribute>
+    <ParseError>
+      <code><![CDATA[MockObject&TransportFactoryInterface]]></code>
+    </ParseError>
+    <PossiblyInvalidArrayAccess>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+      <code><![CDATA[$receivedEnvelopes[0]]]></code>
+    </PossiblyInvalidArrayAccess>
+    <TooManyArguments>
+      <code><![CDATA[new DeduplicateStamp(false)]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new MessageMap([])]]></code>
+      <code><![CDATA[new RejectDelayStamp(90)]]></code>
+      <code><![CDATA[new ReplyToStamp('fallback')]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+      <code><![CDATA[NatsTransportFactory]]></code>
+    </UndefinedClass>
+    <UndefinedDocblockClass>
+      <code><![CDATA[$client]]></code>
+      <code><![CDATA[$client->connection]]></code>
+    </UndefinedDocblockClass>
+    <UndefinedInterfaceMethod>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+      <code><![CDATA[$receivedEnvelopes]]></code>
+    </UndefinedInterfaceMethod>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->context]]></code>
+      <code><![CDATA[$record->formatted]]></code>
+      <code><![CDATA[$record->message]]></code>
+      <code><![CDATA[$replyTo->expiresAt]]></code>
+      <code><![CDATA[$replyTo->id]]></code>
+      <code><![CDATA[$setupRecords[0]->context]]></code>
+      <code><![CDATA[$setupRecords[1]->context]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="tests/Messenger/ReducedLogTest.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[Logger]]></code>
+    </ParseError>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[[$logMiddleware, new class($logger) implements MiddlewareInterface {
+            public function __construct(
+                private readonly Logger $logger,
+            ) {}
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $this->logger->info('handling '.$envelope->getMessage()::class);
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        }]]]></code>
+    </PossiblyInvalidArgument>
+    <TooManyArguments>
+      <code><![CDATA[new MessageMap([], [\stdClass::class => [ReducedLogStamp::class => [new ReducedLogStamp()]]])]]></code>
+      <code><![CDATA[new ReducedLogHandler(new MessageMap([], [\stdClass::class => [ReducedLogStamp::class => [new ReducedLogStamp()]]]))]]></code>
+      <code><![CDATA[new class($logger) implements MiddlewareInterface {
+            public function __construct(
+                private readonly Logger $logger,
+            ) {}
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $this->logger->info('handling '.$envelope->getMessage()::class);
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        }]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[LogMiddleware]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->message]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->logger]]></code>
+    </UndefinedThisPropertyFetch>
   </file>
   <file src="tests/Messenger/SecurityTest.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
     <MissingTemplateParam>
       <code><![CDATA[UserProviderInterface]]></code>
     </MissingTemplateParam>
+    <ParseError>
+      <code><![CDATA[TokenStorage]]></code>
+    </ParseError>
+    <PossiblyInvalidArgument>
+      <code><![CDATA[[$securityMiddleware, $envelopeMiddleware]]]></code>
+    </PossiblyInvalidArgument>
+    <TooManyArguments>
+      <code><![CDATA[new FirewallConfig('main', 'user_checker', null, true, false, 'user_provider')]]></code>
+      <code><![CDATA[new SecurityStamp($envelopeToken)]]></code>
+      <code><![CDATA[new SecurityStamp($envelopeToken)]]></code>
+      <code><![CDATA[new SecurityStamp(null)]]></code>
+      <code><![CDATA[new class($tokenStorage, $tokenStorageRecord) implements MiddlewareInterface {
+            public function __construct(
+                private readonly TokenStorage $tokenStorage,
+                private readonly TokenStorage $tokenStorageRecord,
+            ) {}
+
+            public function handle(Envelope $envelope, StackInterface $stack): Envelope
+            {
+                $this->tokenStorageRecord->setToken($this->tokenStorage->getToken());
+
+                return $stack->next()->handle($envelope, $stack);
+            }
+        }]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[SecurityMiddleware]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->formatted]]></code>
+    </UndefinedPropertyFetch>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->tokenStorage]]></code>
+      <code><![CDATA[$this->tokenStorageRecord]]></code>
+    </UndefinedThisPropertyFetch>
+  </file>
+  <file src="tests/Messenger/SerializerTest.php">
+    <TooManyArguments>
+      <code><![CDATA[new DeflateSerializer($phpSerializer = new PhpSerializer())]]></code>
+    </TooManyArguments>
+    <UnusedVariable>
+      <code><![CDATA[$phpSerializer]]></code>
+    </UnusedVariable>
+  </file>
+  <file src="tests/Performance/BenchmarkTest.php">
+    <UndefinedClass>
+      <code><![CDATA[Benchmark]]></code>
+    </UndefinedClass>
+    <UndefinedPropertyFetch>
+      <code><![CDATA[$record->formatted]]></code>
+    </UndefinedPropertyFetch>
+  </file>
+  <file src="tests/Soap/CachedWsdlProviderTest.php">
+    <InvalidDocblock>
+      <code><![CDATA[private readonly]]></code>
+      <code><![CDATA[private readonly]]></code>
+    </InvalidDocblock>
+    <ParseError>
+      <code><![CDATA[string]]></code>
+      <code><![CDATA[string]]></code>
+    </ParseError>
+    <TooManyArguments>
+      <code><![CDATA[new class($wsdl) implements WsdlLoader {
+            public function __construct(private readonly string $wsdl) {}
+
+            public function __invoke(string $location): string
+            {
+                return $this->wsdl;
+            }
+        }]]></code>
+      <code><![CDATA[new class(self::VALID_WSDL) implements WsdlLoader {
+            public int $calls = 0;
+
+            public function __construct(private readonly string $wsdl) {}
+
+            public function __invoke(string $location): string
+            {
+                ++$this->calls;
+
+                return $this->wsdl;
+            }
+        }]]></code>
+    </TooManyArguments>
+    <UndefinedClass>
+      <code><![CDATA[CachedWsdlProvider]]></code>
+      <code><![CDATA[CachedWsdlProvider]]></code>
+      <code><![CDATA[CachedWsdlProvider]]></code>
+    </UndefinedClass>
+    <UndefinedThisPropertyFetch>
+      <code><![CDATA[$this->wsdl]]></code>
+      <code><![CDATA[$this->wsdl]]></code>
+    </UndefinedThisPropertyFetch>
   </file>
 </files>
