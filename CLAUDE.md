@@ -54,6 +54,28 @@ make test               # phpunit
 make qa                 # all of the above
 ```
 
+## Updating consumers
+
+A change here only reaches production once the projects that depend on the
+toolkit pick it up, so every change ends with updating those consumers:
+
+1. As soon as the change is merged, ask the maintainer to tag a release. Never
+   tag or release the toolkit yourself; tagging is a human decision. Never
+   point a consumer at a branch or commit instead of a tag.
+2. Once the tag exists, open a dependency update PR in **every** consumer
+   without waiting to be asked.
+
+- Consumers are the repositories in the same GitHub organization whose
+  `composer.json` requires `etrias/php-toolkit`. Add each one to the session
+  and check them all, not only the one the change was made for.
+- Bump the constraint to the new tag (`^X.Y.Z`) and update only this package
+  (`composer update etrias/php-toolkit`), so the lock diff touches nothing
+  else. Check the consumer already satisfies the toolkit's `php` constraint.
+- Follow each consumer's own contribution rules for the branch base, title and
+  description. If its previous bump PR is already merged, open a new one.
+- In the description, list what changes for that consumer since the version
+  it was on, linking the toolkit PRs, and state anything you could not verify.
+
 ## Conventions
 
 - Keep changes small and focused; this toolkit is shared by multiple projects.
