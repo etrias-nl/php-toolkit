@@ -25,7 +25,6 @@ final class LoggerPlugin implements Plugin
         private readonly bool $debug = false,
         #[Autowire(env: 'int:SHELL_VERBOSITY')]
         private readonly ?int $verbosity = null,
-        private readonly ?int $slowRequestMilliseconds = null,
     ) {}
 
     public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
@@ -39,12 +38,11 @@ final class LoggerPlugin implements Plugin
         }
 
         return $next($request)->then(function (ResponseInterface $response) use ($start, $uid, $request, $shouldLog): ResponseInterface {
-            $milliseconds = (int) round(hrtime(true) / 1E6 - $start);
-
-            if (!$shouldLog && $response->getStatusCode() < 400 && (null === $this->slowRequestMilliseconds || $milliseconds < $this->slowRequestMilliseconds)) {
+            if (!$shouldLog && $response->getStatusCode() < 400) {
                 return $response;
             }
 
+            $milliseconds = (int) round(hrtime(true) / 1E6 - $start);
             $formattedResponse = method_exists($this->formatter, 'formatResponseForRequest') ? $this->formatter->formatResponseForRequest($response, $request) : $this->formatter->formatResponse($response);
 
             if (!$shouldLog) {
