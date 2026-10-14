@@ -28,5 +28,6 @@
         <function name="strtok"/>
         <function name="getenv"/>
         <function name="putenv"/>
+        <function name="eval"/>
     </forbiddenFunctions>
 </psalm>
