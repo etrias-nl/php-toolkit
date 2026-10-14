@@ -494,16 +494,16 @@
         },
         {
             "name": "doctrine/dbal",
-            "version": "4.4.4",
+            "version": "4.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce"
+                "reference": "c435cd7ea33e17d2a89288caf994cf3d4549b879"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
-                "reference": "fb9e0ffe15e1590e24dc61c0c0a23f9a33ee42ce",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/c435cd7ea33e17d2a89288caf994cf3d4549b879",
+                "reference": "c435cd7ea33e17d2a89288caf994cf3d4549b879",
                 "shasum": ""
             },
             "require": {
@@ -519,9 +519,9 @@
                 "phpstan/phpstan": "2.1.30",
                 "phpstan/phpstan-phpunit": "2.0.7",
                 "phpstan/phpstan-strict-rules": "^2",
-                "phpunit/phpunit": "11.5.50",
-                "slevomat/coding-standard": "8.27.1",
-                "squizlabs/php_codesniffer": "4.0.1",
+                "phpunit/phpunit": "11.5.56",
+                "slevomat/coding-standard": "8.31.1",
+                "squizlabs/php_codesniffer": "4.0.4",
                 "symfony/cache": "^6.3.8|^7.0|^8.0",
                 "symfony/console": "^5.4|^6.3|^7.0|^8.0"
             },
@@ -580,7 +580,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/dbal/issues",
-                "source": "https://github.com/doctrine/dbal/tree/4.4.4"
+                "source": "https://github.com/doctrine/dbal/tree/4.5.0"
             },
             "funding": [
                 {
@@ -596,7 +596,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-21T14:34:40+00:00"
+            "time": "2026-09-24T16:11:26+00:00"
         },
         {
             "name": "doctrine/deprecations",
@@ -898,27 +898,25 @@
         },
         {
             "name": "doctrine/lexer",
-            "version": "3.0.1",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/lexer.git",
-                "reference": "31ad66abc0fc9e1a1f2d9bc6a42668d2fbbcd6dd"
+                "reference": "71d305eaa6480d3d3460c7d053d1da7749fa9cca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/lexer/zipball/31ad66abc0fc9e1a1f2d9bc6a42668d2fbbcd6dd",
-                "reference": "31ad66abc0fc9e1a1f2d9bc6a42668d2fbbcd6dd",
+                "url": "https://api.github.com/repos/doctrine/lexer/zipball/71d305eaa6480d3d3460c7d053d1da7749fa9cca",
+                "reference": "71d305eaa6480d3d3460c7d053d1da7749fa9cca",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.1"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^12",
-                "phpstan/phpstan": "^1.10",
-                "phpunit/phpunit": "^10.5",
-                "psalm/plugin-phpunit": "^0.18.3",
-                "vimeo/psalm": "^5.21"
+                "doctrine/coding-standard": "^14",
+                "phpstan/phpstan": "^2",
+                "phpunit/phpunit": "^10.5.58 || ^12.5.4"
             },
             "type": "library",
             "autoload": {
@@ -955,7 +953,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/lexer/issues",
-                "source": "https://github.com/doctrine/lexer/tree/3.0.1"
+                "source": "https://github.com/doctrine/lexer/tree/3.0.3"
             },
             "funding": [
                 {
@@ -971,7 +969,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-05T11:56:58+00:00"
+            "time": "2026-10-01T06:59:29+00:00"
         },
         {
             "name": "doctrine/migrations",
@@ -1168,16 +1166,16 @@
         },
         {
             "name": "doctrine/persistence",
-            "version": "4.2.0",
+            "version": "4.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/persistence.git",
-                "reference": "49ab73e0d3e2ac8d1f5ecda3dd8acd5503781e8b"
+                "reference": "d8293831c5b99449b2f63eb1e1bbdc202118daa6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/persistence/zipball/49ab73e0d3e2ac8d1f5ecda3dd8acd5503781e8b",
-                "reference": "49ab73e0d3e2ac8d1f5ecda3dd8acd5503781e8b",
+                "url": "https://api.github.com/repos/doctrine/persistence/zipball/d8293831c5b99449b2f63eb1e1bbdc202118daa6",
+                "reference": "d8293831c5b99449b2f63eb1e1bbdc202118daa6",
                 "shasum": ""
             },
             "require": {
@@ -1242,7 +1240,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/persistence/issues",
-                "source": "https://github.com/doctrine/persistence/tree/4.2.0"
+                "source": "https://github.com/doctrine/persistence/tree/4.2.1"
             },
             "funding": [
                 {
@@ -1258,7 +1256,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-26T12:12:52+00:00"
+            "time": "2026-10-03T14:15:35+00:00"
         },
         {
             "name": "goetas-webservices/xsd-reader",
@@ -3133,16 +3131,16 @@
         },
         {
             "name": "php-standard-library/async",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/async.git",
-                "reference": "8c0c63d3e304318a7c78846044edc1dfef398d1d"
+                "reference": "3d2fbaf391cd256f5543f96889e9e738840d321a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/async/zipball/8c0c63d3e304318a7c78846044edc1dfef398d1d",
-                "reference": "8c0c63d3e304318a7c78846044edc1dfef398d1d",
+                "url": "https://api.github.com/repos/php-standard-library/async/zipball/3d2fbaf391cd256f5543f96889e9e738840d321a",
+                "reference": "3d2fbaf391cd256f5543f96889e9e738840d321a",
                 "shasum": ""
             },
             "require": {
@@ -3165,7 +3163,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3199,22 +3197,22 @@
                 "cooperative-multitasking"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/async/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/async/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/channel",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/channel.git",
-                "reference": "1d90ea4e262978a583ad24c2c9a97c9daa26b6f1"
+                "reference": "f2f5f0ee4d04dccc57d33e6620671c6296e881e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/channel/zipball/1d90ea4e262978a583ad24c2c9a97c9daa26b6f1",
-                "reference": "1d90ea4e262978a583ad24c2c9a97c9daa26b6f1",
+                "url": "https://api.github.com/repos/php-standard-library/channel/zipball/f2f5f0ee4d04dccc57d33e6620671c6296e881e2",
+                "reference": "f2f5f0ee4d04dccc57d33e6620671c6296e881e2",
                 "shasum": ""
             },
             "require": {
@@ -3234,7 +3232,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3268,22 +3266,22 @@
                 "message-passing"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/channel/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/channel/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/collection",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/collection.git",
-                "reference": "0e8b757a16ccb1f68a70f4ada8565099743d50b9"
+                "reference": "d31f6a015958ae4e13e2c1d47621d9786ee1ec1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/collection/zipball/0e8b757a16ccb1f68a70f4ada8565099743d50b9",
-                "reference": "0e8b757a16ccb1f68a70f4ada8565099743d50b9",
+                "url": "https://api.github.com/repos/php-standard-library/collection/zipball/d31f6a015958ae4e13e2c1d47621d9786ee1ec1a",
+                "reference": "d31f6a015958ae4e13e2c1d47621d9786ee1ec1a",
                 "shasum": ""
             },
             "require": {
@@ -3302,7 +3300,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3334,22 +3332,22 @@
                 "vector"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/collection/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/collection/tree/6.3.0"
             },
-            "time": "2026-05-18T22:19:21+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/comparison",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/comparison.git",
-                "reference": "1884e2218c231c285b6039e9b2010f5dd956ae20"
+                "reference": "e77454e109feaa13732a3d556e1f8855b216b4fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/comparison/zipball/1884e2218c231c285b6039e9b2010f5dd956ae20",
-                "reference": "1884e2218c231c285b6039e9b2010f5dd956ae20",
+                "url": "https://api.github.com/repos/php-standard-library/comparison/zipball/e77454e109feaa13732a3d556e1f8855b216b4fd",
+                "reference": "e77454e109feaa13732a3d556e1f8855b216b4fd",
                 "shasum": ""
             },
             "require": {
@@ -3366,7 +3364,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3399,22 +3397,22 @@
                 "ordering"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/comparison/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/comparison/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/date-time",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/date-time.git",
-                "reference": "1e5e2b51eb2b27c2933859872e7c4a45abc5226e"
+                "reference": "4d280c6192e1b17ee8a59e07ed0fc29129bcd373"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/date-time/zipball/1e5e2b51eb2b27c2933859872e7c4a45abc5226e",
-                "reference": "1e5e2b51eb2b27c2933859872e7c4a45abc5226e",
+                "url": "https://api.github.com/repos/php-standard-library/date-time/zipball/4d280c6192e1b17ee8a59e07ed0fc29129bcd373",
+                "reference": "4d280c6192e1b17ee8a59e07ed0fc29129bcd373",
                 "shasum": ""
             },
             "require": {
@@ -3437,7 +3435,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3471,22 +3469,22 @@
                 "timezone"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/date-time/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/date-time/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/default",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/default.git",
-                "reference": "89f05ec6e6a29e8c07de7b6755d14d05b06048e2"
+                "reference": "6f7daf0864b4f319dee645cb0ffd7c4be0c9907c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/default/zipball/89f05ec6e6a29e8c07de7b6755d14d05b06048e2",
-                "reference": "89f05ec6e6a29e8c07de7b6755d14d05b06048e2",
+                "url": "https://api.github.com/repos/php-standard-library/default/zipball/6f7daf0864b4f319dee645cb0ffd7c4be0c9907c",
+                "reference": "6f7daf0864b4f319dee645cb0ffd7c4be0c9907c",
                 "shasum": ""
             },
             "require": {
@@ -3501,7 +3499,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3530,22 +3528,22 @@
                 "interface"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/default/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/default/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/dict",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/dict.git",
-                "reference": "e06a4b7dea0f870b909e9f7d81d9dc70395f0eeb"
+                "reference": "0c3f7546c4dd5887e085e21663eedaa3df78a00d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/dict/zipball/e06a4b7dea0f870b909e9f7d81d9dc70395f0eeb",
-                "reference": "e06a4b7dea0f870b909e9f7d81d9dc70395f0eeb",
+                "url": "https://api.github.com/repos/php-standard-library/dict/zipball/0c3f7546c4dd5887e085e21663eedaa3df78a00d",
+                "reference": "0c3f7546c4dd5887e085e21663eedaa3df78a00d",
                 "shasum": ""
             },
             "require": {
@@ -3565,7 +3563,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3599,22 +3597,22 @@
                 "map"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/dict/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/dict/tree/6.3.0"
             },
-            "time": "2026-03-31T16:59:27+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/either-or-both",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/either-or-both.git",
-                "reference": "a1f4d80ee5ee616272688941390d2eae2d1948e6"
+                "reference": "cd443b661dae1dc87f309e17953e9a7426690195"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/either-or-both/zipball/a1f4d80ee5ee616272688941390d2eae2d1948e6",
-                "reference": "a1f4d80ee5ee616272688941390d2eae2d1948e6",
+                "url": "https://api.github.com/repos/php-standard-library/either-or-both/zipball/cd443b661dae1dc87f309e17953e9a7426690195",
+                "reference": "cd443b661dae1dc87f309e17953e9a7426690195",
                 "shasum": ""
             },
             "require": {
@@ -3633,7 +3631,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3668,22 +3666,22 @@
                 "union-type"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/either-or-both/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/either-or-both/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/encoding",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/encoding.git",
-                "reference": "9023db66cb9c5137941c8c844cb15748a3713131"
+                "reference": "fb7e9112568ee38afc7063333ac0227f437d24c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/encoding/zipball/9023db66cb9c5137941c8c844cb15748a3713131",
-                "reference": "9023db66cb9c5137941c8c844cb15748a3713131",
+                "url": "https://api.github.com/repos/php-standard-library/encoding/zipball/fb7e9112568ee38afc7063333ac0227f437d24c8",
+                "reference": "fb7e9112568ee38afc7063333ac0227f437d24c8",
                 "shasum": ""
             },
             "require": {
@@ -3706,7 +3704,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3739,22 +3737,22 @@
                 "hex"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/encoding/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/encoding/tree/6.3.0"
             },
-            "time": "2026-03-31T16:59:27+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/file",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/file.git",
-                "reference": "64c064f8a599cb6621e7b9329a4f1b7c5bc04152"
+                "reference": "8e6c84b64060278c833e64fb8fb3298a34d2d3af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/file/zipball/64c064f8a599cb6621e7b9329a4f1b7c5bc04152",
-                "reference": "64c064f8a599cb6621e7b9329a4f1b7c5bc04152",
+                "url": "https://api.github.com/repos/php-standard-library/file/zipball/8e6c84b64060278c833e64fb8fb3298a34d2d3af",
+                "reference": "8e6c84b64060278c833e64fb8fb3298a34d2d3af",
                 "shasum": ""
             },
             "require": {
@@ -3777,7 +3775,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3810,22 +3808,22 @@
                 "io"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/file/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/file/tree/6.3.0"
             },
-            "time": "2026-04-06T03:33:20+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/filesystem",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/filesystem.git",
-                "reference": "d1e87eaee4d8180842f38d010747ee5d963a8d5b"
+                "reference": "65a13875f9f918a10b072a3f6975dfd9e4e412e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/filesystem/zipball/d1e87eaee4d8180842f38d010747ee5d963a8d5b",
-                "reference": "d1e87eaee4d8180842f38d010747ee5d963a8d5b",
+                "url": "https://api.github.com/repos/php-standard-library/filesystem/zipball/65a13875f9f918a10b072a3f6975dfd9e4e412e6",
+                "reference": "65a13875f9f918a10b072a3f6975dfd9e4e412e6",
                 "shasum": ""
             },
             "require": {
@@ -3847,7 +3845,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3879,22 +3877,22 @@
                 "filesystem"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/filesystem/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/filesystem/tree/6.3.0"
             },
-            "time": "2026-03-31T16:59:27+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/foundation",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/foundation.git",
-                "reference": "7f65cec48c8ed3d53dc8dd7643796e2ba6de6008"
+                "reference": "9b464388f93b5c496bd6a17912e5cdc846b9df1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/foundation/zipball/7f65cec48c8ed3d53dc8dd7643796e2ba6de6008",
-                "reference": "7f65cec48c8ed3d53dc8dd7643796e2ba6de6008",
+                "url": "https://api.github.com/repos/php-standard-library/foundation/zipball/9b464388f93b5c496bd6a17912e5cdc846b9df1e",
+                "reference": "9b464388f93b5c496bd6a17912e5cdc846b9df1e",
                 "shasum": ""
             },
             "require": {
@@ -3909,7 +3907,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -3942,22 +3940,22 @@
                 "invariant"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/foundation/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/foundation/tree/6.3.0"
             },
-            "time": "2026-04-28T06:28:49+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/fun",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/fun.git",
-                "reference": "9153639b04e30c1f900c4a66b4445125ec5540dc"
+                "reference": "fb77181e5e5177723396324e7b970ff12c5a2654"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/fun/zipball/9153639b04e30c1f900c4a66b4445125ec5540dc",
-                "reference": "9153639b04e30c1f900c4a66b4445125ec5540dc",
+                "url": "https://api.github.com/repos/php-standard-library/fun/zipball/fb77181e5e5177723396324e7b970ff12c5a2654",
+                "reference": "fb77181e5e5177723396324e7b970ff12c5a2654",
                 "shasum": ""
             },
             "require": {
@@ -3975,7 +3973,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4008,22 +4006,22 @@
                 "pipe"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/fun/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/fun/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/interoperability",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/interoperability.git",
-                "reference": "09ae66cc3e6463538c3a4592bb8762cf60113821"
+                "reference": "d95ae8d2502d05b7aa14e456b2c7f5e9c1510228"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/interoperability/zipball/09ae66cc3e6463538c3a4592bb8762cf60113821",
-                "reference": "09ae66cc3e6463538c3a4592bb8762cf60113821",
+                "url": "https://api.github.com/repos/php-standard-library/interoperability/zipball/d95ae8d2502d05b7aa14e456b2c7f5e9c1510228",
+                "reference": "d95ae8d2502d05b7aa14e456b2c7f5e9c1510228",
                 "shasum": ""
             },
             "require": {
@@ -4038,7 +4036,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4067,22 +4065,22 @@
                 "interoperability"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/interoperability/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/interoperability/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/io",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/io.git",
-                "reference": "0b61f6b5e0a392c52d3cb2b386d8bba379b91f3c"
+                "reference": "cd55c50f5158871c9a77b3fc6a1fca14f3d4d082"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/io/zipball/0b61f6b5e0a392c52d3cb2b386d8bba379b91f3c",
-                "reference": "0b61f6b5e0a392c52d3cb2b386d8bba379b91f3c",
+                "url": "https://api.github.com/repos/php-standard-library/io/zipball/cd55c50f5158871c9a77b3fc6a1fca14f3d4d082",
+                "reference": "cd55c50f5158871c9a77b3fc6a1fca14f3d4d082",
                 "shasum": ""
             },
             "require": {
@@ -4105,7 +4103,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4139,22 +4137,22 @@
                 "stream"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/io/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/io/tree/6.3.0"
             },
-            "time": "2026-04-28T03:11:45+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/iter",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/iter.git",
-                "reference": "d3f2db3adec4cbe5129f3428969ae8508a54aeb7"
+                "reference": "9a53e9e4614b6e30ac23df21bd9bf7540dad79f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/iter/zipball/d3f2db3adec4cbe5129f3428969ae8508a54aeb7",
-                "reference": "d3f2db3adec4cbe5129f3428969ae8508a54aeb7",
+                "url": "https://api.github.com/repos/php-standard-library/iter/zipball/9a53e9e4614b6e30ac23df21bd9bf7540dad79f8",
+                "reference": "9a53e9e4614b6e30ac23df21bd9bf7540dad79f8",
                 "shasum": ""
             },
             "require": {
@@ -4177,7 +4175,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4211,22 +4209,22 @@
                 "iterator"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/iter/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/iter/tree/6.3.0"
             },
-            "time": "2026-04-28T06:28:49+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/json",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/json.git",
-                "reference": "03e00062efdd704d874012b5412340f3003a043d"
+                "reference": "ba52bbe747e91b2a1c905d3c51b8fc0b9f5af27d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/json/zipball/03e00062efdd704d874012b5412340f3003a043d",
-                "reference": "03e00062efdd704d874012b5412340f3003a043d",
+                "url": "https://api.github.com/repos/php-standard-library/json/zipball/ba52bbe747e91b2a1c905d3c51b8fc0b9f5af27d",
+                "reference": "ba52bbe747e91b2a1c905d3c51b8fc0b9f5af27d",
                 "shasum": ""
             },
             "require": {
@@ -4247,7 +4245,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4280,22 +4278,22 @@
                 "json"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/json/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/json/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/locale",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/locale.git",
-                "reference": "0771cfb19757e8923c66b7f46ab90280775caecd"
+                "reference": "9687409700fc2392046f43cc4c1494253f8cf178"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/locale/zipball/0771cfb19757e8923c66b7f46ab90280775caecd",
-                "reference": "0771cfb19757e8923c66b7f46ab90280775caecd",
+                "url": "https://api.github.com/repos/php-standard-library/locale/zipball/9687409700fc2392046f43cc4c1494253f8cf178",
+                "reference": "9687409700fc2392046f43cc4c1494253f8cf178",
                 "shasum": ""
             },
             "require": {
@@ -4312,7 +4310,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4342,22 +4340,22 @@
                 "locale"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/locale/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/locale/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/math",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/math.git",
-                "reference": "25333da6f2b89bc6bc2927c1a8eb5245f59b80d4"
+                "reference": "7ed71a7ed487a32d136b5f38ffe7cffc206bbdfe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/math/zipball/25333da6f2b89bc6bc2927c1a8eb5245f59b80d4",
-                "reference": "25333da6f2b89bc6bc2927c1a8eb5245f59b80d4",
+                "url": "https://api.github.com/repos/php-standard-library/math/zipball/7ed71a7ed487a32d136b5f38ffe7cffc206bbdfe",
+                "reference": "7ed71a7ed487a32d136b5f38ffe7cffc206bbdfe",
                 "shasum": ""
             },
             "require": {
@@ -4377,7 +4375,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4409,22 +4407,22 @@
                 "mathematics"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/math/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/math/tree/6.3.0"
             },
-            "time": "2026-03-31T16:59:27+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/option",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/option.git",
-                "reference": "afe2059dbb3a9e2e3ba6edd371ccbb7d87355a66"
+                "reference": "d6cfc43ae2d0ce122d861065f5e6a433737b9e93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/option/zipball/afe2059dbb3a9e2e3ba6edd371ccbb7d87355a66",
-                "reference": "afe2059dbb3a9e2e3ba6edd371ccbb7d87355a66",
+                "url": "https://api.github.com/repos/php-standard-library/option/zipball/d6cfc43ae2d0ce122d861065f5e6a433737b9e93",
+                "reference": "d6cfc43ae2d0ce122d861065f5e6a433737b9e93",
                 "shasum": ""
             },
             "require": {
@@ -4441,7 +4439,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4475,22 +4473,22 @@
                 "some"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/option/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/option/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/promise",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/promise.git",
-                "reference": "a38a2694e06609874e856e68951bca24ad00009c"
+                "reference": "97e5c6ffac07058f0ae408c747b5f5c363f3673b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/promise/zipball/a38a2694e06609874e856e68951bca24ad00009c",
-                "reference": "a38a2694e06609874e856e68951bca24ad00009c",
+                "url": "https://api.github.com/repos/php-standard-library/promise/zipball/97e5c6ffac07058f0ae408c747b5f5c363f3673b",
+                "reference": "97e5c6ffac07058f0ae408c747b5f5c363f3673b",
                 "shasum": ""
             },
             "require": {
@@ -4505,7 +4503,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4535,22 +4533,22 @@
                 "promise"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/promise/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/promise/tree/6.3.0"
             },
-            "time": "2026-04-26T16:26:10+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/range",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/range.git",
-                "reference": "34befd85fa3e048972aabac7cdf6a86e2f4b833f"
+                "reference": "9e08b73482c2c8ee6065e4eb1c6d138ceba56376"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/range/zipball/34befd85fa3e048972aabac7cdf6a86e2f4b833f",
-                "reference": "34befd85fa3e048972aabac7cdf6a86e2f4b833f",
+                "url": "https://api.github.com/repos/php-standard-library/range/zipball/9e08b73482c2c8ee6065e4eb1c6d138ceba56376",
+                "reference": "9e08b73482c2c8ee6065e4eb1c6d138ceba56376",
                 "shasum": ""
             },
             "require": {
@@ -4568,7 +4566,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4600,22 +4598,22 @@
                 "range"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/range/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/range/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/regex",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/regex.git",
-                "reference": "150533c75ee7aaf83a1254837690603b22bc0191"
+                "reference": "199b6e8f3321e7e5978a3f55963d4bd6fbc57317"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/regex/zipball/150533c75ee7aaf83a1254837690603b22bc0191",
-                "reference": "150533c75ee7aaf83a1254837690603b22bc0191",
+                "url": "https://api.github.com/repos/php-standard-library/regex/zipball/199b6e8f3321e7e5978a3f55963d4bd6fbc57317",
+                "reference": "199b6e8f3321e7e5978a3f55963d4bd6fbc57317",
                 "shasum": ""
             },
             "require": {
@@ -4632,7 +4630,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4665,22 +4663,22 @@
                 "regular-expression"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/regex/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/regex/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/result",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/result.git",
-                "reference": "242bbf872662f5091a37d7db9d45f119225a01f5"
+                "reference": "8489291e58eb926d3ffc9e48b23d8fa6678a0ff3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/result/zipball/242bbf872662f5091a37d7db9d45f119225a01f5",
-                "reference": "242bbf872662f5091a37d7db9d45f119225a01f5",
+                "url": "https://api.github.com/repos/php-standard-library/result/zipball/8489291e58eb926d3ffc9e48b23d8fa6678a0ff3",
+                "reference": "8489291e58eb926d3ffc9e48b23d8fa6678a0ff3",
                 "shasum": ""
             },
             "require": {
@@ -4698,7 +4696,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4731,22 +4729,22 @@
                 "result"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/result/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/result/tree/6.3.0"
             },
-            "time": "2026-04-26T16:26:10+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/str",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/str.git",
-                "reference": "e88e7c79e1c07227aa3c50005a3a91e88425e56a"
+                "reference": "ab722aecf6c45531cdf0bf8ee11aa2370d71dff7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/str/zipball/e88e7c79e1c07227aa3c50005a3a91e88425e56a",
-                "reference": "e88e7c79e1c07227aa3c50005a3a91e88425e56a",
+                "url": "https://api.github.com/repos/php-standard-library/str/zipball/ab722aecf6c45531cdf0bf8ee11aa2370d71dff7",
+                "reference": "ab722aecf6c45531cdf0bf8ee11aa2370d71dff7",
                 "shasum": ""
             },
             "require": {
@@ -4765,7 +4763,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4799,22 +4797,22 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/str/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/str/tree/6.3.0"
             },
-            "time": "2026-04-29T06:23:35+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/type",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/type.git",
-                "reference": "ffc050e32bc5def0e03aaae3d52c78dfc746e143"
+                "reference": "80986810f49ba476d90dfeaa9c41bee0997675eb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/type/zipball/ffc050e32bc5def0e03aaae3d52c78dfc746e143",
-                "reference": "ffc050e32bc5def0e03aaae3d52c78dfc746e143",
+                "url": "https://api.github.com/repos/php-standard-library/type/zipball/80986810f49ba476d90dfeaa9c41bee0997675eb",
+                "reference": "80986810f49ba476d90dfeaa9c41bee0997675eb",
                 "shasum": ""
             },
             "require": {
@@ -4828,6 +4826,7 @@
                 "azjezz/psl": "*"
             },
             "require-dev": {
+                "ext-bcmath": "*",
                 "php-standard-library/dict": "^6.0",
                 "php-standard-library/math": "^6.0",
                 "php-standard-library/result": "^6.0",
@@ -4838,7 +4837,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4872,22 +4871,22 @@
                 "validation"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/type/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/type/tree/6.3.0"
             },
-            "time": "2026-05-23T20:26:52+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-standard-library/vec",
-            "version": "6.2.1",
+            "version": "6.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-standard-library/vec.git",
-                "reference": "ac119fa952177c10eeb3d5d6bca04130491c7f2e"
+                "reference": "5251a921c3d06b2045b4371c191bb60ff0ce47d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-standard-library/vec/zipball/ac119fa952177c10eeb3d5d6bca04130491c7f2e",
-                "reference": "ac119fa952177c10eeb3d5d6bca04130491c7f2e",
+                "url": "https://api.github.com/repos/php-standard-library/vec/zipball/5251a921c3d06b2045b4371c191bb60ff0ce47d3",
+                "reference": "5251a921c3d06b2045b4371c191bb60ff0ce47d3",
                 "shasum": ""
             },
             "require": {
@@ -4907,7 +4906,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-next": "6.2.x-dev"
+                    "dev-next": "6.3.x-dev"
                 }
             },
             "autoload": {
@@ -4941,9 +4940,9 @@
                 "vector"
             ],
             "support": {
-                "source": "https://github.com/php-standard-library/vec/tree/6.2.1"
+                "source": "https://github.com/php-standard-library/vec/tree/6.3.0"
             },
-            "time": "2026-03-28T18:39:47+00:00"
+            "time": "2026-09-25T15:54:11+00:00"
         },
         {
             "name": "php-tui/cassowary",
@@ -7398,16 +7397,16 @@
         },
         {
             "name": "symfony/polyfill-deepclone",
-            "version": "v1.42.0",
+            "version": "v1.43.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-deepclone.git",
-                "reference": "70ba0627efc68e97ea392843458a2dd9d6dbd156"
+                "reference": "aaba44b6ee7299ae65717811c55b57ab9bc0fedd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-deepclone/zipball/70ba0627efc68e97ea392843458a2dd9d6dbd156",
-                "reference": "70ba0627efc68e97ea392843458a2dd9d6dbd156",
+                "url": "https://api.github.com/repos/symfony/polyfill-deepclone/zipball/aaba44b6ee7299ae65717811c55b57ab9bc0fedd",
+                "reference": "aaba44b6ee7299ae65717811c55b57ab9bc0fedd",
                 "shasum": ""
             },
             "require": {
@@ -7461,7 +7460,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-deepclone/tree/v1.42.0"
+                "source": "https://github.com/symfony/polyfill-deepclone/tree/v1.43.1"
             },
             "funding": [
                 {
@@ -7481,20 +7480,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-07T06:33:24+00:00"
+            "time": "2026-10-06T19:46:18+00:00"
         },
         {
             "name": "symfony/polyfill-php85",
-            "version": "v1.41.0",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php85.git",
-                "reference": "255fab485aaa1006ed411040c42aecd7b5302d7a"
+                "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/255fab485aaa1006ed411040c42aecd7b5302d7a",
-                "reference": "255fab485aaa1006ed411040c42aecd7b5302d7a",
+                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/86a42cbcc07adc331481a5ab310a4024bfc227f6",
+                "reference": "86a42cbcc07adc331481a5ab310a4024bfc227f6",
                 "shasum": ""
             },
             "require": {
@@ -7541,7 +7540,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php85/tree/v1.41.0"
+                "source": "https://github.com/symfony/polyfill-php85/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -7561,20 +7560,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-01T12:47:55+00:00"
+            "time": "2026-09-25T15:46:47+00:00"
         },
         {
             "name": "symfony/polyfill-php86",
-            "version": "v1.41.0",
+            "version": "v1.43.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php86.git",
-                "reference": "6bc356ed3d8dbfeea8f0de235e34d670704e880e"
+                "reference": "8840df45b24f33a49dc419fa18dc0057231ae1d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php86/zipball/6bc356ed3d8dbfeea8f0de235e34d670704e880e",
-                "reference": "6bc356ed3d8dbfeea8f0de235e34d670704e880e",
+                "url": "https://api.github.com/repos/symfony/polyfill-php86/zipball/8840df45b24f33a49dc419fa18dc0057231ae1d8",
+                "reference": "8840df45b24f33a49dc419fa18dc0057231ae1d8",
                 "shasum": ""
             },
             "require": {
@@ -7621,7 +7620,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php86/tree/v1.41.0"
+                "source": "https://github.com/symfony/polyfill-php86/tree/v1.43.0"
             },
             "funding": [
                 {
@@ -7641,7 +7640,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-07-02T13:42:24+00:00"
+            "time": "2026-09-25T15:46:47+00:00"
         },
         {
             "name": "symfony/property-access",
@@ -9207,16 +9206,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "2.4.1",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-                "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70"
+                "reference": "8a163706bbcac613733dba03f51e13b5eb1bb819"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/2ccb7c2e821038c03a3e6e1700c570c158c55f70",
-                "reference": "2ccb7c2e821038c03a3e6e1700c570c158c55f70",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/8a163706bbcac613733dba03f51e13b5eb1bb819",
+                "reference": "8a163706bbcac613733dba03f51e13b5eb1bb819",
                 "shasum": ""
             },
             "require": {
@@ -9267,9 +9266,9 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-                "source": "https://github.com/webmozarts/assert/tree/2.4.1"
+                "source": "https://github.com/webmozarts/assert/tree/2.5.0"
             },
-            "time": "2026-06-15T15:31:57+00:00"
+            "time": "2026-10-05T23:14:19+00:00"
         }
     ],
     "aliases": [],
